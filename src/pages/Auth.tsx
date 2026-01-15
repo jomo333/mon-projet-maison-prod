@@ -20,7 +20,7 @@ const Auth = () => {
 
   // Redirect if already logged in
   if (user) {
-    navigate("/mes-projets");
+    navigate("/");
     return null;
   }
 
@@ -38,7 +38,7 @@ const Auth = () => {
       toast.error("Erreur de connexion: " + error.message);
     } else {
       toast.success("Connexion réussie!");
-      navigate("/mes-projets");
+      navigate("/");
     }
     
     setIsLoading(false);
@@ -59,7 +59,7 @@ const Auth = () => {
       toast.error("Erreur d'inscription: " + error.message);
     } else {
       toast.success("Compte créé avec succès!");
-      navigate("/mes-projets");
+      navigate("/");
     }
     
     setIsLoading(false);
