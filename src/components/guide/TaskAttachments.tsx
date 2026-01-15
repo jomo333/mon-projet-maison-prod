@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Paperclip, Upload, X, FileText, Image, File, Loader2 } from "lucide-react";
+import { Paperclip, Upload, X, FileText, Image, File, Loader2, DollarSign, ArrowRight } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface TaskAttachmentsProps {
   stepId: string;
@@ -43,8 +44,10 @@ function formatFileSize(bytes: number) {
 export function TaskAttachments({ stepId, taskId }: TaskAttachmentsProps) {
   const [selectedCategory, setSelectedCategory] = useState("other");
   const [isUploading, setIsUploading] = useState(false);
+  const [showBudgetSuggestion, setShowBudgetSuggestion] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: attachments = [], isLoading } = useQuery({
     queryKey: ["task-attachments", stepId, taskId],
@@ -91,6 +94,11 @@ export function TaskAttachments({ stepId, taskId }: TaskAttachmentsProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["task-attachments", stepId, taskId] });
       toast.success("Fichier ajouté avec succès");
+      
+      // Show budget suggestion when a plan is uploaded
+      if (selectedCategory === "plan") {
+        setShowBudgetSuggestion(true);
+      }
     },
     onError: (error) => {
       console.error("Upload error:", error);
@@ -256,6 +264,43 @@ export function TaskAttachments({ stepId, taskId }: TaskAttachmentsProps) {
         <p className="text-sm text-muted-foreground italic">
           Aucune pièce jointe. Ajoutez vos plans, permis, soumissions...
         </p>
+      )}
+
+      {/* Budget suggestion after plan upload */}
+      {showBudgetSuggestion && (
+        <div className="mt-4 p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-200 dark:border-green-800">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-full bg-green-100 dark:bg-green-900">
+              <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-medium text-green-800 dark:text-green-200">
+                Plan téléversé avec succès!
+              </h4>
+              <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                Maintenant que vous avez votre plan, vous pouvez créer un budget détaillé pour estimer les coûts de construction.
+              </p>
+              <div className="flex items-center gap-2 mt-3">
+                <Button 
+                  size="sm" 
+                  onClick={() => navigate("/budget")}
+                  className="gap-2 bg-green-600 hover:bg-green-700"
+                >
+                  Créer mon budget
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setShowBudgetSuggestion(false)}
+                  className="text-green-700 dark:text-green-300"
+                >
+                  Plus tard
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
