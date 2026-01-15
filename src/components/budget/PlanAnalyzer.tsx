@@ -548,24 +548,27 @@ export function PlanAnalyzer({ onBudgetGenerated }: PlanAnalyzerProps) {
             <p className="text-muted-foreground">{analysis.projectSummary}</p>
 
             {/* Categories preview */}
-            <div className="grid gap-2">
-              {analysis.categories.slice(0, 5).map((cat, index) => (
+            <div className="grid gap-2 max-h-[400px] overflow-y-auto pr-2">
+              {analysis.categories.map((cat, index) => (
                 <div 
                   key={index}
-                  className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
+                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors"
                 >
-                  <span className="font-medium">{cat.name}</span>
-                  <span className="text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center font-medium">
+                      {index + 1}
+                    </span>
+                    <span className="font-medium">{cat.name}</span>
+                  </div>
+                  <span className="text-muted-foreground font-medium">
                     {cat.budget.toLocaleString()} $
                   </span>
                 </div>
               ))}
-              {analysis.categories.length > 5 && (
-                <p className="text-sm text-muted-foreground text-center">
-                  + {analysis.categories.length - 5} autres catégories
-                </p>
-              )}
             </div>
+            <p className="text-xs text-muted-foreground text-center">
+              {analysis.categories.length} catégorie(s) au total
+            </p>
 
             {/* Warnings */}
             {analysis.warnings && analysis.warnings.length > 0 && (
