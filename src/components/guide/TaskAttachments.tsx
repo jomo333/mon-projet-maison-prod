@@ -1,0 +1,262 @@
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { Paperclip, Upload, X, FileText, Image, File, Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+interface TaskAttachmentsProps {
+  stepId: string;
+  taskId: string;
+}
+
+const categories = [
+  { value: "plan", label: "Plan", color: "bg-blue-500" },
+  { value: "permis", label: "Permis", color: "bg-green-500" },
+  { value: "soumission", label: "Soumission", color: "bg-amber-500" },
+  { value: "contrat", label: "Contrat", color: "bg-purple-500" },
+  { value: "facture", label: "Facture", color: "bg-red-500" },
+  { value: "photo", label: "Photo", color: "bg-cyan-500" },
+  { value: "other", label: "Autre", color: "bg-gray-500" },
+];
+
+function getFileIcon(fileType: string) {
+  if (fileType.startsWith("image/")) return Image;
+  if (fileType.includes("pdf")) return FileText;
+  return File;
+}
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+}
+
+export function TaskAttachments({ stepId, taskId }: TaskAttachmentsProps) {
+  const [selectedCategory, setSelectedCategory] = useState("other");
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
+
+  const { data: attachments = [], isLoading } = useQuery({
+    queryKey: ["task-attachments", stepId, taskId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("task_attachments")
+        .select("*")
+        .eq("step_id", stepId)
+        .eq("task_id", taskId)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const uploadMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${stepId}/${taskId}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("task-attachments")
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("task-attachments")
+        .getPublicUrl(fileName);
+
+      const { error: dbError } = await supabase.from("task_attachments").insert({
+        step_id: stepId,
+        task_id: taskId,
+        file_name: file.name,
+        file_url: urlData.publicUrl,
+        file_type: file.type,
+        file_size: file.size,
+        category: selectedCategory,
+      });
+
+      if (dbError) throw dbError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["task-attachments", stepId, taskId] });
+      toast.success("Fichier ajouté avec succès");
+    },
+    onError: (error) => {
+      console.error("Upload error:", error);
+      toast.error("Erreur lors de l'upload du fichier");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (attachment: { id: string; file_url: string }) => {
+      const path = attachment.file_url.split("/task-attachments/")[1];
+      
+      if (path) {
+        await supabase.storage.from("task-attachments").remove([path]);
+      }
+
+      const { error } = await supabase
+        .from("task_attachments")
+        .delete()
+        .eq("id", attachment.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["task-attachments", stepId, taskId] });
+      toast.success("Fichier supprimé");
+    },
+    onError: (error) => {
+      console.error("Delete error:", error);
+      toast.error("Erreur lors de la suppression");
+    },
+  });
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        await uploadMutation.mutateAsync(file);
+      }
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const getCategoryInfo = (value: string) => {
+    return categories.find((c) => c.value === value) || categories[categories.length - 1];
+  };
+
+  return (
+    <div className="mt-4 space-y-4">
+      <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+        <Paperclip className="h-4 w-4" />
+        <span>Pièces jointes</span>
+        {attachments.length > 0 && (
+          <Badge variant="secondary" className="ml-1">
+            {attachments.length}
+          </Badge>
+        )}
+      </div>
+
+      {/* Upload section */}
+      <div className="flex flex-wrap items-center gap-2">
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Catégorie" />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((cat) => (
+              <SelectItem key={cat.value} value={cat.value}>
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${cat.color}`} />
+                  {cat.label}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileSelect}
+          className="hidden"
+          multiple
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.webp"
+        />
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          className="gap-2"
+        >
+          {isUploading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Upload className="h-4 w-4" />
+          )}
+          Ajouter un fichier
+        </Button>
+      </div>
+
+      {/* Attachments list */}
+      {isLoading ? (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Chargement...
+        </div>
+      ) : attachments.length > 0 ? (
+        <div className="space-y-2">
+          {attachments.map((attachment) => {
+            const FileIcon = getFileIcon(attachment.file_type);
+            const categoryInfo = getCategoryInfo(attachment.category);
+
+            return (
+              <div
+                key={attachment.id}
+                className="flex items-center gap-3 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors group"
+              >
+                <FileIcon className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                
+                <div className="flex-1 min-w-0">
+                  <a
+                    href={attachment.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium hover:underline truncate block"
+                  >
+                    {attachment.file_name}
+                  </a>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Badge 
+                      variant="secondary" 
+                      className={`text-white ${categoryInfo.color}`}
+                    >
+                      {categoryInfo.label}
+                    </Badge>
+                    {attachment.file_size && (
+                      <span>{formatFileSize(attachment.file_size)}</span>
+                    )}
+                  </div>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => deleteMutation.mutate({ id: attachment.id, file_url: attachment.file_url })}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground italic">
+          Aucune pièce jointe. Ajoutez vos plans, permis, soumissions...
+        </p>
+      )}
+    </div>
+  );
+}

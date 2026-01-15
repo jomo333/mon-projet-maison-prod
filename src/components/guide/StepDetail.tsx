@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Clock, ChevronLeft, ChevronRight, Lightbulb, FileText, CheckCircle2, ClipboardList, DollarSign, Home, Umbrella, DoorOpen, Zap, Droplets, Wind, Thermometer, PaintBucket, Square, ChefHat, Sparkles, Building, ClipboardCheck, Circle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { TaskAttachments } from "./TaskAttachments";
 
 const iconMap: Record<string, LucideIcon> = {
   ClipboardList,
@@ -123,6 +124,9 @@ export function StepDetail({ step, onNext, onPrevious, hasNext, hasPrevious }: S
                         </ul>
                       </div>
                     )}
+
+                    {/* Task Attachments */}
+                    <TaskAttachments stepId={step.id} taskId={task.id} />
                   </div>
                 </AccordionContent>
               </AccordionItem>
