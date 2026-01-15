@@ -13,7 +13,8 @@ import {
   CheckCircle2, 
   AlertTriangle,
   DollarSign,
-  ArrowRight
+  ArrowRight,
+  Download
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -146,25 +147,39 @@ export function PlanAnalyzer({ onBudgetGenerated }: PlanAnalyzerProps) {
 
           <div className="space-y-2">
             <Label>Plan téléversé (optionnel)</Label>
-            <Select 
-              value={selectedPlanUrl || "none"} 
-              onValueChange={(v) => setSelectedPlanUrl(v === "none" ? null : v)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Sélectionner un plan" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Aucun plan (estimation standard)</SelectItem>
-                {plans.map((plan) => (
-                  <SelectItem key={plan.id} value={plan.file_url}>
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      {plan.file_name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select 
+                value={selectedPlanUrl || "none"} 
+                onValueChange={(v) => setSelectedPlanUrl(v === "none" ? null : v)}
+              >
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Sélectionner un plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Aucun plan (estimation standard)</SelectItem>
+                  {plans.map((plan) => (
+                    <SelectItem key={plan.id} value={plan.file_url}>
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        {plan.file_name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedPlanUrl && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  asChild
+                  title="Télécharger le plan"
+                >
+                  <a href={selectedPlanUrl} download target="_blank" rel="noopener noreferrer">
+                    <Download className="h-4 w-4" />
+                  </a>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
