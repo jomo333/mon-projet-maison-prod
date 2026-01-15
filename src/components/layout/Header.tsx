@@ -1,4 +1,4 @@
-import { LayoutDashboard, Calculator, BookOpen, MessageSquare, User, LogOut, FolderOpen } from "lucide-react";
+import { LayoutDashboard, Calculator, BookOpen, User, LogOut, FolderOpen, Scale } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import logo from "@/assets/logo.png";
 const navItems = [
   { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/budget", label: "Budget", icon: Calculator },
+  { href: "/code-batiment", label: "Code du bâtiment", icon: Scale },
   { href: "/guide", label: "Guide", icon: BookOpen },
 ];
 
