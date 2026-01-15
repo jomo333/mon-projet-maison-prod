@@ -46,7 +46,7 @@ export function Hero() {
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/dashboard">
+            <Link to="/start">
               <Button variant="hero" size="xl">
                 Démarrer mon projet
                 <ArrowRight className="h-5 w-5" />
