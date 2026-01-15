@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/landing/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,9 +8,21 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { DollarSign, TrendingUp, TrendingDown, AlertTriangle, Plus, Edit2, ChevronDown, ChevronUp } from "lucide-react";
+import { DollarSign, TrendingUp, TrendingDown, AlertTriangle, Plus, Edit2, ChevronDown, ChevronUp, Save, FolderOpen } from "lucide-react";
 import { PlanAnalyzer } from "@/components/budget/PlanAnalyzer";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import type { Json } from "@/integrations/supabase/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface BudgetItem {
   name: string;
@@ -56,8 +68,120 @@ const categoryColors = [
 ];
 
 const Budget = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [budgetCategories, setBudgetCategories] = useState<BudgetCategory[]>(defaultCategories);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+
+  // Fetch user's projects
+  const { data: projects = [] } = useQuery({
+    queryKey: ["user-projects", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from("projects")
+        .select("id, name, project_type, total_budget")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fetch budget categories for selected project
+  const { data: savedBudget = [] } = useQuery({
+    queryKey: ["project-budget", selectedProjectId],
+    queryFn: async () => {
+      if (!selectedProjectId) return [];
+      const { data, error } = await supabase
+        .from("project_budgets")
+        .select("*")
+        .eq("project_id", selectedProjectId);
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!selectedProjectId,
+  });
+
+  // Load saved budget when project changes
+  useEffect(() => {
+    if (savedBudget && savedBudget.length > 0) {
+      const loadedCategories: BudgetCategory[] = savedBudget.map((cat, index) => ({
+        name: cat.category_name,
+        budget: Number(cat.budget) || 0,
+        spent: Number(cat.spent) || 0,
+        color: cat.color || categoryColors[index % categoryColors.length],
+        description: cat.description || undefined,
+        items: (cat.items as unknown as BudgetItem[]) || [],
+      }));
+      setBudgetCategories(loadedCategories);
+    } else if (selectedProjectId) {
+      // Reset to default if no budget saved
+      setBudgetCategories(defaultCategories);
+    }
+  }, [savedBudget, selectedProjectId]);
+
+  // Auto-select first project if available
+  useEffect(() => {
+    if (projects.length > 0 && !selectedProjectId) {
+      setSelectedProjectId(projects[0].id);
+    }
+  }, [projects, selectedProjectId]);
+
+  // Save budget mutation
+  const saveBudgetMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedProjectId || !user?.id) {
+        throw new Error("Aucun projet sélectionné");
+      }
+
+      // Delete existing budget categories for this project
+      await supabase
+        .from("project_budgets")
+        .delete()
+        .eq("project_id", selectedProjectId);
+
+      // Insert new budget categories
+      const budgetData = budgetCategories.map(cat => ({
+        project_id: selectedProjectId,
+        category_name: cat.name,
+        budget: cat.budget,
+        spent: cat.spent,
+        color: cat.color,
+        description: cat.description || null,
+        items: JSON.parse(JSON.stringify(cat.items || [])) as Json,
+      }));
+
+      const { error: insertError } = await supabase
+        .from("project_budgets")
+        .insert(budgetData);
+
+      if (insertError) throw insertError;
+
+      // Update project total budget
+      const totalBudget = budgetCategories.reduce((acc, cat) => acc + cat.budget, 0);
+      const { error: updateError } = await supabase
+        .from("projects")
+        .update({ total_budget: totalBudget, updated_at: new Date().toISOString() })
+        .eq("id", selectedProjectId);
+
+      if (updateError) throw updateError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project-budget", selectedProjectId] });
+      queryClient.invalidateQueries({ queryKey: ["user-projects"] });
+      toast.success("Budget sauvegardé avec succès!");
+    },
+    onError: (error) => {
+      console.error("Save error:", error);
+      toast.error("Erreur lors de la sauvegarde du budget");
+    },
+  });
 
   const totalBudget = budgetCategories.reduce((acc, cat) => acc + cat.budget, 0);
   const totalSpent = budgetCategories.reduce((acc, cat) => acc + cat.spent, 0);
@@ -69,7 +193,7 @@ const Budget = () => {
     color: cat.color,
   }));
 
-  const handleBudgetGenerated = (categories: { name: string; budget: number; description: string; items?: BudgetItem[] }[]) => {
+  const handleBudgetGenerated = async (categories: { name: string; budget: number; description: string; items?: BudgetItem[] }[]) => {
     const newCategories: BudgetCategory[] = categories.map((cat, index) => ({
       name: cat.name,
       budget: cat.budget,
@@ -79,9 +203,14 @@ const Budget = () => {
       items: cat.items || [],
     }));
     setBudgetCategories(newCategories);
-  };
 
-  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+    // Auto-save if a project is selected
+    if (selectedProjectId) {
+      setTimeout(() => {
+        saveBudgetMutation.mutate();
+      }, 100);
+    }
+  };
 
   const toggleCategory = (categoryName: string) => {
     setExpandedCategories(prev => 
@@ -105,11 +234,78 @@ const Budget = () => {
                 Gérez et suivez vos dépenses de construction
               </p>
             </div>
-            <Button variant="accent" onClick={() => setShowAddExpense(!showAddExpense)}>
-              <Plus className="h-4 w-4" />
-              Ajouter une dépense
-            </Button>
+            <div className="flex gap-2">
+              {selectedProjectId && (
+                <Button 
+                  variant="default" 
+                  onClick={() => saveBudgetMutation.mutate()}
+                  disabled={saveBudgetMutation.isPending}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {saveBudgetMutation.isPending ? "Sauvegarde..." : "Sauvegarder"}
+                </Button>
+              )}
+              <Button variant="accent" onClick={() => setShowAddExpense(!showAddExpense)}>
+                <Plus className="h-4 w-4" />
+                Ajouter une dépense
+              </Button>
+            </div>
           </div>
+
+          {/* Project Selection */}
+          {user && (
+            <Card className="border-primary/20">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <FolderOpen className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-lg">Projet associé</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {projects.length > 0 ? (
+                  <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                    <div className="flex-1 w-full sm:max-w-xs">
+                      <Select 
+                        value={selectedProjectId || ""} 
+                        onValueChange={setSelectedProjectId}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner un projet" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {projects.map((project) => (
+                            <SelectItem key={project.id} value={project.id}>
+                              {project.name} {project.project_type && `(${project.project_type})`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {selectedProjectId && (
+                      <p className="text-sm text-muted-foreground">
+                        Le budget sera automatiquement sauvegardé pour ce projet
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">
+                    Vous n'avez pas encore de projet. <a href="/demarrer" className="text-primary underline">Créez-en un</a> pour sauvegarder votre budget.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {!user && (
+            <Card className="border-warning/50 bg-warning/5">
+              <CardContent className="py-4">
+                <p className="text-sm text-warning-foreground flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  <a href="/auth" className="text-primary underline">Connectez-vous</a> pour sauvegarder votre budget dans votre projet.
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* AI Plan Analyzer */}
           <PlanAnalyzer onBudgetGenerated={handleBudgetGenerated} />
