@@ -9,10 +9,18 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { DollarSign, TrendingUp, TrendingDown, AlertTriangle, Plus, Edit2 } from "lucide-react";
+import { PlanAnalyzer } from "@/components/budget/PlanAnalyzer";
 
-const budgetCategories = [
-  { name: "Fondations", budget: 35000, spent: 33500, color: "hsl(217, 33%, 17%)" },
-  { name: "Structure", budget: 45000, spent: 28000, color: "hsl(25, 95%, 53%)" },
+interface BudgetCategory {
+  name: string;
+  budget: number;
+  spent: number;
+  color: string;
+}
+
+const defaultCategories: BudgetCategory[] = [
+  { name: "Fondations", budget: 35000, spent: 0, color: "hsl(217, 33%, 17%)" },
+  { name: "Structure", budget: 45000, spent: 0, color: "hsl(25, 95%, 53%)" },
   { name: "Toiture", budget: 18000, spent: 0, color: "hsl(142, 71%, 45%)" },
   { name: "Fenêtres/Portes", budget: 22000, spent: 0, color: "hsl(38, 92%, 50%)" },
   { name: "Électricité", budget: 15000, spent: 0, color: "hsl(215, 16%, 47%)" },
@@ -21,18 +29,42 @@ const budgetCategories = [
   { name: "Finitions", budget: 45000, spent: 0, color: "hsl(0, 84%, 60%)" },
 ];
 
-const totalBudget = budgetCategories.reduce((acc, cat) => acc + cat.budget, 0);
-const totalSpent = budgetCategories.reduce((acc, cat) => acc + cat.spent, 0);
-const percentUsed = (totalSpent / totalBudget) * 100;
-
-const pieData = budgetCategories.map((cat) => ({
-  name: cat.name,
-  value: cat.budget,
-  color: cat.color,
-}));
+const categoryColors = [
+  "hsl(217, 33%, 17%)",
+  "hsl(25, 95%, 53%)",
+  "hsl(142, 71%, 45%)",
+  "hsl(38, 92%, 50%)",
+  "hsl(215, 16%, 47%)",
+  "hsl(222, 47%, 11%)",
+  "hsl(280, 60%, 50%)",
+  "hsl(0, 84%, 60%)",
+  "hsl(180, 50%, 40%)",
+  "hsl(320, 70%, 50%)",
+];
 
 const Budget = () => {
   const [showAddExpense, setShowAddExpense] = useState(false);
+  const [budgetCategories, setBudgetCategories] = useState<BudgetCategory[]>(defaultCategories);
+
+  const totalBudget = budgetCategories.reduce((acc, cat) => acc + cat.budget, 0);
+  const totalSpent = budgetCategories.reduce((acc, cat) => acc + cat.spent, 0);
+  const percentUsed = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+
+  const pieData = budgetCategories.map((cat) => ({
+    name: cat.name,
+    value: cat.budget,
+    color: cat.color,
+  }));
+
+  const handleBudgetGenerated = (categories: { name: string; budget: number; description: string }[]) => {
+    const newCategories: BudgetCategory[] = categories.map((cat, index) => ({
+      name: cat.name,
+      budget: cat.budget,
+      spent: 0,
+      color: categoryColors[index % categoryColors.length],
+    }));
+    setBudgetCategories(newCategories);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -53,6 +85,9 @@ const Budget = () => {
               Ajouter une dépense
             </Button>
           </div>
+
+          {/* AI Plan Analyzer */}
+          <PlanAnalyzer onBudgetGenerated={handleBudgetGenerated} />
 
           {/* Summary Cards */}
           <div className="grid gap-4 md:grid-cols-3">
@@ -189,9 +224,9 @@ const Budget = () => {
                 <CardDescription>Budget et dépenses par poste</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-4 max-h-[400px] overflow-y-auto">
                   {budgetCategories.map((category) => {
-                    const percent = (category.spent / category.budget) * 100;
+                    const percent = category.budget > 0 ? (category.spent / category.budget) * 100 : 0;
                     const isOverBudget = category.spent > category.budget;
                     const isNearLimit = percent > 80 && !isOverBudget;
 
