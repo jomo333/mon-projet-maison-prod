@@ -169,10 +169,10 @@ export function PlanAnalyzer({ onBudgetGenerated }: PlanAnalyzerProps) {
         // Check if it's a PDF and needs conversion
         if (isPdf(file)) {
           toast.info("Conversion du PDF en images...");
-          const { images, pageCount } = await convertPdfToImages(file, { scale: 2, maxPages: 5 });
+          const { images, pageCount } = await convertPdfToImages(file, { scale: 2, maxPages: 20 });
           
-          if (pageCount > 5) {
-            toast.warning(`Le PDF contient ${pageCount} pages. Seules les 5 premières ont été converties.`);
+          if (pageCount > 20) {
+            toast.warning(`Le PDF contient ${pageCount} pages. Seules les 20 premières ont été converties.`);
           }
           
           // Upload each converted image
