@@ -14,6 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      project_budgets: {
+        Row: {
+          budget: number | null
+          category_name: string
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          items: Json | null
+          project_id: string
+          spent: number | null
+        }
+        Insert: {
+          budget?: number | null
+          category_name: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          items?: Json | null
+          project_id: string
+          spent?: number | null
+        }
+        Update: {
+          budget?: number | null
+          category_name?: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          items?: Json | null
+          project_id?: string
+          spent?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_budgets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          created_at: string
+          description: string | null
+          has_garage: boolean | null
+          id: string
+          name: string
+          number_of_floors: number | null
+          project_type: string | null
+          square_footage: number | null
+          status: string | null
+          total_budget: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          has_garage?: boolean | null
+          id?: string
+          name: string
+          number_of_floors?: number | null
+          project_type?: string | null
+          square_footage?: number | null
+          status?: string | null
+          total_budget?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          has_garage?: boolean | null
+          id?: string
+          name?: string
+          number_of_floors?: number | null
+          project_type?: string | null
+          square_footage?: number | null
+          status?: string | null
+          total_budget?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       task_attachments: {
         Row: {
           category: string
@@ -23,6 +139,7 @@ export type Database = {
           file_type: string
           file_url: string
           id: string
+          project_id: string | null
           step_id: string
           task_id: string
         }
@@ -34,6 +151,7 @@ export type Database = {
           file_type: string
           file_url: string
           id?: string
+          project_id?: string | null
           step_id: string
           task_id: string
         }
@@ -45,10 +163,19 @@ export type Database = {
           file_type?: string
           file_url?: string
           id?: string
+          project_id?: string | null
           step_id?: string
           task_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "task_attachments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
