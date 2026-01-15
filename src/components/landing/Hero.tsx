@@ -11,7 +11,7 @@ const features = [
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-hero py-12 lg:py-20">
+    <section className="relative overflow-hidden bg-hero py-6 lg:py-10">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
