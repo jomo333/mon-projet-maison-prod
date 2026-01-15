@@ -1,6 +1,6 @@
 import { ArrowRight, Shield, Clock, PiggyBank } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const features = [
@@ -10,6 +10,8 @@ const features = [
 ];
 
 export function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section className="relative overflow-hidden bg-hero py-6 lg:py-10">
       {/* Background pattern */}
@@ -46,17 +48,22 @@ export function Hero() {
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button variant="hero" size="xl" asChild>
-              <Link to="/start">
-                Démarrer mon projet
-                <ArrowRight className="h-5 w-5" />
-              </Link>
+            <Button 
+              variant="hero" 
+              size="xl" 
+              onClick={() => navigate("/start")}
+            >
+              Démarrer mon projet
+              <ArrowRight className="h-5 w-5" />
             </Button>
-            <Link to="/guide">
-              <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10 hover:text-white">
-                Voir le guide
-              </Button>
-            </Link>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="border-white/30 text-white hover:bg-white/10 hover:text-white"
+              onClick={() => navigate("/guide")}
+            >
+              Voir le guide
+            </Button>
           </div>
 
           <div className="mt-16 flex flex-wrap items-center justify-center gap-8">
