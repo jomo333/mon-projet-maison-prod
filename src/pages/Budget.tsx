@@ -19,27 +19,30 @@ interface BudgetCategory {
 }
 
 const defaultCategories: BudgetCategory[] = [
-  { name: "Fondations", budget: 35000, spent: 0, color: "hsl(217, 33%, 17%)" },
-  { name: "Structure", budget: 45000, spent: 0, color: "hsl(25, 95%, 53%)" },
-  { name: "Toiture", budget: 18000, spent: 0, color: "hsl(142, 71%, 45%)" },
-  { name: "Fenêtres/Portes", budget: 22000, spent: 0, color: "hsl(38, 92%, 50%)" },
-  { name: "Électricité", budget: 15000, spent: 0, color: "hsl(215, 16%, 47%)" },
-  { name: "Plomberie", budget: 12000, spent: 0, color: "hsl(222, 47%, 11%)" },
-  { name: "Isolation", budget: 8000, spent: 0, color: "hsl(210, 40%, 96%)" },
-  { name: "Finitions", budget: 45000, spent: 0, color: "hsl(0, 84%, 60%)" },
+  { name: "Fondations", budget: 35000, spent: 0, color: "#3B82F6" },
+  { name: "Structure", budget: 45000, spent: 0, color: "#F97316" },
+  { name: "Toiture", budget: 18000, spent: 0, color: "#22C55E" },
+  { name: "Fenêtres/Portes", budget: 22000, spent: 0, color: "#EAB308" },
+  { name: "Électricité", budget: 15000, spent: 0, color: "#EC4899" },
+  { name: "Plomberie", budget: 12000, spent: 0, color: "#06B6D4" },
+  { name: "Isolation", budget: 8000, spent: 0, color: "#8B5CF6" },
+  { name: "Finitions", budget: 45000, spent: 0, color: "#EF4444" },
 ];
 
+// Couleurs vives et distinctes pour une meilleure lisibilité
 const categoryColors = [
-  "hsl(217, 33%, 17%)",
-  "hsl(25, 95%, 53%)",
-  "hsl(142, 71%, 45%)",
-  "hsl(38, 92%, 50%)",
-  "hsl(215, 16%, 47%)",
-  "hsl(222, 47%, 11%)",
-  "hsl(280, 60%, 50%)",
-  "hsl(0, 84%, 60%)",
-  "hsl(180, 50%, 40%)",
-  "hsl(320, 70%, 50%)",
+  "#3B82F6", // Bleu vif
+  "#F97316", // Orange
+  "#22C55E", // Vert
+  "#EAB308", // Jaune doré
+  "#EC4899", // Rose
+  "#06B6D4", // Cyan
+  "#8B5CF6", // Violet
+  "#EF4444", // Rouge
+  "#14B8A6", // Teal
+  "#A855F7", // Pourpre
+  "#F59E0B", // Ambre
+  "#10B981", // Émeraude
 ];
 
 const Budget = () => {
