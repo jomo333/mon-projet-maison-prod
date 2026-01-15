@@ -353,13 +353,17 @@ export function PlanAnalyzer({ onBudgetGenerated }: PlanAnalyzerProps) {
           
           {/* Plan Analysis Mode */}
           <TabsContent value="plan" className="mt-4 space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Téléversez un plan de construction et l'IA analysera automatiquement les dimensions et caractéristiques pour générer le budget.
-            </p>
+            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                <strong>Important :</strong> Téléversez une <strong>image</strong> de votre plan (PNG, JPG, WebP, GIF). 
+                Les fichiers PDF ne sont pas supportés pour l'analyse IA. Vous pouvez prendre une capture d'écran 
+                de votre plan PDF ou le convertir en image.
+              </p>
+            </div>
             
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Plan de construction</Label>
+                <Label>Plan de construction (image uniquement)</Label>
                 <div className="flex flex-wrap gap-2">
                   <Select 
                     value={selectedPlanUrl || "none"} 
@@ -370,7 +374,10 @@ export function PlanAnalyzer({ onBudgetGenerated }: PlanAnalyzerProps) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">Sélectionner un plan...</SelectItem>
-                      {plans.map((plan) => (
+                      {plans.filter(plan => 
+                        plan.file_type?.startsWith('image/') || 
+                        plan.file_url?.match(/\.(png|jpg|jpeg|gif|webp)$/i)
+                      ).map((plan) => (
                         <SelectItem key={plan.id} value={plan.file_url}>
                           <div className="flex items-center gap-2">
                             <FileText className="h-4 w-4" />
@@ -386,7 +393,7 @@ export function PlanAnalyzer({ onBudgetGenerated }: PlanAnalyzerProps) {
                     ref={fileInputRef}
                     onChange={handleFileUpload}
                     className="hidden"
-                    accept=".pdf,.jpg,.jpeg,.png,.gif,.webp"
+                    accept=".jpg,.jpeg,.png,.gif,.webp"
                   />
                   
                   <Button
@@ -401,7 +408,7 @@ export function PlanAnalyzer({ onBudgetGenerated }: PlanAnalyzerProps) {
                     ) : (
                       <Upload className="h-4 w-4" />
                     )}
-                    Téléverser un plan
+                    Téléverser une image
                   </Button>
 
                   {selectedPlanUrl && (
