@@ -1,10 +1,11 @@
-import { Home, LayoutDashboard, Calculator, BookOpen, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Calculator, BookOpen, MessageSquare } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.png";
 
 const navItems = [
-  { href: "/", label: "Accueil", icon: Home },
+  { href: "/", label: "Accueil", icon: null },
   { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/budget", label: "Budget", icon: Calculator },
   { href: "/guide", label: "Guide", icon: BookOpen },
@@ -16,18 +17,13 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-gradient">
-            <Home className="h-5 w-5 text-accent-foreground" />
-          </div>
-          <span className="font-display text-xl font-bold text-foreground">
-            MonProjetMaison
-          </span>
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="MonProjetMaison.ca" className="h-10 w-auto" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
+          {navItems.filter(item => item.icon).map((item) => {
+            const Icon = item.icon!;
             const isActive = location.pathname === item.href;
             return (
               <Link
