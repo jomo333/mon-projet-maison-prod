@@ -25,8 +25,17 @@ serve(async (req) => {
 
     console.log('Analyzing plan:', { projectType, squareFootage, hasImage: !!imageUrl });
 
-    const systemPrompt = `Tu es un expert en estimation de coûts de construction résidentielle au Québec. 
+    const systemPrompt = `Tu es un expert en estimation de coûts de construction résidentielle au QUÉBEC, CANADA. 
 Tu dois analyser les informations fournies sur un projet de construction et générer une estimation budgétaire détaillée.
+
+IMPORTANT - CONTEXTE QUÉBÉCOIS:
+- Tous les prix doivent refléter le marché québécois 2024-2025
+- Inclure les coûts de main-d'œuvre québécois (salaires syndicaux CCQ si applicable)
+- Tenir compte du climat québécois (isolation R-41 minimum pour les murs, R-60 pour le toit)
+- Considérer les exigences du Code de construction du Québec
+- Inclure la TPS (5%) et TVQ (9.975%) dans le total estimé
+- Prix des matériaux selon les fournisseurs locaux (BMR, Canac, Rona, Patrick Morin)
+- Coût moyen au Québec: 250-350$/pi² pour construction standard, 350-500$/pi² pour qualité supérieure
 
 Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans backticks) avec cette structure:
 {
@@ -46,16 +55,15 @@ Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans backticks) av
   "warnings": ["Avertissement si applicable"]
 }
 
-Catégories typiques: Fondations, Structure/Charpente, Toiture, Fenêtres et Portes, Électricité, Plomberie, Chauffage/Ventilation, Isolation, Revêtements extérieurs, Finitions intérieures.
+Catégories typiques: Fondations, Structure/Charpente, Toiture, Fenêtres et Portes, Électricité, Plomberie, Chauffage/Ventilation, Isolation, Revêtements extérieurs, Finitions intérieures.`;
 
-Base tes estimations sur les prix du marché québécois 2024-2025.`;
-
-    const userMessage = `Analyse ce projet de construction et génère un budget détaillé:
+    const userMessage = `Analyse ce projet de construction AU QUÉBEC et génère un budget détaillé avec les prix du marché québécois:
 - Type de projet: ${projectType || 'Maison unifamiliale'}
 - Superficie approximative: ${squareFootage || 1500} pieds carrés
-${imageUrl ? '- Un plan a été fourni (analyse l\'image pour plus de détails)' : '- Aucun plan fourni, utilise des estimations standards'}
+- Région: Québec, Canada
+${imageUrl ? '- Un plan a été fourni (analyse l\'image pour plus de détails)' : '- Aucun plan fourni, utilise des estimations standards pour le Québec'}
 
-Génère une estimation budgétaire complète et réaliste pour le Québec.`;
+Génère une estimation budgétaire complète et réaliste basée sur les coûts actuels au Québec (2024-2025).`;
 
     const messages: any[] = [
       { role: "system", content: systemPrompt }
