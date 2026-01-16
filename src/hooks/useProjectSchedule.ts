@@ -344,7 +344,7 @@ export const useProjectSchedule = (projectId: string | null) => {
     const completedSchedule = sortedSchedules[completedIndex];
     const originalEndDate = completedSchedule.end_date;
 
-    // Calculer le nombre de jours d'avance (positif = en avance)
+    // Calculer le nombre de jours d'avance/retard (positif = en avance, négatif = en retard)
     let daysAhead = 0;
     if (originalEndDate) {
       daysAhead = differenceInBusinessDays(parseISO(originalEndDate), parseISO(actualEndDate));
@@ -365,14 +365,7 @@ export const useProjectSchedule = (projectId: string | null) => {
       })
       .eq("id", completedScheduleId);
 
-    // Si pas en avance, on arrête là
-    if (daysAhead <= 0) {
-      queryClient.invalidateQueries({ queryKey: ["project-schedules", projectId] });
-      toast({ title: "Étape terminée", description: "L'échéancier a été mis à jour." });
-      return { daysAhead: 0, alertsCreated: 0 };
-    }
-
-    // Décaler toutes les étapes suivantes en batch
+    // Décaler toutes les étapes suivantes en batch (que ce soit en avance OU en retard)
     const subsequentSchedules = sortedSchedules.slice(completedIndex + 1);
     let newStartDate = addBusinessDays(parseISO(actualEndDate), 1);
     const alertsToCreate: Omit<ScheduleAlert, 'id' | 'created_at'>[] = [];
@@ -407,19 +400,30 @@ export const useProjectSchedule = (projectId: string | null) => {
       // Stocker la date de fin pour les délais des étapes suivantes
       previousStepEndDates[schedule.step_id] = newEnd;
 
-      // Vérifier si le fournisseur doit être appelé plus tôt
+      // Vérifier si le fournisseur doit être appelé (en avance = urgent, en retard = reporter)
       if (schedule.supplier_schedule_lead_days > 0 && schedule.start_date) {
         const newCallDate = subBusinessDays(newStartDate, schedule.supplier_schedule_lead_days);
         const today = new Date();
         const daysUntilCall = differenceInBusinessDays(newCallDate, today);
         
-        if (daysUntilCall <= 5 && daysUntilCall >= -2) {
+        if (daysAhead > 0 && daysUntilCall <= 5 && daysUntilCall >= -2) {
+          // En avance: alerte urgente
           alertsToCreate.push({
             project_id: projectId,
             schedule_id: schedule.id,
             alert_type: "urgent_supplier_call",
             alert_date: format(today, "yyyy-MM-dd"),
             message: `⚠️ URGENT: Appeler ${schedule.supplier_name || "le fournisseur"} pour ${schedule.step_name} - Le projet avance plus vite! Nouvelle date prévue: ${format(newStartDate, "d MMM yyyy")}`,
+            is_dismissed: false,
+          });
+        } else if (daysAhead < 0) {
+          // En retard: informer du report
+          alertsToCreate.push({
+            project_id: projectId,
+            schedule_id: schedule.id,
+            alert_type: "schedule_delayed",
+            alert_date: format(today, "yyyy-MM-dd"),
+            message: `📅 REPORT: ${schedule.step_name} reportée au ${format(newStartDate, "d MMM yyyy")} (${Math.abs(daysAhead)} jour(s) de retard). Prévenir ${schedule.supplier_name || "le fournisseur"}.`,
             is_dismissed: false,
           });
         }
@@ -437,7 +441,7 @@ export const useProjectSchedule = (projectId: string | null) => {
         .eq("id", update.id);
     }
 
-    // Créer les alertes urgentes
+    // Créer les alertes
     if (alertsToCreate.length > 0) {
       await supabase.from("schedule_alerts").insert(alertsToCreate);
     }
@@ -446,10 +450,24 @@ export const useProjectSchedule = (projectId: string | null) => {
     queryClient.invalidateQueries({ queryKey: ["project-schedules", projectId] });
     queryClient.invalidateQueries({ queryKey: ["schedule-alerts", projectId] });
 
-    toast({
-      title: "Échéancier ajusté",
-      description: `${daysAhead} jour(s) d'avance! ${updates.length} étape(s) devancée(s).`,
-    });
+    // Message adapté selon avance ou retard
+    if (daysAhead > 0) {
+      toast({
+        title: "Échéancier ajusté",
+        description: `${daysAhead} jour(s) d'avance! ${updates.length} étape(s) devancée(s).`,
+      });
+    } else if (daysAhead < 0) {
+      toast({
+        title: "Échéancier recalculé",
+        description: `${Math.abs(daysAhead)} jour(s) de retard. ${updates.length} étape(s) reportée(s).`,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Étape terminée",
+        description: "L'échéancier a été mis à jour.",
+      });
+    }
 
     return { daysAhead, alertsCreated: alertsToCreate.length };
   };
