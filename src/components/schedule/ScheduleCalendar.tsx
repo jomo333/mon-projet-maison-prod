@@ -24,6 +24,7 @@ import { ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScheduleItem } from "@/hooks/useProjectSchedule";
 import { getTradeName } from "@/data/tradeTypes";
+import { sortSchedulesByExecutionOrder } from "@/lib/scheduleOrder";
 
 interface ScheduleCalendarProps {
   schedules: ScheduleItem[];
@@ -43,12 +44,14 @@ export const ScheduleCalendar = ({
   }, [currentMonth]);
 
   const getSchedulesForDay = (date: Date): ScheduleItem[] => {
-    return schedules.filter((schedule) => {
+    // Filter schedules that include this day and sort by execution order
+    const daySchedules = schedules.filter((schedule) => {
       if (!schedule.start_date || !schedule.end_date) return false;
       const start = parseISO(schedule.start_date);
       const end = parseISO(schedule.end_date);
       return isWithinInterval(date, { start, end });
     });
+    return sortSchedulesByExecutionOrder(daySchedules);
   };
 
   const hasConflict = (date: Date): boolean => {

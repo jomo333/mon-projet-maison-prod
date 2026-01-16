@@ -21,6 +21,7 @@ import { AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScheduleItem } from "@/hooks/useProjectSchedule";
 import { getTradeName } from "@/data/tradeTypes";
+import { sortSchedulesByExecutionOrder } from "@/lib/scheduleOrder";
 
 interface ScheduleGanttProps {
   schedules: ScheduleItem[];
@@ -70,8 +71,10 @@ export const ScheduleGantt = ({ schedules, conflicts }: ScheduleGanttProps) => {
     }
   }, [isDragging, handleMouseUp]);
 
-  const schedulesWithDates = schedules.filter(
-    (s) => s.start_date && s.end_date
+  // Sort schedules by execution order and filter those with dates
+  const schedulesWithDates = useMemo(() => 
+    sortSchedulesByExecutionOrder(schedules).filter((s) => s.start_date && s.end_date),
+    [schedules]
   );
 
   const { minDate, maxDate, totalDays, weeks } = useMemo(() => {

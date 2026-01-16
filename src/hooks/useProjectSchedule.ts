@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { addBusinessDays, differenceInBusinessDays, format, parseISO, subBusinessDays } from "date-fns";
+import { sortSchedulesByExecutionOrder } from "@/lib/scheduleOrder";
 
 export interface ScheduleItem {
   id: string;
@@ -49,11 +50,11 @@ export const useProjectSchedule = (projectId: string | null) => {
       const { data, error } = await supabase
         .from("project_schedules")
         .select("*")
-        .eq("project_id", projectId)
-        .order("start_date", { ascending: true, nullsFirst: false });
+        .eq("project_id", projectId);
       
       if (error) throw error;
-      return data as ScheduleItem[];
+      // Sort by execution order defined in constructionSteps
+      return sortSchedulesByExecutionOrder(data as ScheduleItem[]);
     },
     enabled: !!projectId,
   });
@@ -287,10 +288,8 @@ export const useProjectSchedule = (projectId: string | null) => {
   ) => {
     if (!projectId) return { daysAhead: 0, alertsCreated: 0 };
 
-    const sortedSchedules = [...(schedulesQuery.data || [])].sort((a, b) => {
-      if (!a.start_date || !b.start_date) return 0;
-      return a.start_date.localeCompare(b.start_date);
-    });
+    // Sort by execution order, not by date
+    const sortedSchedules = sortSchedulesByExecutionOrder(schedulesQuery.data || []);
 
     const completedIndex = sortedSchedules.findIndex((s) => s.id === completedScheduleId);
     if (completedIndex === -1) return { daysAhead: 0, alertsCreated: 0 };
@@ -425,10 +424,8 @@ export const useProjectSchedule = (projectId: string | null) => {
   const uncompleteStep = async (scheduleId: string) => {
     if (!projectId) return;
 
-    const sortedSchedules = [...(schedulesQuery.data || [])].sort((a, b) => {
-      if (!a.start_date || !b.start_date) return 0;
-      return a.start_date.localeCompare(b.start_date);
-    });
+    // Sort by execution order, not by date
+    const sortedSchedules = sortSchedulesByExecutionOrder(schedulesQuery.data || []);
 
     const uncompleteIndex = sortedSchedules.findIndex((s) => s.id === scheduleId);
     if (uncompleteIndex === -1) return;
