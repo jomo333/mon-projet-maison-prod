@@ -1,4 +1,5 @@
 import { format, addDays, subDays, isWeekend } from "date-fns";
+import { fr } from "date-fns/locale";
 import { constructionSteps } from "@/data/constructionSteps";
 import { getTradeColor } from "@/data/tradeTypes";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,14 +110,15 @@ function calculateStartDateBackward(endDate: string, businessDays: number): stri
 
 /**
  * Génère automatiquement l'échéancier complet pour un projet
+ * La préparation commence AUJOURD'HUI (jour de l'entrée des données)
  * La date visée correspond au JOUR 1 des travaux (excavation-fondation)
- * Les étapes de préparation sont TOUJOURS planifiées EN AMONT de cette date
+ * Retourne une alerte si la date visée est impossible
  */
 export async function generateProjectSchedule(
   projectId: string,
   targetStartDate: string,
   currentStage?: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; warning?: string }> {
   try {
     // Mapping des stages utilisateur vers les étapes de construction
     const stageToStepMapping: Record<string, string> = {
@@ -140,39 +142,18 @@ export async function generateProjectSchedule(
     const constructionStepsFiltered = stepsToSchedule.filter(s => !preparationSteps.includes(s.id));
 
     const schedulesToInsert: any[] = [];
+    const today = format(new Date(), "yyyy-MM-dd");
+    let warning: string | undefined;
 
-    // 1. Planifier les étapes de PRÉPARATION EN AMONT de la date visée
-    // On calcule en remontant depuis la date visée
+    // 1. Planifier les étapes de PRÉPARATION à partir d'AUJOURD'HUI
+    let currentPrepDate = today;
+    let prepEndDate = today;
+    
     if (prepSteps.length > 0) {
-      // Calculer les dates en remontant depuis targetStartDate
-      // D'abord on calcule la durée totale de préparation
-      const prepDates: { stepId: string; startDate: string; endDate: string }[] = [];
-      
-      // On remonte depuis la veille de la date visée (jour 1 = travaux)
-      let currentEndDate = calculateStartDateBackward(targetStartDate, 1); // Veille du jour 1
-      
-      // Planifier en ordre inverse (de plans-permis vers planification)
-      for (const step of [...prepSteps].reverse()) {
-        const duration = defaultDurations[step.id] || 5;
-        const startDate = calculateStartDateBackward(currentEndDate, duration - 1);
-        
-        prepDates.unshift({
-          stepId: step.id,
-          startDate: startDate,
-          endDate: currentEndDate,
-        });
-        
-        // L'étape précédente se termine 1 jour avant le début de celle-ci
-        currentEndDate = calculateStartDateBackward(startDate, 1);
-      }
-      
-      // Créer les schedules pour les étapes de préparation
       for (const step of prepSteps) {
-        const dates = prepDates.find(d => d.stepId === step.id);
-        if (!dates) continue;
-        
         const tradeType = stepTradeMapping[step.id] || "autre";
         const duration = defaultDurations[step.id] || 5;
+        const endDate = calculateEndDate(currentPrepDate, duration);
         
         schedulesToInsert.push({
           project_id: projectId,
@@ -181,20 +162,40 @@ export async function generateProjectSchedule(
           trade_type: tradeType,
           trade_color: getTradeColor(tradeType),
           estimated_days: duration,
-          start_date: dates.startDate,
-          end_date: dates.endDate,
+          start_date: currentPrepDate,
+          end_date: endDate,
           supplier_schedule_lead_days: supplierLeadDays[step.id] || 21,
           fabrication_lead_days: fabricationLeadDays[step.id] || 0,
           measurement_required: false,
           measurement_after_step_id: null,
           measurement_notes: null,
-          status: "scheduled",
+          status: currentPrepDate === today ? "in_progress" : "scheduled",
         });
+
+        prepEndDate = endDate;
+        // Prochaine étape commence après la fin de celle-ci
+        currentPrepDate = calculateEndDate(endDate, 1);
       }
     }
 
-    // 2. Planifier les étapes de CONSTRUCTION à partir de la date visée (JOUR 1)
-    let currentDate = targetStartDate;
+    // 2. Vérifier si la date visée est réalisable
+    // La préparation doit se terminer AVANT la date visée
+    const prepFinishDate = prepSteps.length > 0 ? prepEndDate : today;
+    const earliestConstructionStart = calculateEndDate(prepFinishDate, 1);
+    
+    let actualConstructionStart = targetStartDate;
+    
+    if (earliestConstructionStart > targetStartDate) {
+      // La date visée est impossible - on décale et on avertit
+      actualConstructionStart = earliestConstructionStart;
+      const delayDays = Math.ceil(
+        (new Date(earliestConstructionStart).getTime() - new Date(targetStartDate).getTime()) / (1000 * 60 * 60 * 24)
+      );
+      warning = `⚠️ La date visée du ${format(new Date(targetStartDate), "d MMMM yyyy", { locale: fr })} est impossible. La préparation nécessite plus de temps. Nouvelle date de début des travaux: ${format(new Date(actualConstructionStart), "d MMMM yyyy", { locale: fr })} (+${delayDays} jours)`;
+    }
+
+    // 3. Planifier les étapes de CONSTRUCTION à partir de la date effective
+    let currentDate = actualConstructionStart;
 
     for (const step of constructionStepsFiltered) {
       const tradeType = stepTradeMapping[step.id] || "autre";
@@ -223,7 +224,7 @@ export async function generateProjectSchedule(
       currentDate = calculateEndDate(endDate, 1);
     }
 
-    // Utiliser upsert pour éviter les doublons (ON CONFLICT DO UPDATE)
+    // Utiliser upsert pour éviter les doublons
     const { error } = await supabase
       .from("project_schedules")
       .upsert(schedulesToInsert, { 
@@ -239,7 +240,7 @@ export async function generateProjectSchedule(
     // Générer les alertes pour chaque étape
     await generateScheduleAlerts(projectId, schedulesToInsert);
 
-    return { success: true };
+    return { success: true, warning };
   } catch (error: any) {
     console.error("Error generating schedule:", error);
     return { success: false, error: error.message };
