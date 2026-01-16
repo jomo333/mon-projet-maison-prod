@@ -23,7 +23,12 @@ const Dashboard = () => {
   const [showPreviousStepsAlert, setShowPreviousStepsAlert] = useState(!!stepFromUrl);
 
   // Fetch project schedules
-  const { schedules, isLoading: isLoadingSchedules, updateSchedule } = useProjectSchedule(projectFromUrl);
+  const {
+    schedules,
+    isLoading: isLoadingSchedules,
+    updateSchedule,
+    completeStep,
+  } = useProjectSchedule(projectFromUrl);
 
   // Fetch completed tasks
   const { isTaskCompleted, toggleTask } = useCompletedTasks(projectFromUrl);
@@ -35,14 +40,17 @@ const Dashboard = () => {
 
   // Create a map of step_id to schedule data
   const scheduleByStepId = useMemo(() => {
-    const map: Record<string, { 
-      id: string;
-      start_date: string | null; 
-      end_date: string | null;
-      status: string | null;
-    }> = {};
+    const map: Record<
+      string,
+      {
+        id: string;
+        start_date: string | null;
+        end_date: string | null;
+        status: string | null;
+      }
+    > = {};
     if (schedules) {
-      schedules.forEach(schedule => {
+      schedules.forEach((schedule) => {
         map[schedule.step_id] = {
           id: schedule.id,
           start_date: schedule.start_date,
@@ -55,12 +63,18 @@ const Dashboard = () => {
   }, [schedules]);
 
   // Handle toggle complete for a step
+  // IMPORTANT: si l'utilisateur marque une étape comme "Terminée", on devance automatiquement
+  // l'échéancier en se basant sur une fin réelle = aujourd'hui.
   const handleToggleComplete = async (stepId: string, completed: boolean) => {
     const schedule = scheduleByStepId[stepId];
-    if (schedule?.id) {
+    if (!schedule?.id) return;
+
+    if (completed) {
+      await completeStep(schedule.id);
+    } else {
       await updateSchedule({
         id: schedule.id,
-        status: completed ? 'completed' : 'pending',
+        status: "pending",
       });
     }
   };
