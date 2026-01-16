@@ -281,6 +281,7 @@ export const useProjectSchedule = (projectId: string | null) => {
     isLoading: schedulesQuery.isLoading,
     isLoadingAlerts: alertsQuery.isLoading,
     createSchedule: createScheduleMutation.mutate,
+    createScheduleAsync: createScheduleMutation.mutateAsync,
     updateSchedule: updateScheduleMutation.mutate,
     deleteSchedule: deleteScheduleMutation.mutate,
     dismissAlert: dismissAlertMutation.mutate,

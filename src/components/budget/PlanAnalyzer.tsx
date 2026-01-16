@@ -55,9 +55,11 @@ interface PlanAnalyzerProps {
   projectId?: string | null;
   /** When true, auto-select the "Analyse de plan" tab on mount */
   autoSelectPlanTab?: boolean;
+  /** Callback when user wants to generate schedule after analysis */
+  onGenerateSchedule?: () => void;
 }
 
-export function PlanAnalyzer({ onBudgetGenerated, projectId, autoSelectPlanTab = false }: PlanAnalyzerProps) {
+export function PlanAnalyzer({ onBudgetGenerated, projectId, autoSelectPlanTab = false, onGenerateSchedule }: PlanAnalyzerProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<BudgetAnalysis | null>(null);
   const [analysisMode, setAnalysisMode] = useState<"manual" | "plan">(autoSelectPlanTab ? "plan" : "manual");
@@ -454,6 +456,13 @@ export function PlanAnalyzer({ onBudgetGenerated, projectId, autoSelectPlanTab =
     if (analysis?.categories) {
       onBudgetGenerated(analysis.categories);
       toast.success("Budget appliqué avec succès!");
+      
+      // Propose de générer l'échéancier si callback disponible
+      if (onGenerateSchedule && projectId) {
+        setTimeout(() => {
+          onGenerateSchedule();
+        }, 500);
+      }
     }
   };
 

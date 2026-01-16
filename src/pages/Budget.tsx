@@ -11,10 +11,12 @@ import { Badge } from "@/components/ui/badge";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { DollarSign, TrendingUp, TrendingDown, AlertTriangle, Plus, Edit2, ChevronDown, ChevronUp, Save, FolderOpen } from "lucide-react";
 import { PlanAnalyzer } from "@/components/budget/PlanAnalyzer";
+import { GenerateScheduleDialog } from "@/components/schedule/GenerateScheduleDialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useProjectSchedule } from "@/hooks/useProjectSchedule";
 import { toast } from "sonner";
 import type { Json } from "@/integrations/supabase/types";
 import {
@@ -79,10 +81,18 @@ const Budget = () => {
   const [budgetCategories, setBudgetCategories] = useState<BudgetCategory[]>(defaultCategories);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(projectFromUrl);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
   
   // Ref for the PlanAnalyzer section to scroll into view
   const planAnalyzerRef = useRef<HTMLDivElement>(null);
   const didScrollRef = useRef(false);
+
+  // Schedule hook for generating schedule after budget analysis
+  const {
+    createScheduleAsync,
+    calculateEndDate,
+    generateAlerts,
+  } = useProjectSchedule(selectedProjectId);
 
   // Fetch user's projects
   const { data: projects = [] } = useQuery({
@@ -348,8 +358,21 @@ const Budget = () => {
               onBudgetGenerated={handleBudgetGenerated} 
               projectId={selectedProjectId}
               autoSelectPlanTab={autoAnalyze}
+              onGenerateSchedule={() => setShowScheduleDialog(true)}
             />
           </div>
+
+          {/* Schedule Generation Dialog */}
+          {selectedProjectId && (
+            <GenerateScheduleDialog
+              open={showScheduleDialog}
+              onOpenChange={setShowScheduleDialog}
+              projectId={selectedProjectId}
+              createSchedule={(data) => createScheduleAsync(data as any)}
+              calculateEndDate={calculateEndDate}
+              generateAlerts={generateAlerts}
+            />
+          )}
 
           {/* Summary Cards */}
           <div className="grid gap-4 md:grid-cols-3">
