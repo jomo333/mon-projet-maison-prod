@@ -227,7 +227,7 @@ export const constructionSteps: Step[] = [
   {
     id: "toiture",
     title: "Toiture",
-    description: "Installation du pontage, membrane et revêtement de toiture.",
+    description: "Installation de la membrane et du revêtement de toiture.",
     phase: "gros-oeuvre",
     phaseLabel: "Gros œuvre",
     icon: "Umbrella",
