@@ -62,6 +62,16 @@ const fabricationLeadDays: Record<string, number> = {
   "fenetres-portes": 28, // 4 semaines
 };
 
+// Délais obligatoires après certaines étapes (jours calendrier)
+// Ex: cure du béton avant structure
+const minimumDelayAfterStep: Record<string, { afterStep: string; days: number; reason: string }> = {
+  structure: {
+    afterStep: "excavation-fondation",
+    days: 21, // 3 semaines minimum pour la cure du béton
+    reason: "Cure du béton des fondations (minimum 3 semaines)",
+  },
+};
+
 // Étapes nécessitant des mesures
 const measurementConfig: Record<string, { afterStep: string; notes: string }> = {
   "cuisine-sdb": {
@@ -196,10 +206,24 @@ export async function generateProjectSchedule(
 
     // 3. Planifier les étapes de CONSTRUCTION à partir de la date effective
     let currentDate = actualConstructionStart;
+    let previousStepEndDates: Record<string, string> = {}; // Pour stocker les dates de fin par step_id
 
     for (const step of constructionStepsFiltered) {
       const tradeType = stepTradeMapping[step.id] || "autre";
       const duration = defaultDurations[step.id] || 5;
+      
+      // Vérifier s'il y a un délai minimum après une étape précédente
+      const delayConfig = minimumDelayAfterStep[step.id];
+      if (delayConfig && previousStepEndDates[delayConfig.afterStep]) {
+        const requiredStartDate = addDays(new Date(previousStepEndDates[delayConfig.afterStep]), delayConfig.days);
+        const requiredStartStr = format(requiredStartDate, "yyyy-MM-dd");
+        
+        // Si le délai impose une date plus tardive, on l'utilise
+        if (requiredStartStr > currentDate) {
+          currentDate = requiredStartStr;
+        }
+      }
+      
       const endDate = calculateEndDate(currentDate, duration);
       const measurementReq = measurementConfig[step.id];
 
@@ -220,6 +244,9 @@ export async function generateProjectSchedule(
         status: "scheduled",
       });
 
+      // Stocker la date de fin pour les vérifications de délais
+      previousStepEndDates[step.id] = endDate;
+      
       // Prochaine étape commence après la fin de celle-ci
       currentDate = calculateEndDate(endDate, 1);
     }
