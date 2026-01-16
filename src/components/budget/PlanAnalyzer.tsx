@@ -79,47 +79,49 @@ export function PlanAnalyzer({ onBudgetGenerated, projectId }: PlanAnalyzerProps
   // PDF conversion hook
   const { convertPdfToImages, isPdf, isConverting, progress } = usePdfToImage();
 
-  // Fetch uploaded plans from project tasks AND project photos with plan-related step_ids
+  // Fetch uploaded plans/documents from project tasks AND project photos
   const { data: plans = [] } = useQuery({
     queryKey: ["project-plans", projectId],
     queryFn: async () => {
-      // Get plans from task_attachments (with category "plan")
-      const attachmentsQuery = supabase
+      if (!projectId) {
+        // No project selected: fetch all plans with category "plan" (legacy behavior)
+        const { data, error } = await supabase
+          .from("task_attachments")
+          .select("*")
+          .eq("category", "plan")
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        return data || [];
+      }
+
+      // Fetch ALL attachments for this project (any category – user may have selected "other")
+      const { data: attachments, error: attachmentsError } = await supabase
         .from("task_attachments")
         .select("*")
-        .eq("category", "plan")
+        .eq("project_id", projectId)
         .order("created_at", { ascending: false });
-      
-      // If project selected, filter by project_id
-      if (projectId) {
-        attachmentsQuery.eq("project_id", projectId);
-      }
-      
-      const { data: attachments, error: attachmentsError } = await attachmentsQuery;
+
       if (attachmentsError) throw attachmentsError;
 
-      // Also get plans from project_photos for the project (plans often uploaded in step 1)
+      // Also get plans from project_photos for the project
+      const { data: projectPhotos, error: photosError } = await supabase
+        .from("project_photos")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("created_at", { ascending: false });
+
       let photos: any[] = [];
-      if (projectId) {
-        const { data: projectPhotos, error: photosError } = await supabase
-          .from("project_photos")
-          .select("*")
-          .eq("project_id", projectId)
-          .order("created_at", { ascending: false });
-        
-        if (!photosError && projectPhotos) {
-          // Convert project photos to match attachment format
-          photos = projectPhotos.map(photo => ({
-            id: photo.id,
-            file_name: photo.file_name,
-            file_url: photo.file_url,
-            file_type: photo.file_url?.match(/\.(png|jpg|jpeg|gif|webp)$/i) ? 'image/jpeg' : 'application/pdf',
-            file_size: photo.file_size,
-            created_at: photo.created_at,
-            category: 'plan',
-            step_id: photo.step_id,
-          }));
-        }
+      if (!photosError && projectPhotos) {
+        photos = projectPhotos.map(photo => ({
+          id: photo.id,
+          file_name: photo.file_name,
+          file_url: photo.file_url,
+          file_type: photo.file_url?.match(/\.(png|jpg|jpeg|gif|webp)$/i) ? "image/jpeg" : "application/pdf",
+          file_size: photo.file_size,
+          created_at: photo.created_at,
+          category: "plan",
+          step_id: photo.step_id,
+        }));
       }
 
       // Merge and deduplicate by file_url
