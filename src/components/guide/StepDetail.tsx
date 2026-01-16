@@ -128,7 +128,7 @@ export function StepDetail({ step, projectId, onNext, onPrevious, hasNext, hasPr
                     )}
 
                     {/* Task Attachments */}
-                    <TaskAttachments stepId={step.id} taskId={task.id} />
+                    <TaskAttachments stepId={step.id} taskId={task.id} projectId={projectId} />
                   </div>
                 </AccordionContent>
               </AccordionItem>

@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 interface TaskAttachmentsProps {
   stepId: string;
   taskId: string;
+  projectId?: string;
 }
 
 const categories = [
@@ -42,7 +43,7 @@ function formatFileSize(bytes: number) {
   return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }
 
-export function TaskAttachments({ stepId, taskId }: TaskAttachmentsProps) {
+export function TaskAttachments({ stepId, taskId, projectId }: TaskAttachmentsProps) {
   const [selectedCategory, setSelectedCategory] = useState("other");
   const [isUploading, setIsUploading] = useState(false);
   const [showBudgetSuggestion, setShowBudgetSuggestion] = useState(false);
@@ -51,14 +52,21 @@ export function TaskAttachments({ stepId, taskId }: TaskAttachmentsProps) {
   const navigate = useNavigate();
 
   const { data: attachments = [], isLoading } = useQuery({
-    queryKey: ["task-attachments", stepId, taskId],
+    queryKey: ["task-attachments", stepId, taskId, projectId ?? null],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("task_attachments")
         .select("*")
         .eq("step_id", stepId)
         .eq("task_id", taskId)
         .order("created_at", { ascending: false });
+
+      // If we know which project we're in, scope attachments to that project
+      if (projectId) {
+        query = query.eq("project_id", projectId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data;
@@ -80,7 +88,16 @@ export function TaskAttachments({ stepId, taskId }: TaskAttachmentsProps) {
         .from("task-attachments")
         .getPublicUrl(fileName);
 
-      const { error: dbError } = await supabase.from("task_attachments").insert({
+      const insertData: {
+        step_id: string;
+        task_id: string;
+        file_name: string;
+        file_url: string;
+        file_type: string;
+        file_size: number;
+        category: string;
+        project_id?: string;
+      } = {
         step_id: stepId,
         task_id: taskId,
         file_name: file.name,
@@ -88,12 +105,18 @@ export function TaskAttachments({ stepId, taskId }: TaskAttachmentsProps) {
         file_type: file.type,
         file_size: file.size,
         category: selectedCategory,
-      });
+      };
+
+      if (projectId) {
+        insertData.project_id = projectId;
+      }
+
+      const { error: dbError } = await supabase.from("task_attachments").insert(insertData);
 
       if (dbError) throw dbError;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["task-attachments", stepId, taskId] });
+      queryClient.invalidateQueries({ queryKey: ["task-attachments", stepId, taskId, projectId ?? null] });
       toast.success("Fichier ajouté avec succès");
       
       // Show budget suggestion after any file upload
@@ -121,7 +144,7 @@ export function TaskAttachments({ stepId, taskId }: TaskAttachmentsProps) {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["task-attachments", stepId, taskId] });
+      queryClient.invalidateQueries({ queryKey: ["task-attachments", stepId, taskId, projectId ?? null] });
       toast.success("Fichier supprimé");
     },
     onError: (error) => {

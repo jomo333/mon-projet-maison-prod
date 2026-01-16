@@ -70,6 +70,8 @@ export function PlanAnalyzer({ onBudgetGenerated, projectId }: PlanAnalyzerProps
   
   // Plan mode state - now supports multiple plans
   const [selectedPlanUrls, setSelectedPlanUrls] = useState<string[]>([]);
+  // Used to avoid re-importing the same existing file (especially PDFs that we convert)
+  const [importedPlanSourceUrls, setImportedPlanSourceUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
@@ -214,6 +216,71 @@ export function PlanAnalyzer({ onBudgetGenerated, projectId }: PlanAnalyzerProps
       toast.error("Erreur lors de la suppression");
     },
   });
+
+  const isPdfUrl = (url: string) => /\.pdf(\?|#|$)/i.test(url);
+  const isImageUrl = (url: string) => /\.(png|jpg|jpeg|gif|webp)(\?|#|$)/i.test(url);
+
+  const addExistingPlanByUrl = async (fileUrl: string) => {
+    if (!fileUrl || fileUrl === "none") return;
+    if (importedPlanSourceUrls.includes(fileUrl)) return;
+
+    const plan = plans.find((p) => p.file_url === fileUrl);
+    const fileName = plan?.file_name || "plan";
+    const fileType = (plan?.file_type || "").toLowerCase();
+
+    const looksLikePdf = fileType.includes("pdf") || isPdfUrl(fileUrl);
+    const looksLikeImage = fileType.startsWith("image/") || isImageUrl(fileUrl);
+
+    // Images can be used as-is
+    if (looksLikeImage) {
+      if (!selectedPlanUrls.includes(fileUrl)) {
+        setSelectedPlanUrls((prev) => [...prev, fileUrl]);
+      }
+      setImportedPlanSourceUrls((prev) => [...prev, fileUrl]);
+      return;
+    }
+
+    // For PDFs already uploaded elsewhere: download -> convert -> upload images so the IA can use URLs
+    if (looksLikePdf) {
+      setIsUploading(true);
+      try {
+        toast.info("Conversion du PDF en images...");
+
+        const res = await fetch(fileUrl);
+        if (!res.ok) throw new Error("Impossible de récupérer le PDF");
+
+        const blob = await res.blob();
+        const pdfFile = new File([blob], fileName.endsWith(".pdf") ? fileName : `${fileName}.pdf`, {
+          type: blob.type || "application/pdf",
+        });
+
+        const { images, pageCount } = await convertPdfToImages(pdfFile, { scale: 2, maxPages: 20 });
+
+        if (pageCount > 20) {
+          toast.warning(`Le PDF contient ${pageCount} pages. Seules les 20 premières ont été converties.`);
+        }
+
+        for (let i = 0; i < images.length; i++) {
+          const imageBlob = images[i];
+          const imageName = `${pdfFile.name.replace(/\.pdf$/i, "")}_page_${i + 1}.png`;
+          const imageFile = new File([imageBlob], imageName, { type: "image/png" });
+          await uploadMutation.mutateAsync(imageFile);
+        }
+
+        setImportedPlanSourceUrls((prev) => [...prev, fileUrl]);
+        toast.success(`PDF converti en ${images.length} image(s) et ajouté à la sélection.`);
+      } catch (error) {
+        console.error("PDF import error:", error);
+        toast.error("Erreur lors de la conversion du PDF");
+      } finally {
+        setIsUploading(false);
+      }
+
+      return;
+    }
+
+    toast.error("Format non supporté (utilisez une image ou un PDF)");
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -466,8 +533,8 @@ export function PlanAnalyzer({ onBudgetGenerated, projectId }: PlanAnalyzerProps
                   <Select 
                     value="none" 
                     onValueChange={(v) => {
-                      if (v !== "none" && !selectedPlanUrls.includes(v)) {
-                        setSelectedPlanUrls(prev => [...prev, v]);
+                      if (v !== "none") {
+                        void addExistingPlanByUrl(v);
                       }
                     }}
                   >
@@ -476,11 +543,16 @@ export function PlanAnalyzer({ onBudgetGenerated, projectId }: PlanAnalyzerProps
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">Ajouter un plan existant...</SelectItem>
-                      {plans.filter(plan => 
-                        (plan.file_type?.startsWith('image/') || 
-                        plan.file_url?.match(/\.(png|jpg|jpeg|gif|webp)$/i)) &&
-                        !selectedPlanUrls.includes(plan.file_url)
-                      ).map((plan) => (
+                      {plans.filter((plan) => {
+                        const url = plan.file_url;
+                        if (!url) return false;
+
+                        const fileType = (plan.file_type || "").toLowerCase();
+                        const isImage = fileType.startsWith("image/") || /\.(png|jpg|jpeg|gif|webp)(\?|#|$)/i.test(url);
+                        const isPdf = fileType.includes("pdf") || /\.pdf(\?|#|$)/i.test(url);
+
+                        return (isImage || isPdf) && !selectedPlanUrls.includes(url) && !importedPlanSourceUrls.includes(url);
+                      }).map((plan) => (
                         <SelectItem key={plan.id} value={plan.file_url}>
                           <div className="flex items-center gap-2">
                             <FileText className="h-4 w-4" />
