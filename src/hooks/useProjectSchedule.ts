@@ -116,7 +116,7 @@ export const useProjectSchedule = (projectId: string | null) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["project-schedules", projectId] });
       queryClient.invalidateQueries({ queryKey: ["schedule-alerts", projectId] });
-      toast({ title: "Échéancier mis à jour" });
+      // Toast supprimé ici - sera affiché une seule fois à la fin des opérations batch
     },
     onError: (error) => {
       toast({ 
@@ -299,35 +299,38 @@ export const useProjectSchedule = (projectId: string | null) => {
     const originalEndDate = completedSchedule.end_date;
 
     // Calculer le nombre de jours d'avance (positif = en avance)
-    // On se base sur la différence entre la date de fin planifiée et la date de fin réelle.
     let daysAhead = 0;
     if (originalEndDate) {
       daysAhead = differenceInBusinessDays(parseISO(originalEndDate), parseISO(actualEndDate));
     } else if (completedSchedule.start_date) {
-      // Fallback si jamais end_date n'est pas défini
       const plannedDuration = completedSchedule.estimated_days;
       const realDuration = actualDays ?? (differenceInBusinessDays(parseISO(actualEndDate), parseISO(completedSchedule.start_date)) + 1);
       daysAhead = plannedDuration - realDuration;
     }
 
-    // Mettre à jour l'étape complétée d'abord
-    await updateScheduleMutation.mutateAsync({
-      id: completedScheduleId,
-      status: "completed",
-      start_date: actualStartDate ?? completedSchedule.start_date,
-      end_date: actualEndDate,
-      actual_days: actualDays ?? completedSchedule.actual_days ?? completedSchedule.estimated_days,
-    });
+    // Mettre à jour l'étape complétée
+    await supabase
+      .from("project_schedules")
+      .update({
+        status: "completed",
+        start_date: actualStartDate ?? completedSchedule.start_date,
+        end_date: actualEndDate,
+        actual_days: actualDays ?? completedSchedule.actual_days ?? completedSchedule.estimated_days,
+      })
+      .eq("id", completedScheduleId);
 
     // Si pas en avance, on arrête là
     if (daysAhead <= 0) {
+      queryClient.invalidateQueries({ queryKey: ["project-schedules", projectId] });
+      toast({ title: "Étape terminée", description: "L'échéancier a été mis à jour." });
       return { daysAhead: 0, alertsCreated: 0 };
     }
 
-    // Décaler toutes les étapes suivantes
+    // Décaler toutes les étapes suivantes en batch
     const subsequentSchedules = sortedSchedules.slice(completedIndex + 1);
     let newStartDate = addBusinessDays(parseISO(actualEndDate), 1);
     const alertsToCreate: Omit<ScheduleAlert, 'id' | 'created_at'>[] = [];
+    const updates: { id: string; start_date: string; end_date: string }[] = [];
 
     for (const schedule of subsequentSchedules) {
       if (schedule.status === "completed") {
@@ -340,11 +343,8 @@ export const useProjectSchedule = (projectId: string | null) => {
 
       // Vérifier si le fournisseur doit être appelé plus tôt
       if (schedule.supplier_schedule_lead_days > 0 && schedule.start_date) {
-        const originalStart = parseISO(schedule.start_date);
         const newCallDate = subBusinessDays(newStartDate, schedule.supplier_schedule_lead_days);
         const today = new Date();
-        
-        // Si la nouvelle date d'appel est proche ou dépassée, créer une alerte urgente
         const daysUntilCall = differenceInBusinessDays(newCallDate, today);
         
         if (daysUntilCall <= 5 && daysUntilCall >= -2) {
@@ -359,34 +359,30 @@ export const useProjectSchedule = (projectId: string | null) => {
         }
       }
 
-      // Mettre à jour l'étape
-      await updateScheduleMutation.mutateAsync({
-        id: schedule.id,
-        start_date: newStart,
-        end_date: newEnd,
-      });
-
-      // La prochaine étape commence après celle-ci
+      updates.push({ id: schedule.id, start_date: newStart, end_date: newEnd });
       newStartDate = addBusinessDays(parseISO(newEnd), 1);
     }
 
-    // Créer les alertes urgentes
-    for (const alert of alertsToCreate) {
-      await createAlertMutation.mutateAsync(alert);
+    // Exécuter les mises à jour en batch
+    for (const update of updates) {
+      await supabase
+        .from("project_schedules")
+        .update({ start_date: update.start_date, end_date: update.end_date })
+        .eq("id", update.id);
     }
 
-    // Régénérer les alertes normales pour les étapes décalées
-    for (const schedule of subsequentSchedules) {
-      const updatedSchedule = {
-        ...schedule,
-        start_date: format(addBusinessDays(parseISO(actualEndDate), 1), "yyyy-MM-dd"),
-      };
-      // Les alertes seront regénérées par generateAlerts
+    // Créer les alertes urgentes
+    if (alertsToCreate.length > 0) {
+      await supabase.from("schedule_alerts").insert(alertsToCreate);
     }
+
+    // Invalider une seule fois à la fin
+    queryClient.invalidateQueries({ queryKey: ["project-schedules", projectId] });
+    queryClient.invalidateQueries({ queryKey: ["schedule-alerts", projectId] });
 
     toast({
       title: "Échéancier ajusté",
-      description: `${daysAhead} jour(s) d'avance! ${subsequentSchedules.length} étape(s) devancée(s). ${alertsToCreate.length} alerte(s) urgente(s) créée(s).`,
+      description: `${daysAhead} jour(s) d'avance! ${updates.length} étape(s) devancée(s).`,
     });
 
     return { daysAhead, alertsCreated: alertsToCreate.length };
@@ -562,14 +558,16 @@ export const useProjectSchedule = (projectId: string | null) => {
 
     const completedStepIndex = getStepExecutionOrder(completedSchedule.step_id);
 
-    // Mettre à jour l'étape complétée
-    await updateScheduleMutation.mutateAsync({
-      id: completedScheduleId,
-      status: "completed",
-      start_date: actualStartDate ?? completedSchedule.start_date ?? actualEndDate,
-      end_date: actualEndDate,
-      actual_days: actualDays ?? 1,
-    });
+    // Mettre à jour l'étape complétée directement via Supabase
+    await supabase
+      .from("project_schedules")
+      .update({
+        status: "completed",
+        start_date: actualStartDate ?? completedSchedule.start_date ?? actualEndDate,
+        end_date: actualEndDate,
+        actual_days: actualDays ?? 1,
+      })
+      .eq("id", completedScheduleId);
 
     // Mapping et durées pour créer les étapes manquantes
     const stepTradeMapping: Record<string, string> = {
@@ -620,11 +618,11 @@ export const useProjectSchedule = (projectId: string | null) => {
 
     // La prochaine étape commence le jour ouvrable suivant la fin
     let nextStartDate = addBusinessDays(parseISO(actualEndDate), 1);
-    const alertsToCreate: any[] = [];
+    let updatedCount = 0;
 
     for (const step of subsequentSteps) {
       // Vérifier si un schedule existe déjà pour cette étape
-      let schedule = existingSchedules.find((s) => s.step_id === step.id);
+      const schedule = existingSchedules.find((s) => s.step_id === step.id);
 
       const tradeType = stepTradeMapping[step.id] || "autre";
       const estimatedDays = defaultDurations[step.id] || 5;
@@ -634,11 +632,11 @@ export const useProjectSchedule = (projectId: string | null) => {
       if (schedule) {
         // Mettre à jour le schedule existant (sauf s'il est déjà complété)
         if (schedule.status !== "completed") {
-          await updateScheduleMutation.mutateAsync({
-            id: schedule.id,
-            start_date: newStart,
-            end_date: newEnd,
-          });
+          await supabase
+            .from("project_schedules")
+            .update({ start_date: newStart, end_date: newEnd })
+            .eq("id", schedule.id);
+          updatedCount++;
         } else {
           // Si complété, on utilise sa date de fin pour le suivant
           if (schedule.end_date) {
@@ -648,7 +646,7 @@ export const useProjectSchedule = (projectId: string | null) => {
         }
       } else {
         // Utiliser upsert pour créer le schedule sans risque de doublon
-        const { error } = await supabase.from("project_schedules").upsert({
+        await supabase.from("project_schedules").upsert({
           project_id: projectId,
           step_id: step.id,
           step_name: step.title,
@@ -664,22 +662,22 @@ export const useProjectSchedule = (projectId: string | null) => {
           onConflict: "project_id,step_id",
           ignoreDuplicates: false,
         });
-
-        if (error) {
-          console.error("Error creating subsequent schedule:", error);
-        }
+        updatedCount++;
       }
 
       // La prochaine étape commence après celle-ci
       nextStartDate = addBusinessDays(parseISO(newEnd), 1);
     }
 
+    // Invalider une seule fois à la fin
+    queryClient.invalidateQueries({ queryKey: ["project-schedules", projectId] });
+
     toast({
-      title: "Échéancier mis à jour",
-      description: `Étape terminée! Les prochaines étapes ont été planifiées à partir de demain.`,
+      title: "Étape terminée",
+      description: `Les ${updatedCount} prochaines étapes ont été planifiées.`,
     });
 
-    return { daysAhead: 0, alertsCreated: alertsToCreate.length };
+    return { daysAhead: 0, alertsCreated: 0 };
   };
 
   /**
@@ -731,7 +729,7 @@ export const useProjectSchedule = (projectId: string | null) => {
       }
     }
 
-    // Mettre à jour l'étape décochée et toutes les suivantes
+    // Mettre à jour toutes les étapes directement via Supabase (batch)
     for (let i = uncompleteIndex; i < sortedSchedules.length; i++) {
       const schedule = sortedSchedules[i];
       
@@ -740,17 +738,22 @@ export const useProjectSchedule = (projectId: string | null) => {
       const newStart = format(newStartDate, "yyyy-MM-dd");
       const newEnd = format(addBusinessDays(newStartDate, duration - 1), "yyyy-MM-dd");
 
-      await updateScheduleMutation.mutateAsync({
-        id: schedule.id,
-        start_date: newStart,
-        end_date: newEnd,
-        status: i === uncompleteIndex ? "pending" : schedule.status,
-        actual_days: i === uncompleteIndex ? null : schedule.actual_days,
-      });
+      await supabase
+        .from("project_schedules")
+        .update({
+          start_date: newStart,
+          end_date: newEnd,
+          status: i === uncompleteIndex ? "pending" : schedule.status,
+          actual_days: i === uncompleteIndex ? null : schedule.actual_days,
+        })
+        .eq("id", schedule.id);
 
       // La prochaine étape commence après celle-ci
       newStartDate = addBusinessDays(parseISO(newEnd), 1);
     }
+
+    // Invalider une seule fois à la fin
+    queryClient.invalidateQueries({ queryKey: ["project-schedules", projectId] });
 
     toast({
       title: "Échéancier restauré",
