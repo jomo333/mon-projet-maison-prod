@@ -257,6 +257,26 @@ export const useProjectSchedule = (projectId: string | null) => {
     return format(end, "yyyy-MM-dd");
   };
 
+  // Métiers intérieurs qui peuvent coexister avec l'extérieur
+  const interiorTrades = ["gypse", "peinture", "plancher", "ceramique", "armoires", "comptoirs", "finitions"];
+  const exteriorTrades = ["exterieur", "amenagement"];
+
+  // Vérifie si deux métiers peuvent travailler en parallèle sans conflit
+  const canWorkInParallel = (trade1: string, trade2: string): boolean => {
+    // L'extérieur peut travailler en parallèle avec les métiers intérieurs
+    const isExterior1 = exteriorTrades.includes(trade1);
+    const isExterior2 = exteriorTrades.includes(trade2);
+    const isInterior1 = interiorTrades.includes(trade1);
+    const isInterior2 = interiorTrades.includes(trade2);
+
+    // Extérieur + Intérieur = pas de conflit
+    if ((isExterior1 && isInterior2) || (isExterior2 && isInterior1)) {
+      return true;
+    }
+
+    return false;
+  };
+
   const checkConflicts = (schedules: ScheduleItem[]): { date: string; trades: string[] }[] => {
     const conflicts: { date: string; trades: string[] }[] = [];
     const dateTradeMap: Record<string, Set<string>> = {};
@@ -280,8 +300,23 @@ export const useProjectSchedule = (projectId: string | null) => {
     }
 
     for (const [date, trades] of Object.entries(dateTradeMap)) {
-      if (trades.size > 1) {
-        conflicts.push({ date, trades: Array.from(trades) });
+      const tradesArray = Array.from(trades);
+      if (tradesArray.length > 1) {
+        // Vérifier si tous les métiers peuvent travailler en parallèle
+        let hasRealConflict = false;
+        for (let i = 0; i < tradesArray.length; i++) {
+          for (let j = i + 1; j < tradesArray.length; j++) {
+            if (!canWorkInParallel(tradesArray[i], tradesArray[j])) {
+              hasRealConflict = true;
+              break;
+            }
+          }
+          if (hasRealConflict) break;
+        }
+        
+        if (hasRealConflict) {
+          conflicts.push({ date, trades: tradesArray });
+        }
       }
     }
 

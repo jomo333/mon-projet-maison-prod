@@ -70,6 +70,11 @@ const minimumDelayAfterStep: Record<string, { afterStep: string; days: number; r
     days: 21, // 3 semaines minimum pour la cure du béton
     reason: "Cure du béton des fondations (minimum 3 semaines)",
   },
+  exterieur: {
+    afterStep: "electricite",
+    days: 0, // Peut commencer dès que l'électricité est terminée
+    reason: "Travaux extérieurs peuvent commencer après le filage électrique",
+  },
 };
 
 // Étapes nécessitant des mesures
