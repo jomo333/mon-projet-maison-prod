@@ -387,6 +387,42 @@ export type Database = {
           },
         ]
       }
+      task_dates: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          notes: string | null
+          project_id: string
+          start_date: string | null
+          step_id: string
+          task_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          project_id: string
+          start_date?: string | null
+          step_id: string
+          task_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          project_id?: string
+          start_date?: string | null
+          step_id?: string
+          task_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

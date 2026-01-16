@@ -8,6 +8,8 @@ import { Clock, ChevronLeft, ChevronRight, Lightbulb, FileText, CheckCircle2, Cl
 import type { LucideIcon } from "lucide-react";
 import { TaskAttachments } from "./TaskAttachments";
 import { StepPhotoUpload } from "@/components/project/StepPhotoUpload";
+import { TaskDatePicker } from "./TaskDatePicker";
+import { useTaskDates } from "@/hooks/useTaskDates";
 
 const iconMap: Record<string, LucideIcon> = {
   ClipboardList,
@@ -52,6 +54,7 @@ export function StepDetail({
 }: StepDetailProps) {
   const phase = phases.find(p => p.id === step.phase);
   const IconComponent = iconMap[step.icon] || Circle;
+  const { getTaskDate, upsertTaskDate } = useTaskDates(projectId || null);
 
   const completedCount = step.tasks.filter(task => 
     isTaskCompleted?.(step.id, task.id)
@@ -63,6 +66,16 @@ export function StepDetail({
       const isCompleted = isTaskCompleted?.(step.id, taskId) || false;
       onToggleTask(step.id, taskId, isCompleted);
     }
+  };
+
+  const handleDateChange = (taskId: string, field: 'start_date' | 'end_date', value: string | null) => {
+    const currentTaskDate = getTaskDate(step.id, taskId);
+    upsertTaskDate({
+      stepId: step.id,
+      taskId,
+      startDate: field === 'start_date' ? value : currentTaskDate?.start_date,
+      endDate: field === 'end_date' ? value : currentTaskDate?.end_date,
+    });
   };
 
   return (
@@ -141,6 +154,28 @@ export function StepDetail({
                       <p className="text-muted-foreground">
                         {task.description}
                       </p>
+
+                      {/* Task Dates */}
+                      {projectId && (
+                        <div className="bg-muted/50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 text-foreground font-medium mb-3">
+                            <Clock className="h-4 w-4" />
+                            <span>Planification</span>
+                          </div>
+                          <div className="flex flex-wrap gap-4">
+                            <TaskDatePicker
+                              label="Date début"
+                              value={getTaskDate(step.id, task.id)?.start_date || null}
+                              onChange={(date) => handleDateChange(task.id, 'start_date', date)}
+                            />
+                            <TaskDatePicker
+                              label="Date fin"
+                              value={getTaskDate(step.id, task.id)?.end_date || null}
+                              onChange={(date) => handleDateChange(task.id, 'end_date', date)}
+                            />
+                          </div>
+                        </div>
+                      )}
                       
                       {task.tips && task.tips.length > 0 && (
                         <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4">
