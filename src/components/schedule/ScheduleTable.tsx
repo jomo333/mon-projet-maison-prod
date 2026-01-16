@@ -248,19 +248,27 @@ export const ScheduleTable = ({
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    {schedule.status !== "completed" && onComplete && (
+                    {onComplete && (
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                            className="text-primary hover:text-primary/90 hover:bg-muted"
                             onClick={() => handleStartComplete(schedule)}
                           >
-                            <CheckCircle className="h-4 w-4" />
+                            {schedule.status === "completed" ? (
+                              <FastForward className="h-4 w-4" />
+                            ) : (
+                              <CheckCircle className="h-4 w-4" />
+                            )}
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Marquer terminé et ajuster l'échéancier</TooltipContent>
+                        <TooltipContent>
+                          {schedule.status === "completed"
+                            ? "Ajuster l'échéancier (étape déjà terminée)"
+                            : "Marquer terminé et devancer l'échéancier"}
+                        </TooltipContent>
                       </Tooltip>
                     )}
                     <Button
