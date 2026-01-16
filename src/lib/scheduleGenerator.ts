@@ -111,6 +111,7 @@ function calculateStartDateBackward(endDate: string, businessDays: number): stri
  * Génère automatiquement l'échéancier complet pour un projet
  * La date visée correspond au JOUR 1 des travaux (excavation-fondation)
  * Les étapes de préparation sont planifiées EN AMONT de cette date
+ * Si la préparation tomberait avant aujourd'hui, on commence aujourd'hui
  */
 export async function generateProjectSchedule(
   projectId: string,
@@ -140,44 +141,66 @@ export async function generateProjectSchedule(
     const constructionStepsFiltered = stepsToSchedule.filter(s => !preparationSteps.includes(s.id));
 
     const schedulesToInsert: any[] = [];
+    const today = format(new Date(), "yyyy-MM-dd");
 
-    // 1. Planifier les étapes de PRÉPARATION en amont (backward from targetStartDate)
-    // On part de la date visée et on remonte dans le temps
-    let prepEndDate = calculateStartDateBackward(targetStartDate, 1); // La veille du jour 1
-
-    // Inverser pour planifier de la fin vers le début (plans-permis -> financement -> planification)
-    const prepStepsReversed = [...prepSteps].reverse();
+    // 1. Planifier les étapes de PRÉPARATION
+    // Si on est en phase de planification, on commence aujourd'hui et on va vers le futur
+    // Sinon, on remonte depuis la date visée des travaux
     
-    for (const step of prepStepsReversed) {
-      const tradeType = stepTradeMapping[step.id] || "autre";
-      const duration = defaultDurations[step.id] || 5;
-      
-      // Calculer la date de début en reculant de la durée
-      const startDate = calculateStartDateBackward(prepEndDate, duration);
-      
-      schedulesToInsert.unshift({
-        project_id: projectId,
-        step_id: step.id,
-        step_name: step.title,
-        trade_type: tradeType,
-        trade_color: getTradeColor(tradeType),
-        estimated_days: duration,
-        start_date: startDate,
-        end_date: prepEndDate,
-        supplier_schedule_lead_days: supplierLeadDays[step.id] || 21,
-        fabrication_lead_days: fabricationLeadDays[step.id] || 0,
-        measurement_required: false,
-        measurement_after_step_id: null,
-        measurement_notes: null,
-        status: "scheduled",
-      });
+    if (prepSteps.length > 0) {
+      // Calculer d'abord la date théorique de début en remontant
+      let theoreticalPrepStartDate = targetStartDate;
+      for (const step of [...prepSteps].reverse()) {
+        const duration = defaultDurations[step.id] || 5;
+        theoreticalPrepStartDate = calculateStartDateBackward(theoreticalPrepStartDate, duration + 1);
+      }
 
-      // L'étape précédente se termine avant le début de celle-ci
-      prepEndDate = calculateStartDateBackward(startDate, 1);
+      // Si la date théorique est avant aujourd'hui, on commence aujourd'hui
+      const actualPrepStartDate = theoreticalPrepStartDate < today ? today : theoreticalPrepStartDate;
+      
+      // Planifier les étapes de préparation vers le futur à partir de la date de début
+      let currentPrepDate = actualPrepStartDate;
+      
+      for (const step of prepSteps) {
+        const tradeType = stepTradeMapping[step.id] || "autre";
+        const duration = defaultDurations[step.id] || 5;
+        const endDate = calculateEndDate(currentPrepDate, duration);
+        
+        schedulesToInsert.push({
+          project_id: projectId,
+          step_id: step.id,
+          step_name: step.title,
+          trade_type: tradeType,
+          trade_color: getTradeColor(tradeType),
+          estimated_days: duration,
+          start_date: currentPrepDate,
+          end_date: endDate,
+          supplier_schedule_lead_days: supplierLeadDays[step.id] || 21,
+          fabrication_lead_days: fabricationLeadDays[step.id] || 0,
+          measurement_required: false,
+          measurement_after_step_id: null,
+          measurement_notes: null,
+          status: currentPrepDate === today ? "in_progress" : "scheduled",
+        });
+
+        // Prochaine étape commence après la fin de celle-ci
+        currentPrepDate = calculateEndDate(endDate, 1);
+      }
     }
 
     // 2. Planifier les étapes de CONSTRUCTION à partir de la date visée (forward)
-    let currentDate = targetStartDate;
+    // Si les étapes de préparation se terminent après la date visée, ajuster
+    let constructionStartDate = targetStartDate;
+    
+    if (schedulesToInsert.length > 0) {
+      const lastPrepStep = schedulesToInsert[schedulesToInsert.length - 1];
+      if (lastPrepStep.end_date && lastPrepStep.end_date >= targetStartDate) {
+        // La préparation se termine après la date visée, on décale la construction
+        constructionStartDate = calculateEndDate(lastPrepStep.end_date, 1);
+      }
+    }
+
+    let currentDate = constructionStartDate;
 
     for (const step of constructionStepsFiltered) {
       const tradeType = stepTradeMapping[step.id] || "autre";
