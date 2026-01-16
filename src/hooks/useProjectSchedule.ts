@@ -481,19 +481,17 @@ export const useProjectSchedule = (projectId: string | null) => {
   ) => {
     const todayDate = new Date();
     const today = format(todayDate, "yyyy-MM-dd");
-    // On considère "terminé" = terminé aujourd'hui.
-    // Si l'utilisateur fournit une durée, on recalcule aussi la date de début réelle.
-    const actualEndDate = today;
 
-    let actualStartDate: string | undefined = undefined;
-    if (actualDays && actualDays > 0) {
-      actualStartDate = format(subBusinessDays(todayDate, actualDays - 1), "yyyy-MM-dd");
-    }
+    // Sécurité: ne jamais écrire un end_date < start_date.
+    // Si l'utilisateur ne fournit pas de durée, on considère 1 jour (aujourd'hui).
+    const usedDays = actualDays && actualDays > 0 ? actualDays : 1;
+    const actualEndDate = today;
+    const actualStartDate = format(subBusinessDays(todayDate, usedDays - 1), "yyyy-MM-dd");
 
     return recalculateScheduleFromCompleted(
       scheduleId,
       actualEndDate,
-      actualDays,
+      usedDays,
       actualStartDate
     );
   };

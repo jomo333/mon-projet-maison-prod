@@ -78,6 +78,7 @@ const Schedule = () => {
     calculateEndDate,
     checkConflicts,
     completeStep,
+    uncompleteStep,
     updateScheduleAndRecalculate,
   } = useProjectSchedule(selectedProjectId);
 
@@ -316,6 +317,7 @@ const Schedule = () => {
                     }}
                     onDelete={deleteSchedule}
                     onComplete={completeStep}
+                    onUncomplete={uncompleteStep}
                     conflicts={conflicts}
                     calculateEndDate={calculateEndDate}
                   />

@@ -51,6 +51,7 @@ import {
   ChevronUp,
   CheckCircle,
   FastForward,
+  RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScheduleItem } from "@/hooks/useProjectSchedule";
@@ -61,7 +62,11 @@ interface ScheduleTableProps {
   schedules: ScheduleItem[];
   onUpdate: (schedule: Partial<ScheduleItem> & { id: string }) => void | Promise<void>;
   onDelete: (id: string) => void;
-  onComplete?: (scheduleId: string, actualDays?: number) => Promise<{ daysAhead: number; alertsCreated: number } | undefined>;
+  onComplete?: (
+    scheduleId: string,
+    actualDays?: number
+  ) => Promise<{ daysAhead: number; alertsCreated: number } | undefined>;
+  onUncomplete?: (scheduleId: string) => void | Promise<void>;
   conflicts: { date: string; trades: string[] }[];
   calculateEndDate: (startDate: string, days: number) => string;
 }
@@ -78,6 +83,7 @@ export const ScheduleTable = ({
   onUpdate,
   onDelete,
   onComplete,
+  onUncomplete,
   conflicts,
   calculateEndDate,
 }: ScheduleTableProps) => {
@@ -131,10 +137,14 @@ export const ScheduleTable = ({
 
   const handleConfirmComplete = async () => {
     if (!completingId || !onComplete) return;
-    
+
+    const schedule = schedules.find((s) => s.id === completingId);
+    const fallbackDays = schedule?.actual_days || schedule?.estimated_days || 1;
+    const normalizedDays = completeDays && completeDays > 0 ? completeDays : fallbackDays;
+
     setIsCompleting(true);
     try {
-      await onComplete(completingId, completeDays);
+      await onComplete(completingId, normalizedDays);
       setCompletingId(null);
       setCompleteDays(undefined);
     } finally {
@@ -254,7 +264,7 @@ export const ScheduleTable = ({
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    {onComplete && (
+                    {onComplete && schedule.status !== "completed" && (
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
@@ -263,18 +273,27 @@ export const ScheduleTable = ({
                             className="text-primary hover:text-primary/90 hover:bg-muted"
                             onClick={() => handleStartComplete(schedule)}
                           >
-                            {schedule.status === "completed" ? (
-                              <FastForward className="h-4 w-4" />
-                            ) : (
-                              <CheckCircle className="h-4 w-4" />
-                            )}
+                            <CheckCircle className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          {schedule.status === "completed"
-                            ? "Ajuster l'échéancier (étape déjà terminée)"
-                            : "Marquer terminé et devancer l'échéancier"}
+                          Marquer terminé et ajuster l'échéancier
                         </TooltipContent>
+                      </Tooltip>
+                    )}
+
+                    {onUncomplete && schedule.status === "completed" && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onUncomplete(schedule.id)}
+                          >
+                            <RotateCcw className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Annuler “Terminé”</TooltipContent>
                       </Tooltip>
                     )}
                     <Button
@@ -675,15 +694,15 @@ export const ScheduleTable = ({
       {/* Dialog de confirmation pour compléter une étape */}
       <Dialog open={!!completingId} onOpenChange={(open) => !open && setCompletingId(null)}>
         <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FastForward className="h-5 w-5 text-green-600" />
-              Marquer l'étape comme terminée
-            </DialogTitle>
-          </DialogHeader>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <FastForward className="h-5 w-5 text-primary" />
+                Marquer l'étape comme terminée
+              </DialogTitle>
+            </DialogHeader>
           <div className="space-y-4 py-4">
             <p className="text-sm text-muted-foreground">
-              En marquant cette étape comme terminée, l'échéancier sera automatiquement ajusté et vous recevrez des alertes si des sous-traitants doivent être contactés plus tôt.
+              En marquant cette étape comme terminée, l'échéancier sera automatiquement ajusté et vous recevrez des alertes si des sous-traitants doivent être contactés.
             </p>
             
             <div className="space-y-2">
@@ -693,10 +712,10 @@ export const ScheduleTable = ({
                 min={1}
                 value={completeDays || ""}
                 onChange={(e) => setCompleteDays(parseInt(e.target.value) || undefined)}
-                placeholder="Laissez vide pour utiliser aujourd'hui comme date de fin"
+                placeholder="Ex: 5"
               />
               <p className="text-xs text-muted-foreground">
-                Si l'étape a pris moins de jours que prévu, les étapes suivantes seront devancées.
+                Astuce: laissez la valeur par défaut si vous n'êtes pas certain.
               </p>
             </div>
           </div>
