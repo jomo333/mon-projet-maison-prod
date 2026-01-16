@@ -308,7 +308,7 @@ const Budget = () => {
           )}
 
           {/* AI Plan Analyzer */}
-          <PlanAnalyzer onBudgetGenerated={handleBudgetGenerated} />
+          <PlanAnalyzer onBudgetGenerated={handleBudgetGenerated} projectId={selectedProjectId} />
 
           {/* Summary Cards */}
           <div className="grid gap-4 md:grid-cols-3">

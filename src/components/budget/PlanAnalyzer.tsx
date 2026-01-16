@@ -52,9 +52,10 @@ interface BudgetAnalysis {
 
 interface PlanAnalyzerProps {
   onBudgetGenerated: (categories: BudgetCategory[]) => void;
+  projectId?: string | null;
 }
 
-export function PlanAnalyzer({ onBudgetGenerated }: PlanAnalyzerProps) {
+export function PlanAnalyzer({ onBudgetGenerated, projectId }: PlanAnalyzerProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<BudgetAnalysis | null>(null);
   const [analysisMode, setAnalysisMode] = useState<"manual" | "plan">("manual");
@@ -76,19 +77,58 @@ export function PlanAnalyzer({ onBudgetGenerated }: PlanAnalyzerProps) {
   // PDF conversion hook
   const { convertPdfToImages, isPdf, isConverting, progress } = usePdfToImage();
 
-  // Fetch uploaded plans from all tasks
+  // Fetch uploaded plans from project tasks AND project photos with plan-related step_ids
   const { data: plans = [] } = useQuery({
-    queryKey: ["all-plans"],
+    queryKey: ["project-plans", projectId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Get plans from task_attachments (with category "plan")
+      const attachmentsQuery = supabase
         .from("task_attachments")
         .select("*")
         .eq("category", "plan")
         .order("created_at", { ascending: false });
+      
+      // If project selected, filter by project_id
+      if (projectId) {
+        attachmentsQuery.eq("project_id", projectId);
+      }
+      
+      const { data: attachments, error: attachmentsError } = await attachmentsQuery;
+      if (attachmentsError) throw attachmentsError;
 
-      if (error) throw error;
-      return data;
+      // Also get plans from project_photos for the project (plans often uploaded in step 1)
+      let photos: any[] = [];
+      if (projectId) {
+        const { data: projectPhotos, error: photosError } = await supabase
+          .from("project_photos")
+          .select("*")
+          .eq("project_id", projectId)
+          .order("created_at", { ascending: false });
+        
+        if (!photosError && projectPhotos) {
+          // Convert project photos to match attachment format
+          photos = projectPhotos.map(photo => ({
+            id: photo.id,
+            file_name: photo.file_name,
+            file_url: photo.file_url,
+            file_type: photo.file_url?.match(/\.(png|jpg|jpeg|gif|webp)$/i) ? 'image/jpeg' : 'application/pdf',
+            file_size: photo.file_size,
+            created_at: photo.created_at,
+            category: 'plan',
+            step_id: photo.step_id,
+          }));
+        }
+      }
+
+      // Merge and deduplicate by file_url
+      const allPlans = [...(attachments || []), ...photos];
+      const uniquePlans = allPlans.filter((plan, index, self) => 
+        index === self.findIndex(p => p.file_url === plan.file_url)
+      );
+      
+      return uniquePlans;
     },
+    enabled: true,
   });
 
   // Upload mutation
@@ -107,7 +147,16 @@ export function PlanAnalyzer({ onBudgetGenerated }: PlanAnalyzerProps) {
         .from("task-attachments")
         .getPublicUrl(fileName);
 
-      const { error: dbError } = await supabase.from("task_attachments").insert({
+      const insertData: {
+        step_id: string;
+        task_id: string;
+        file_name: string;
+        file_url: string;
+        file_type: string;
+        file_size: number;
+        category: string;
+        project_id?: string;
+      } = {
         step_id: "budget",
         task_id: "plan-upload",
         file_name: file.name,
@@ -115,14 +164,21 @@ export function PlanAnalyzer({ onBudgetGenerated }: PlanAnalyzerProps) {
         file_type: file.type,
         file_size: file.size,
         category: "plan",
-      });
+      };
+
+      // Include project_id if available
+      if (projectId) {
+        insertData.project_id = projectId;
+      }
+
+      const { error: dbError } = await supabase.from("task_attachments").insert(insertData);
 
       if (dbError) throw dbError;
       
       return urlData.publicUrl;
     },
     onSuccess: (publicUrl) => {
-      queryClient.invalidateQueries({ queryKey: ["all-plans"] });
+      queryClient.invalidateQueries({ queryKey: ["project-plans", projectId] });
       setSelectedPlanUrls(prev => [...prev, publicUrl]);
       toast.success("Plan téléversé avec succès!");
     },
@@ -149,7 +205,7 @@ export function PlanAnalyzer({ onBudgetGenerated }: PlanAnalyzerProps) {
       if (error) throw error;
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["all-plans"] });
+      queryClient.invalidateQueries({ queryKey: ["project-plans", projectId] });
       setSelectedPlanUrls(prev => prev.filter(url => url !== variables.file_url));
       toast.success("Plan supprimé");
     },
