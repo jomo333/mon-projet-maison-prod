@@ -2,8 +2,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { addBusinessDays, differenceInBusinessDays, format, parseISO, subBusinessDays } from "date-fns";
-import { sortSchedulesByExecutionOrder } from "@/lib/scheduleOrder";
-
+import { sortSchedulesByExecutionOrder, getStepExecutionOrder } from "@/lib/scheduleOrder";
+import { constructionSteps } from "@/data/constructionSteps";
+import { getTradeColor } from "@/data/tradeTypes";
 export interface ScheduleItem {
   id: string;
   project_id: string;
@@ -418,6 +419,264 @@ export const useProjectSchedule = (projectId: string | null) => {
   };
 
   /**
+   * Complète une étape par son step_id (crée le schedule si nécessaire)
+   * et recalcule toutes les étapes suivantes
+   */
+  const completeStepByStepId = async (stepId: string, actualDays?: number) => {
+    if (!projectId) return { daysAhead: 0, alertsCreated: 0 };
+
+    const todayDate = new Date();
+    const today = format(todayDate, "yyyy-MM-dd");
+
+    // Chercher si un schedule existe déjà pour cette étape
+    let existingSchedule = schedulesQuery.data?.find((s) => s.step_id === stepId);
+
+    // Mapping des step_id vers trade_type
+    const stepTradeMapping: Record<string, string> = {
+      planification: "autre",
+      financement: "autre",
+      "plans-permis": "autre",
+      "excavation-fondation": "excavation",
+      structure: "charpente",
+      toiture: "toiture",
+      "fenetres-portes": "fenetre",
+      electricite: "electricite",
+      plomberie: "plomberie",
+      hvac: "hvac",
+      isolation: "isolation",
+      gypse: "gypse",
+      "revetements-sol": "plancher",
+      "cuisine-sdb": "armoires",
+      "finitions-int": "finitions",
+      exterieur: "exterieur",
+      "inspections-finales": "inspecteur",
+    };
+
+    // Durées par défaut
+    const defaultDurations: Record<string, number> = {
+      planification: 15,
+      financement: 20,
+      "plans-permis": 30,
+      "excavation-fondation": 15,
+      structure: 15,
+      toiture: 7,
+      "fenetres-portes": 5,
+      electricite: 7,
+      plomberie: 7,
+      hvac: 7,
+      isolation: 5,
+      gypse: 15,
+      "revetements-sol": 7,
+      "cuisine-sdb": 10,
+      "finitions-int": 10,
+      exterieur: 15,
+      "inspections-finales": 5,
+    };
+
+    // Si le schedule n'existe pas, on doit le créer
+    if (!existingSchedule) {
+      const step = constructionSteps.find((s) => s.id === stepId);
+      if (!step) return { daysAhead: 0, alertsCreated: 0 };
+
+      const tradeType = stepTradeMapping[stepId] || "autre";
+      const estimatedDays = defaultDurations[stepId] || 5;
+      const usedDays = actualDays || 1; // Par défaut 1 jour si terminé aujourd'hui sans date
+      
+      // Calculer la date de début basée sur la durée réelle
+      const startDate = format(subBusinessDays(todayDate, usedDays - 1), "yyyy-MM-dd");
+
+      // Créer le schedule comme "completed"
+      const { data: newSchedule, error } = await supabase
+        .from("project_schedules")
+        .insert({
+          project_id: projectId,
+          step_id: stepId,
+          step_name: step.title,
+          trade_type: tradeType,
+          trade_color: getTradeColor(tradeType),
+          estimated_days: estimatedDays,
+          actual_days: usedDays,
+          start_date: startDate,
+          end_date: today,
+          status: "completed",
+          supplier_schedule_lead_days: 21,
+          fabrication_lead_days: 0,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error creating schedule:", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de créer l'échéancier pour cette étape",
+          variant: "destructive",
+        });
+        return { daysAhead: 0, alertsCreated: 0 };
+      }
+
+      existingSchedule = newSchedule as ScheduleItem;
+    }
+
+    // Maintenant on a un schedule, on peut le marquer comme complété et recalculer
+    // Utiliser la logique existante de recalculateScheduleFromCompleted
+    let actualStartDate: string | undefined = undefined;
+    if (actualDays && actualDays > 0) {
+      actualStartDate = format(subBusinessDays(todayDate, actualDays - 1), "yyyy-MM-dd");
+    }
+
+    // Recalculer pour devancer les étapes suivantes
+    const result = await recalculateScheduleFromCompletedAndCreateMissing(
+      existingSchedule.id,
+      today,
+      actualDays,
+      actualStartDate
+    );
+
+    // Invalider les queries pour rafraîchir les données
+    queryClient.invalidateQueries({ queryKey: ["project-schedules", projectId] });
+
+    return result;
+  };
+
+  /**
+   * Version étendue de recalculateScheduleFromCompleted qui crée les schedules manquants
+   */
+  const recalculateScheduleFromCompletedAndCreateMissing = async (
+    completedScheduleId: string,
+    actualEndDate: string,
+    actualDays?: number,
+    actualStartDate?: string
+  ) => {
+    if (!projectId) return { daysAhead: 0, alertsCreated: 0 };
+
+    // Récupérer les schedules existants, triés par ordre d'exécution
+    const existingSchedules = sortSchedulesByExecutionOrder(schedulesQuery.data || []);
+    
+    // Trouver l'étape complétée
+    const completedSchedule = existingSchedules.find((s) => s.id === completedScheduleId);
+    if (!completedSchedule) return { daysAhead: 0, alertsCreated: 0 };
+
+    const completedStepIndex = getStepExecutionOrder(completedSchedule.step_id);
+
+    // Mettre à jour l'étape complétée
+    await updateScheduleMutation.mutateAsync({
+      id: completedScheduleId,
+      status: "completed",
+      start_date: actualStartDate ?? completedSchedule.start_date ?? actualEndDate,
+      end_date: actualEndDate,
+      actual_days: actualDays ?? 1,
+    });
+
+    // Mapping et durées pour créer les étapes manquantes
+    const stepTradeMapping: Record<string, string> = {
+      planification: "autre",
+      financement: "autre",
+      "plans-permis": "autre",
+      "excavation-fondation": "excavation",
+      structure: "charpente",
+      toiture: "toiture",
+      "fenetres-portes": "fenetre",
+      electricite: "electricite",
+      plomberie: "plomberie",
+      hvac: "hvac",
+      isolation: "isolation",
+      gypse: "gypse",
+      "revetements-sol": "plancher",
+      "cuisine-sdb": "armoires",
+      "finitions-int": "finitions",
+      exterieur: "exterieur",
+      "inspections-finales": "inspecteur",
+    };
+
+    const defaultDurations: Record<string, number> = {
+      planification: 15,
+      financement: 20,
+      "plans-permis": 30,
+      "excavation-fondation": 15,
+      structure: 15,
+      toiture: 7,
+      "fenetres-portes": 5,
+      electricite: 7,
+      plomberie: 7,
+      hvac: 7,
+      isolation: 5,
+      gypse: 15,
+      "revetements-sol": 7,
+      "cuisine-sdb": 10,
+      "finitions-int": 10,
+      exterieur: 15,
+      "inspections-finales": 5,
+    };
+
+    // Trouver toutes les étapes qui viennent APRÈS l'étape complétée
+    const subsequentSteps = constructionSteps.filter((step) => {
+      const stepIndex = getStepExecutionOrder(step.id);
+      return stepIndex > completedStepIndex;
+    });
+
+    // La prochaine étape commence le jour ouvrable suivant la fin
+    let nextStartDate = addBusinessDays(parseISO(actualEndDate), 1);
+    const alertsToCreate: any[] = [];
+
+    for (const step of subsequentSteps) {
+      // Vérifier si un schedule existe déjà pour cette étape
+      let schedule = existingSchedules.find((s) => s.step_id === step.id);
+
+      const tradeType = stepTradeMapping[step.id] || "autre";
+      const estimatedDays = defaultDurations[step.id] || 5;
+      const newStart = format(nextStartDate, "yyyy-MM-dd");
+      const newEnd = format(addBusinessDays(nextStartDate, estimatedDays - 1), "yyyy-MM-dd");
+
+      if (schedule) {
+        // Mettre à jour le schedule existant (sauf s'il est déjà complété)
+        if (schedule.status !== "completed") {
+          await updateScheduleMutation.mutateAsync({
+            id: schedule.id,
+            start_date: newStart,
+            end_date: newEnd,
+          });
+        } else {
+          // Si complété, on utilise sa date de fin pour le suivant
+          if (schedule.end_date) {
+            nextStartDate = addBusinessDays(parseISO(schedule.end_date), 1);
+            continue;
+          }
+        }
+      } else {
+        // Créer un nouveau schedule pour cette étape
+        const { error } = await supabase.from("project_schedules").insert({
+          project_id: projectId,
+          step_id: step.id,
+          step_name: step.title,
+          trade_type: tradeType,
+          trade_color: getTradeColor(tradeType),
+          estimated_days: estimatedDays,
+          start_date: newStart,
+          end_date: newEnd,
+          status: "scheduled",
+          supplier_schedule_lead_days: 21,
+          fabrication_lead_days: 0,
+        });
+
+        if (error) {
+          console.error("Error creating subsequent schedule:", error);
+        }
+      }
+
+      // La prochaine étape commence après celle-ci
+      nextStartDate = addBusinessDays(parseISO(newEnd), 1);
+    }
+
+    toast({
+      title: "Échéancier mis à jour",
+      description: `Étape terminée! Les prochaines étapes ont été planifiées à partir de demain.`,
+    });
+
+    return { daysAhead: 0, alertsCreated: alertsToCreate.length };
+  };
+
+  /**
    * Annuler la complétion d'une étape et restaurer l'échéancier original
    * Recalcule toutes les dates suivantes en utilisant les durées estimées
    */
@@ -509,6 +768,7 @@ export const useProjectSchedule = (projectId: string | null) => {
     checkConflicts,
     recalculateScheduleFromCompleted,
     completeStep,
+    completeStepByStepId,
     uncompleteStep,
     isCreating: createScheduleMutation.isPending,
     isUpdating: updateScheduleMutation.isPending,

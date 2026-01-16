@@ -27,6 +27,7 @@ const Dashboard = () => {
     schedules,
     isLoading: isLoadingSchedules,
     completeStep,
+    completeStepByStepId,
     uncompleteStep,
   } = useProjectSchedule(projectFromUrl);
 
@@ -65,15 +66,23 @@ const Dashboard = () => {
   // Handle toggle complete for a step
   // IMPORTANT: si l'utilisateur marque une étape comme "Terminée", on devance automatiquement
   // l'échéancier en se basant sur une fin réelle = aujourd'hui.
+  // Si aucun schedule n'existe, on le crée automatiquement
   const handleToggleComplete = async (stepId: string, completed: boolean) => {
     const schedule = scheduleByStepId[stepId];
-    if (!schedule?.id) return;
-
+    
     if (completed) {
-      await completeStep(schedule.id);
+      if (schedule?.id) {
+        // Schedule existe, utiliser completeStep
+        await completeStep(schedule.id);
+      } else {
+        // Pas de schedule, utiliser completeStepByStepId pour créer et recalculer
+        await completeStepByStepId(stepId);
+      }
     } else {
       // Restaurer l'échéancier original en utilisant les durées estimées
-      await uncompleteStep(schedule.id);
+      if (schedule?.id) {
+        await uncompleteStep(schedule.id);
+      }
     }
   };
 
