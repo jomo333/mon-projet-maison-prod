@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { stageToGuideStep, shouldOfferPlanUpload } from "@/lib/projectStageMapping";
 import { usePdfToImage } from "@/hooks/use-pdf-to-image";
+import { generateProjectSchedule, calculateTotalProjectDuration } from "@/lib/scheduleGenerator";
 
 type ProjectStage = 
   | "planification" 
@@ -270,7 +271,7 @@ const StartProject = () => {
       }
 
       toast.success("Plans téléversés avec succès!");
-      finalizeAndRedirect(createdProjectId);
+      await finalizeAndRedirect(createdProjectId);
     } catch (error: any) {
       console.error("Error uploading plans:", error);
       toast.error("Erreur lors du téléversement des plans");
@@ -279,12 +280,33 @@ const StartProject = () => {
     }
   };
 
-  const finalizeAndRedirect = (projectId: string | null) => {
+  const finalizeAndRedirect = async (projectId: string | null) => {
+    if (projectId && projectData.targetStartDate) {
+      // Générer l'échéancier automatiquement
+      toast.info("Génération de l'échéancier...");
+      const result = await generateProjectSchedule(
+        projectId,
+        projectData.targetStartDate,
+        projectData.currentStage
+      );
+      
+      if (result.success) {
+        toast.success("Échéancier généré automatiquement!");
+      } else {
+        console.error("Schedule generation error:", result.error);
+        // Ne pas bloquer la création du projet
+      }
+    }
+
     const guideStepId = stageToGuideStep[projectData.currentStage] || "planification";
     toast.success("Projet créé avec succès!");
     
-    // Navigate to dashboard with the step pre-selected
-    navigate(`/dashboard?step=${guideStepId}&project=${projectId || ""}`);
+    // Navigate to schedule page if date was set, otherwise dashboard
+    if (projectData.targetStartDate) {
+      navigate(`/echeancier?project=${projectId || ""}`);
+    } else {
+      navigate(`/dashboard?step=${guideStepId}&project=${projectId || ""}`);
+    }
   };
 
   const handleNext = async () => {
@@ -307,11 +329,11 @@ const StartProject = () => {
         // No plan upload needed, save and redirect
         setIsSaving(true);
         const projectId = await saveProject();
-        setIsSaving(false);
         
         if (projectId) {
-          finalizeAndRedirect(projectId);
+          await finalizeAndRedirect(projectId);
         }
+        setIsSaving(false);
       }
     } else if (currentStep === 6) {
       // Upload plans and finish
@@ -519,16 +541,21 @@ const StartProject = () => {
               </Popover>
 
               {projectData.targetStartDate && (
-                <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-2">
-                  <p className="text-sm font-medium text-primary">Planification automatique</p>
+                <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-primary">Échéancier automatique</p>
+                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                      ~{calculateTotalProjectDuration(projectData.currentStage)} jours ouvrables
+                    </span>
+                  </div>
                   <p className="text-sm text-muted-foreground">
-                    En fonction de cette date, nous calculerons automatiquement les délais pour :
+                    Un échéancier complet sera généré automatiquement avec :
                   </p>
                   <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
-                    <li>L'obtention des permis</li>
-                    <li>La préparation des plans</li>
-                    <li>Les réservations des entrepreneurs</li>
-                    <li>Les commandes de matériaux</li>
+                    <li>Toutes les étapes de construction planifiées</li>
+                    <li>Les alertes pour appeler les fournisseurs</li>
+                    <li>Les délais de fabrication et livraison</li>
+                    <li>Les rappels pour les mesures et inspections</li>
                   </ul>
                 </div>
               )}
