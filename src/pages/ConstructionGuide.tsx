@@ -1,17 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/landing/Footer";
 import { constructionSteps, phases } from "@/data/constructionSteps";
 import { StepCard } from "@/components/guide/StepCard";
 import { StepDetail } from "@/components/guide/StepDetail";
+import { ScheduleDatesBanner } from "@/components/guide/ScheduleDatesBanner";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const ConstructionGuide = () => {
+  const [searchParams] = useSearchParams();
+  const stepFromUrl = searchParams.get("step");
+  const projectId = searchParams.get("project");
+  
   const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
   const [activePhase, setActivePhase] = useState<string | null>(null);
+
+  // Set initial step from URL if provided
+  useEffect(() => {
+    if (stepFromUrl) {
+      const step = constructionSteps.find(s => s.id === stepFromUrl);
+      if (step) {
+        setSelectedStepId(stepFromUrl);
+      }
+    }
+  }, [stepFromUrl]);
 
   const selectedStep = selectedStepId 
     ? constructionSteps.find(s => s.id === selectedStepId) 
@@ -40,6 +56,9 @@ const ConstructionGuide = () => {
               <ArrowLeft className="h-4 w-4" />
               Retour aux étapes
             </Button>
+
+            {/* Schedule dates banner */}
+            <ScheduleDatesBanner currentStepId={selectedStepId} />
 
             <div className="mb-6">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
@@ -85,6 +104,9 @@ const ConstructionGuide = () => {
               Suivez ces étapes pour mener à bien votre projet d'autoconstruction.
             </p>
           </div>
+
+          {/* Schedule dates banner */}
+          <ScheduleDatesBanner currentStepId={null} />
 
           {/* Phase filters */}
           <div className="flex flex-wrap gap-2 mb-8">
