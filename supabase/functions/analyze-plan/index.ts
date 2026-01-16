@@ -138,9 +138,11 @@ IMPORTANT POUR LES ITEMS - PERSONNALISATION SELON LES PLANS ANALYSÉS:
   * "Béton" (pas de dimension)
 - Si tu vois des détails spécifiques sur les plans (type de toiture, style de fenêtres, matériaux notés), INCLUS-LES ABSOLUMENT dans les noms d'items
 
-CATÉGORIES À EXCLURE (projet autoconstruction - pas de frais de gestion):
+CATÉGORIES À EXCLURE (projet autoconstruction):
 - NE PAS inclure: Gestion de projet, Administration, Supervision, Frais généraux d'entrepreneur, Profit d'entrepreneur, Honoraires de gestion
+- NE PAS inclure: Frais divers, Imprévus, Divers et imprévus (déjà couverts par la Contingence 5%)
 - L'autoconstructeur gère lui-même son projet, donc aucun frais de gestion ne doit apparaître
+- La contingence de 5% couvre TOUS les imprévus et frais divers - ne pas créer de catégorie séparée
 
 Catégories pour AGRANDISSEMENT: Fondations (nouvelle partie), Structure/Charpente, Toiture, Raccordement à l'existant, Fenêtres et Portes, Électricité, Plomberie, Chauffage/Ventilation, Isolation, Revêtements extérieurs, Finitions intérieures, Démolition (si applicable), Contingence (5%), Taxes (TPS + TVQ).
 
@@ -238,9 +240,11 @@ IMPORTANT POUR LES ITEMS - DESCRIPTIONS PERSONNALISÉES AU PROJET:
   * "Électricité" (pas de détail)
   * "Isolation" (pas de valeur R ni superficie)
 
-CATÉGORIES À EXCLURE (projet autoconstruction - pas de frais de gestion):
+CATÉGORIES À EXCLURE (projet autoconstruction):
 - NE PAS inclure: Gestion de projet, Administration, Supervision, Frais généraux d'entrepreneur, Profit d'entrepreneur, Honoraires de gestion
+- NE PAS inclure: Frais divers, Imprévus, Divers et imprévus (déjà couverts par la Contingence 5%)
 - L'autoconstructeur gère lui-même son projet, donc aucun frais de gestion ne doit apparaître
+- La contingence de 5% couvre TOUS les imprévus et frais divers - ne pas créer de catégorie séparée
 
 Catégories typiques: Fondations, Structure/Charpente, Toiture, Fenêtres et Portes, Électricité, Plomberie, Chauffage/Ventilation, Isolation, Revêtements extérieurs, Finitions intérieures${hasGarage ? ', Garage' : ''}, Contingence (5%), Taxes (TPS + TVQ).`;
 
