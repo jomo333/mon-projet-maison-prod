@@ -83,10 +83,17 @@ IMPORTANT - CONTEXTE QUÉBÉCOIS:
 - Inclure les coûts de main-d'œuvre québécois (salaires syndicaux CCQ si applicable)
 - Tenir compte du climat québécois (isolation R-41 minimum pour les murs, R-60 pour le toit)
 - Considérer les exigences du Code de construction du Québec
-- Inclure la TPS (5%) et TVQ (9.975%) dans le total estimé
 - Prix des matériaux selon les fournisseurs locaux (BMR, Canac, Rona, Patrick Morin)
 - Coût moyen au Québec pour agrandissement: 300-450$/pi²
 - Coût moyen au Québec pour construction neuve: 250-350$/pi² standard, 350-500$/pi² qualité supérieure
+
+IMPORTANT - STRUCTURE DU BUDGET:
+1. Calcule d'abord le SOUS-TOTAL de tous les travaux (sans taxes ni contingence)
+2. Ajoute une catégorie "Contingence" = 5% du sous-total des travaux
+3. Ajoute une catégorie "Taxes" avec:
+   - TPS (5% du sous-total + contingence)
+   - TVQ (9.975% du sous-total + contingence)
+4. Le "estimatedTotal" = sous-total + contingence + taxes
 
 Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans backticks) avec cette structure:
 {
@@ -135,9 +142,9 @@ CATÉGORIES À EXCLURE (projet autoconstruction - pas de frais de gestion):
 - NE PAS inclure: Gestion de projet, Administration, Supervision, Frais généraux d'entrepreneur, Profit d'entrepreneur, Honoraires de gestion
 - L'autoconstructeur gère lui-même son projet, donc aucun frais de gestion ne doit apparaître
 
-Catégories pour AGRANDISSEMENT: Fondations (nouvelle partie), Structure/Charpente, Toiture, Raccordement à l'existant, Fenêtres et Portes, Électricité, Plomberie, Chauffage/Ventilation, Isolation, Revêtements extérieurs, Finitions intérieures, Démolition (si applicable).
+Catégories pour AGRANDISSEMENT: Fondations (nouvelle partie), Structure/Charpente, Toiture, Raccordement à l'existant, Fenêtres et Portes, Électricité, Plomberie, Chauffage/Ventilation, Isolation, Revêtements extérieurs, Finitions intérieures, Démolition (si applicable), Contingence (5%), Taxes (TPS + TVQ).
 
-Catégories pour CONSTRUCTION NEUVE: Fondations, Structure/Charpente, Toiture, Fenêtres et Portes, Électricité, Plomberie, Chauffage/Ventilation, Isolation, Revêtements extérieurs, Finitions intérieures, Garage (si présent).`;
+Catégories pour CONSTRUCTION NEUVE: Fondations, Structure/Charpente, Toiture, Fenêtres et Portes, Électricité, Plomberie, Chauffage/Ventilation, Isolation, Revêtements extérieurs, Finitions intérieures, Garage (si présent), Contingence (5%), Taxes (TPS + TVQ).`;
 
       userMessage = `Analyse ${imageUrls.length > 1 ? 'ces ' + imageUrls.length + ' plans' : 'ce plan'} de construction/rénovation pour un projet AU QUÉBEC.
 
@@ -181,9 +188,16 @@ IMPORTANT - CONTEXTE QUÉBÉCOIS:
 - Inclure les coûts de main-d'œuvre québécois (salaires syndicaux CCQ si applicable)
 - Tenir compte du climat québécois (isolation R-41 minimum pour les murs, R-60 pour le toit)
 - Considérer les exigences du Code de construction du Québec
-- Inclure la TPS (5%) et TVQ (9.975%) dans le total estimé
 - Prix des matériaux selon les fournisseurs locaux (BMR, Canac, Rona, Patrick Morin)
 - Coût moyen au Québec: 250-350$/pi² pour construction standard, 350-500$/pi² pour qualité supérieure
+
+IMPORTANT - STRUCTURE DU BUDGET:
+1. Calcule d'abord le SOUS-TOTAL de tous les travaux (sans taxes ni contingence)
+2. Ajoute une catégorie "Contingence" = 5% du sous-total des travaux
+3. Ajoute une catégorie "Taxes" avec:
+   - TPS (5% du sous-total + contingence)
+   - TVQ (9.975% du sous-total + contingence)
+4. Le "estimatedTotal" = sous-total + contingence + taxes
 
 Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans backticks) avec cette structure:
 {
@@ -228,7 +242,7 @@ CATÉGORIES À EXCLURE (projet autoconstruction - pas de frais de gestion):
 - NE PAS inclure: Gestion de projet, Administration, Supervision, Frais généraux d'entrepreneur, Profit d'entrepreneur, Honoraires de gestion
 - L'autoconstructeur gère lui-même son projet, donc aucun frais de gestion ne doit apparaître
 
-Catégories typiques: Fondations, Structure/Charpente, Toiture, Fenêtres et Portes, Électricité, Plomberie, Chauffage/Ventilation, Isolation, Revêtements extérieurs, Finitions intérieures${hasGarage ? ', Garage' : ''}.`;
+Catégories typiques: Fondations, Structure/Charpente, Toiture, Fenêtres et Portes, Électricité, Plomberie, Chauffage/Ventilation, Isolation, Revêtements extérieurs, Finitions intérieures${hasGarage ? ', Garage' : ''}, Contingence (5%), Taxes (TPS + TVQ).`;
 
       // Build floor details string
       let floorDetailsStr = '';
