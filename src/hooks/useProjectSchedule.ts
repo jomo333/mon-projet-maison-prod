@@ -344,7 +344,17 @@ export const useProjectSchedule = (projectId: string | null) => {
     // Collecter les dates de fin pour les vérifications de délais
     const stepEndDates: Record<string, string> = {};
 
-    // 1) D'abord, traiter toutes les étapes pour collecter leurs dates de fin
+    // Identifier les étapes avec dates manuelles (dates explicitement définies par l'utilisateur)
+    // On considère qu'une date est "manuelle" si elle existe dans la DB ET n'est pas l'étape focus actuelle
+    const manualDateStepIds = new Set<string>();
+    for (const s of sorted) {
+      if (s.status !== "completed" && s.start_date && s.id !== focusScheduleId) {
+        // Cette étape a une date existante qui n'est pas en train d'être modifiée
+        manualDateStepIds.add(s.id);
+      }
+    }
+
+    // 1) D'abord, traiter les étapes terminées et l'étape focus pour collecter leurs dates de fin
     for (const s of sorted) {
       if (s.status === "completed") {
         const norm = normalizeCompletedDates(s);
@@ -354,10 +364,11 @@ export const useProjectSchedule = (projectId: string | null) => {
       } else if (s.id === focusScheduleId && focusUpdates?.start_date) {
         const duration = (s.actual_days ?? s.estimated_days ?? 1) || 1;
         stepEndDates[s.step_id] = format(addBusinessDays(parseISO(focusUpdates.start_date), duration - 1), "yyyy-MM-dd");
-      } else if (s.end_date) {
-        stepEndDates[s.step_id] = s.end_date;
       }
     }
+
+    // Variable pour suivre le curseur de date pour les étapes à décaler
+    let cursor: Date | null = null;
 
     // 2) Traiter chaque étape
     for (let i = 0; i < sorted.length; i++) {
@@ -383,6 +394,8 @@ export const useProjectSchedule = (projectId: string | null) => {
           if (Object.keys(patch).length > 0) {
             updatesToApply.push({ id: s.id, patch });
           }
+          // Mettre à jour cursor pour l'étape suivante
+          cursor = addBusinessDays(parseISO(norm.end), 1);
         }
         continue;
       }
@@ -445,37 +458,71 @@ export const useProjectSchedule = (projectId: string | null) => {
           updatesToApply.push({ id: s.id, patch });
         }
         
-        // Mettre à jour stepEndDates pour les vérifications suivantes
+        // Mettre à jour stepEndDates et cursor pour les vérifications suivantes
         stepEndDates[s.step_id] = newEndStr;
+        cursor = addBusinessDays(parseISO(newEndStr), 1);
         continue;
       }
 
-      // === AUTRES ÉTAPES: Ne PAS modifier les dates existantes ===
-      // Juste vérifier les conflits et générer des warnings
-      if (s.start_date && s.end_date) {
-        const currentStart = parseISO(s.start_date);
+      // === AUTRES ÉTAPES APRÈS L'ÉTAPE FOCUS ===
+      if (focusIndex >= 0 && i > focusIndex) {
+        const isManualDate = manualDateStepIds.has(s.id);
         
-        // Vérifier conflit de cure
-        if (requiredStartDate && currentStart < requiredStartDate) {
-          const daysShort = Math.ceil((requiredStartDate.getTime() - currentStart.getTime()) / (1000 * 60 * 60 * 24));
-          warnings.push(
-            `⚠️ "${s.step_name}" commence le ${format(currentStart, "d MMM yyyy", { locale: fr })} ` +
-            `mais devrait attendre ${daysShort} jour(s) de plus pour respecter le délai de cure.`
-          );
-        }
-
-        // Vérifier chevauchement avec l'étape précédente
-        const prevStep = sorted[i - 1];
-        if (prevStep && prevStep.end_date && prevStep.status !== "completed") {
-          const prevEnd = parseISO(prevStep.end_date);
-          if (currentStart <= prevEnd) {
+        if (isManualDate && s.start_date) {
+          // Cette étape a une date manuelle - NE PAS la modifier
+          // Vérifier s'il y a conflit avec le cursor
+          const manualStart = parseISO(s.start_date);
+          
+          if (cursor && manualStart < cursor) {
+            const daysConflict = Math.ceil((cursor.getTime() - manualStart.getTime()) / (1000 * 60 * 60 * 24));
             warnings.push(
-              `⚠️ CHEVAUCHEMENT: "${s.step_name}" (${format(currentStart, "d MMM", { locale: fr })}) ` +
-              `chevauche "${prevStep.step_name}" (fin: ${format(prevEnd, "d MMM", { locale: fr })}). ` +
-              `Vérifiez que ces travaux peuvent se faire en parallèle.`
+              `🚨 CONFLIT: "${s.step_name}" a une date manuelle (${format(manualStart, "d MMM yyyy", { locale: fr })}) ` +
+              `qui chevauche l'étape précédente (${daysConflict} jour(s) de conflit). ` +
+              `Cette date a été conservée car elle représente un engagement avec un sous-traitant.`
             );
           }
+          
+          // Vérifier conflit de cure
+          if (requiredStartDate && manualStart < requiredStartDate) {
+            const daysShort = Math.ceil((requiredStartDate.getTime() - manualStart.getTime()) / (1000 * 60 * 60 * 24));
+            warnings.push(
+              `🚨 CONFLIT: "${s.step_name}" a une date manuelle qui ne respecte pas le délai de cure (${daysShort} jour(s) manquants). ` +
+              `Date conservée car elle représente un engagement.`
+            );
+          }
+          
+          // Mettre à jour cursor et stepEndDates pour continuer la chaîne
+          const manualEnd = s.end_date ? parseISO(s.end_date) : addBusinessDays(manualStart, duration - 1);
+          stepEndDates[s.step_id] = format(manualEnd, "yyyy-MM-dd");
+          cursor = addBusinessDays(manualEnd, 1);
+        } else {
+          // Cette étape N'A PAS de date manuelle - la décaler automatiquement
+          let newStart = cursor || new Date();
+          
+          // Respecter les contraintes de délai (cure béton)
+          if (requiredStartDate && newStart < requiredStartDate) {
+            newStart = requiredStartDate;
+          }
+          
+          const newStartStr = format(newStart, "yyyy-MM-dd");
+          const newEndStr = format(addBusinessDays(newStart, duration - 1), "yyyy-MM-dd");
+          
+          const patch: Partial<ScheduleItem> = {};
+          if (s.start_date !== newStartStr) patch.start_date = newStartStr;
+          if (s.end_date !== newEndStr) patch.end_date = newEndStr;
+          
+          if (Object.keys(patch).length > 0) {
+            updatesToApply.push({ id: s.id, patch });
+          }
+          
+          // Mettre à jour cursor et stepEndDates
+          stepEndDates[s.step_id] = newEndStr;
+          cursor = addBusinessDays(parseISO(newEndStr), 1);
         }
+      } else if (s.start_date && s.end_date) {
+        // Étapes avant l'étape focus - juste mettre à jour le cursor
+        stepEndDates[s.step_id] = s.end_date;
+        cursor = addBusinessDays(parseISO(s.end_date), 1);
       }
     }
 
