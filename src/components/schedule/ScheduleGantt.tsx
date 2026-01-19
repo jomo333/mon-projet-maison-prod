@@ -17,7 +17,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, Clock, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScheduleItem } from "@/hooks/useProjectSchedule";
 import { getTradeName, getTradeColor } from "@/data/tradeTypes";
@@ -35,9 +36,11 @@ const minimumDelayConfig: Record<string, { afterStep: string; days: number; reas
 interface ScheduleGanttProps {
   schedules: ScheduleItem[];
   conflicts: { date: string; trades: string[] }[];
+  onRegenerateSchedule?: () => Promise<void>;
+  isUpdating?: boolean;
 }
 
-export const ScheduleGantt = ({ schedules, conflicts }: ScheduleGanttProps) => {
+export const ScheduleGantt = ({ schedules, conflicts, onRegenerateSchedule, isUpdating }: ScheduleGanttProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -188,16 +191,35 @@ export const ScheduleGantt = ({ schedules, conflicts }: ScheduleGanttProps) => {
   }
 
   return (
-    <div 
-      ref={containerRef}
-      className="bg-card rounded-lg border"
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
-      style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-    >
-      <ScrollArea className="w-full">
+    <div className="bg-card rounded-lg border">
+      {/* Header avec titre et bouton */}
+      <div className="flex items-center justify-between px-4 py-3 border-b">
+        <h3 className="font-semibold text-lg">Planification du projet</h3>
+        {onRegenerateSchedule && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={async () => {
+              await onRegenerateSchedule();
+            }}
+            disabled={isUpdating}
+            className="gap-2"
+          >
+            <RotateCcw className={`h-4 w-4 ${isUpdating ? "animate-spin" : ""}`} />
+            Mise à jour de l'échéancier
+          </Button>
+        )}
+      </div>
+      
+      <div 
+        ref={containerRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+      >
+        <ScrollArea className="w-full">
         <div
           style={{
             minWidth: totalDays * dayWidth + 250,
@@ -402,29 +424,30 @@ export const ScheduleGantt = ({ schedules, conflicts }: ScheduleGanttProps) => {
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
 
-      {/* Légende */}
-      <div className="border-t p-4">
-        <div className="flex flex-wrap gap-2">
-          {schedulesWithDates
-            .reduce<ScheduleItem[]>((acc, s) => {
-              if (!acc.find((a) => a.trade_type === s.trade_type)) {
-                acc.push(s);
-              }
-              return acc;
-            }, [])
-            .map((schedule) => (
-              <Badge
-                key={schedule.trade_type}
-                variant="outline"
-                className="flex items-center gap-1"
-              >
-                <div
-                  className="w-2 h-2 rounded-full"
-                  style={{ backgroundColor: getTradeColor(schedule.trade_type) }}
-                />
-                {getTradeName(schedule.trade_type)}
-              </Badge>
-            ))}
+        {/* Légende */}
+        <div className="border-t p-4">
+          <div className="flex flex-wrap gap-2">
+            {schedulesWithDates
+              .reduce<ScheduleItem[]>((acc, s) => {
+                if (!acc.find((a) => a.trade_type === s.trade_type)) {
+                  acc.push(s);
+                }
+                return acc;
+              }, [])
+              .map((schedule) => (
+                <Badge
+                  key={schedule.trade_type}
+                  variant="outline"
+                  className="flex items-center gap-1"
+                >
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: getTradeColor(schedule.trade_type) }}
+                  />
+                  {getTradeName(schedule.trade_type)}
+                </Badge>
+              ))}
+          </div>
         </div>
       </div>
     </div>

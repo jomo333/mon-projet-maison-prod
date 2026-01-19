@@ -26,7 +26,6 @@ import {
   Loader2,
   Calendar,
   Flag,
-  RotateCcw,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -213,27 +212,13 @@ const Schedule = () => {
               </Select>
 
               {selectedProjectId && (
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={async () => {
-                      await regenerateSchedule();
-                    }}
-                    className="gap-2"
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                    Recalculer
-                  </Button>
-
-                  <AddScheduleDialog
-                    projectId={selectedProjectId}
-                    onAdd={(schedule) => {
-                      createSchedule(schedule as any);
-                    }}
-                    calculateEndDate={calculateEndDate}
-                  />
-                </div>
+                <AddScheduleDialog
+                  projectId={selectedProjectId}
+                  onAdd={(schedule) => {
+                    createSchedule(schedule as any);
+                  }}
+                  calculateEndDate={calculateEndDate}
+                />
               )}
             </div>
           </div>
@@ -349,7 +334,12 @@ const Schedule = () => {
                   />
                 )}
                 {activeTab === "gantt" && (
-                  <ScheduleGantt schedules={schedules} conflicts={conflicts} />
+                  <ScheduleGantt 
+                    schedules={schedules} 
+                    conflicts={conflicts}
+                    onRegenerateSchedule={regenerateSchedule}
+                    isUpdating={isLoading}
+                  />
                 )}
               </>
             )}
