@@ -333,165 +333,150 @@ export const useProjectSchedule = (projectId: string | null) => {
     if (!projectId) return { warnings: [] };
 
     const sorted = sortSchedulesByExecutionOrder(allSchedules);
-
-    // Appliquer les updates focus en mémoire avant le recalcul
-    const schedules = sorted.map((s) =>
-      s.id === focusScheduleId ? ({ ...s, ...focusUpdates } as ScheduleItem) : s
-    );
-
-    // Collecter les alertes de validation
     const warnings: string[] = [];
+    const updatesToApply: Array<{ id: string; patch: Partial<ScheduleItem> }> = [];
 
-    // Point de départ: la plus petite start_date connue (sinon aujourd'hui)
-    const startCandidatesMs: number[] = [];
-    for (const s of schedules) {
+    // Trouver l'index de l'étape focus
+    const focusIndex = focusScheduleId 
+      ? sorted.findIndex(s => s.id === focusScheduleId)
+      : -1;
+
+    // Collecter les dates de fin pour les vérifications de délais
+    const stepEndDates: Record<string, string> = {};
+
+    // 1) D'abord, traiter toutes les étapes pour collecter leurs dates de fin
+    for (const s of sorted) {
       if (s.status === "completed") {
         const norm = normalizeCompletedDates(s);
-        if (norm.start) startCandidatesMs.push(parseISO(norm.start).getTime());
-        else if (s.start_date) startCandidatesMs.push(parseISO(s.start_date).getTime());
-      } else if (s.start_date) {
-        startCandidatesMs.push(parseISO(s.start_date).getTime());
+        if (norm.end) stepEndDates[s.step_id] = norm.end;
+      } else if (s.id === focusScheduleId && focusUpdates?.end_date) {
+        stepEndDates[s.step_id] = focusUpdates.end_date;
+      } else if (s.id === focusScheduleId && focusUpdates?.start_date) {
+        const duration = (s.actual_days ?? s.estimated_days ?? 1) || 1;
+        stepEndDates[s.step_id] = format(addBusinessDays(parseISO(focusUpdates.start_date), duration - 1), "yyyy-MM-dd");
+      } else if (s.end_date) {
+        stepEndDates[s.step_id] = s.end_date;
       }
     }
 
-    let cursor = startCandidatesMs.length
-      ? new Date(Math.min(...startCandidatesMs))
-      : new Date();
-
-    // Délais minimum (ex: cure béton)
-    const previousStepEndDates: Record<string, string> = {};
-
-    const updatesToApply: Array<{ id: string; patch: Partial<ScheduleItem> }> = [];
-
-    for (const s of schedules) {
+    // 2) Traiter chaque étape
+    for (let i = 0; i < sorted.length; i++) {
+      const s = sorted[i];
       const duration = (s.actual_days ?? s.estimated_days ?? 1) || 1;
 
-      // 1) Étapes terminées = points fixes (on corrige seulement si incohérent)
+      // Étapes terminées = ne pas toucher (sauf normalisation)
       if (s.status === "completed") {
         const norm = normalizeCompletedDates(s);
-
         if (norm.start && norm.end) {
           const patch: Partial<ScheduleItem> = {};
-
           if (s.start_date !== norm.start) patch.start_date = norm.start;
           if (s.end_date !== norm.end) patch.end_date = norm.end;
-
-          // Si c'est l'étape focus, on persiste aussi ses champs (status/actual_days/etc.)
-          // IMPORTANT: si l'étape focus est complétée, il faut aussi persister ses dates réelles,
-          // sinon elles restent "planifiées" en DB et reviennent après un refresh.
+          
           if (s.id === focusScheduleId && focusUpdates) {
             const { start_date, end_date, ...rest } = focusUpdates;
             Object.assign(patch, rest);
-
             if (typeof start_date === "string") patch.start_date = start_date;
             if (typeof end_date === "string") patch.end_date = end_date;
-
             if (focusUpdates.actual_days === null) patch.actual_days = null;
           }
-
+          
           if (Object.keys(patch).length > 0) {
             updatesToApply.push({ id: s.id, patch });
           }
-
-          previousStepEndDates[s.step_id] = norm.end;
-
-          // Ne jamais faire reculer le curseur
-          const next = addBusinessDays(parseISO(norm.end), 1);
-          if (next > cursor) cursor = next;
         }
-
         continue;
       }
 
-      // 2) Étapes non terminées = recalcul en chaîne
+      // Vérifier les contraintes de délai (ex: cure béton)
       const delayConfig = minimumDelayAfterStep[s.step_id];
       let requiredStartDate: Date | null = null;
-      
-      if (delayConfig && previousStepEndDates[delayConfig.afterStep]) {
-        requiredStartDate = addDays(
-          parseISO(previousStepEndDates[delayConfig.afterStep]),
-          delayConfig.days
-        );
-        
-        if (requiredStartDate > cursor) cursor = requiredStartDate;
+      if (delayConfig && stepEndDates[delayConfig.afterStep]) {
+        requiredStartDate = addDays(parseISO(stepEndDates[delayConfig.afterStep]), delayConfig.days);
       }
 
-      // Si l'utilisateur modifie l'étape focus:
-      // - start_date: on la respecte si elle est PLUS TARD que le curseur (retard)
-      // - end_date (sans start_date): on translate l'étape pour que la fin corresponde
-      let userSetEndDate: string | null = null;
-      let userDesiredStart: Date | null = null;
-      
-      if (s.id === focusScheduleId) {
-        if (focusUpdates?.start_date) {
-          const desired = parseISO(focusUpdates.start_date);
-          userDesiredStart = desired;
-          
-          // IMPORTANT: Toujours respecter la date manuelle du client/sous-traitant
-          // Mais générer un avertissement si elle viole les contraintes
-          if (requiredStartDate && desired < requiredStartDate) {
-            const daysShort = Math.ceil((requiredStartDate.getTime() - desired.getTime()) / (1000 * 60 * 60 * 24));
-            warnings.push(
-              `🚨 CONFLIT DE DATE pour "${s.step_name}": La date choisie (${format(desired, "d MMM yyyy", { locale: fr })}) ` +
-              `ne respecte pas le délai de cure du béton de ${delayConfig!.days} jours. ` +
-              `Il manque ${daysShort} jour(s). Date minimum recommandée: ${format(requiredStartDate, "d MMM yyyy", { locale: fr })}. ` +
-              `⚠️ La date a été conservée car elle représente un engagement avec le sous-traitant.`
-            );
-          }
-          // Toujours utiliser la date choisie par l'utilisateur
-          cursor = desired;
-        } else if (focusUpdates?.end_date) {
-          // L'utilisateur a changé la date de fin: calculer le début en conséquence
-          const desiredEnd = parseISO(focusUpdates.end_date);
-          const desiredStart = subBusinessDays(desiredEnd, duration - 1);
-          userDesiredStart = desiredStart;
-          
-          // Générer un avertissement si la date viole les contraintes, mais la respecter
-          if (requiredStartDate && desiredStart < requiredStartDate) {
-            const daysShort = Math.ceil((requiredStartDate.getTime() - desiredStart.getTime()) / (1000 * 60 * 60 * 24));
-            warnings.push(
-              `🚨 CONFLIT DE DATE pour "${s.step_name}": La date de fin choisie (${format(desiredEnd, "d MMM yyyy", { locale: fr })}) ` +
-              `implique un début le ${format(desiredStart, "d MMM yyyy", { locale: fr })}, ` +
-              `ce qui ne respecte pas le délai de cure du béton de ${delayConfig!.days} jours. ` +
-              `Il manque ${daysShort} jour(s). ` +
-              `⚠️ La date a été conservée car elle représente un engagement avec le sous-traitant.`
-            );
-          }
-          // Toujours utiliser la date choisie par l'utilisateur
-          cursor = desiredStart;
-          userSetEndDate = focusUpdates.end_date;
-        }
-      }
-
-      // Utiliser la date choisie par l'utilisateur si c'est l'étape focus
-      const startStr = s.id === focusScheduleId && focusUpdates?.start_date 
-        ? focusUpdates.start_date 
-        : format(cursor, "yyyy-MM-dd");
-      // Si l'utilisateur a fixé une date de fin, on l'utilise, sinon on calcule
-      const endStr = userSetEndDate || format(addBusinessDays(parseISO(startStr), duration - 1), "yyyy-MM-dd");
-
-      previousStepEndDates[s.step_id] = endStr;
-
-      const patch: Partial<ScheduleItem> = {};
-      // Toujours comparer avec les valeurs ORIGINALES (avant fusion focusUpdates)
-      const originalSchedule = sortSchedulesByExecutionOrder(allSchedules).find(orig => orig.id === s.id);
-      const originalStart = originalSchedule?.start_date;
-      const originalEnd = originalSchedule?.end_date;
-      
-      if (originalStart !== startStr) patch.start_date = startStr;
-      if (originalEnd !== endStr) patch.end_date = endStr;
-
+      // === ÉTAPE FOCUS: Appliquer les changements de l'utilisateur ===
       if (s.id === focusScheduleId && focusUpdates) {
+        const patch: Partial<ScheduleItem> = {};
+        let newStartStr: string;
+        let newEndStr: string;
+
+        if (focusUpdates.start_date) {
+          newStartStr = focusUpdates.start_date;
+          newEndStr = focusUpdates.end_date || format(addBusinessDays(parseISO(newStartStr), duration - 1), "yyyy-MM-dd");
+          
+          // Vérifier conflit de cure
+          if (requiredStartDate && parseISO(newStartStr) < requiredStartDate) {
+            const daysShort = Math.ceil((requiredStartDate.getTime() - parseISO(newStartStr).getTime()) / (1000 * 60 * 60 * 24));
+            warnings.push(
+              `🚨 CONFLIT pour "${s.step_name}": La date choisie (${format(parseISO(newStartStr), "d MMM yyyy", { locale: fr })}) ` +
+              `ne respecte pas le délai de cure du béton de ${delayConfig!.days} jours (manque ${daysShort} jour(s)). ` +
+              `Date recommandée: ${format(requiredStartDate, "d MMM yyyy", { locale: fr })}. ` +
+              `La date a été conservée car elle représente un engagement.`
+            );
+          }
+        } else if (focusUpdates.end_date) {
+          newEndStr = focusUpdates.end_date;
+          newStartStr = format(subBusinessDays(parseISO(newEndStr), duration - 1), "yyyy-MM-dd");
+          
+          // Vérifier conflit de cure
+          if (requiredStartDate && parseISO(newStartStr) < requiredStartDate) {
+            const daysShort = Math.ceil((requiredStartDate.getTime() - parseISO(newStartStr).getTime()) / (1000 * 60 * 60 * 24));
+            warnings.push(
+              `🚨 CONFLIT pour "${s.step_name}": La date de fin choisie implique un début trop tôt. ` +
+              `Le délai de cure de ${delayConfig!.days} jours n'est pas respecté (manque ${daysShort} jour(s)). ` +
+              `La date a été conservée car elle représente un engagement.`
+            );
+          }
+        } else {
+          // Pas de changement de date, juste d'autres champs
+          newStartStr = s.start_date || format(new Date(), "yyyy-MM-dd");
+          newEndStr = s.end_date || format(addBusinessDays(parseISO(newStartStr), duration - 1), "yyyy-MM-dd");
+        }
+
+        // Appliquer les changements
+        if (s.start_date !== newStartStr) patch.start_date = newStartStr;
+        if (s.end_date !== newEndStr) patch.end_date = newEndStr;
+        
         const { start_date, end_date, ...rest } = focusUpdates;
         Object.assign(patch, rest);
         if (focusUpdates.actual_days === null) patch.actual_days = null;
+
+        if (Object.keys(patch).length > 0) {
+          updatesToApply.push({ id: s.id, patch });
+        }
+        
+        // Mettre à jour stepEndDates pour les vérifications suivantes
+        stepEndDates[s.step_id] = newEndStr;
+        continue;
       }
 
-      if (Object.keys(patch).length > 0) {
-        updatesToApply.push({ id: s.id, patch });
-      }
+      // === AUTRES ÉTAPES: Ne PAS modifier les dates existantes ===
+      // Juste vérifier les conflits et générer des warnings
+      if (s.start_date && s.end_date) {
+        const currentStart = parseISO(s.start_date);
+        
+        // Vérifier conflit de cure
+        if (requiredStartDate && currentStart < requiredStartDate) {
+          const daysShort = Math.ceil((requiredStartDate.getTime() - currentStart.getTime()) / (1000 * 60 * 60 * 24));
+          warnings.push(
+            `⚠️ "${s.step_name}" commence le ${format(currentStart, "d MMM yyyy", { locale: fr })} ` +
+            `mais devrait attendre ${daysShort} jour(s) de plus pour respecter le délai de cure.`
+          );
+        }
 
-      cursor = addBusinessDays(parseISO(endStr), 1);
+        // Vérifier chevauchement avec l'étape précédente
+        const prevStep = sorted[i - 1];
+        if (prevStep && prevStep.end_date && prevStep.status !== "completed") {
+          const prevEnd = parseISO(prevStep.end_date);
+          if (currentStart <= prevEnd) {
+            warnings.push(
+              `⚠️ CHEVAUCHEMENT: "${s.step_name}" (${format(currentStart, "d MMM", { locale: fr })}) ` +
+              `chevauche "${prevStep.step_name}" (fin: ${format(prevEnd, "d MMM", { locale: fr })}). ` +
+              `Vérifiez que ces travaux peuvent se faire en parallèle.`
+            );
+          }
+        }
+      }
     }
 
     if (updatesToApply.length > 0) {
@@ -516,7 +501,7 @@ export const useProjectSchedule = (projectId: string | null) => {
     queryClient.invalidateQueries({ queryKey: ["schedule-alerts", projectId] });
 
     // Vérifier les conflits de métiers après recalcul
-    const recalculatedSchedules = schedules.map((s, i) => {
+    const recalculatedSchedules = sorted.map((s) => {
       const update = updatesToApply.find(u => u.id === s.id);
       if (update?.patch) {
         return { ...s, ...update.patch };
