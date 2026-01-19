@@ -29,6 +29,7 @@ export interface ScheduleItem {
   measurement_notes: string | null;
   status: string;
   notes: string | null;
+  is_manual_date: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -344,12 +345,10 @@ export const useProjectSchedule = (projectId: string | null) => {
     // Collecter les dates de fin pour les vérifications de délais
     const stepEndDates: Record<string, string> = {};
 
-    // Identifier les étapes avec dates manuelles (dates explicitement définies par l'utilisateur)
-    // On considère qu'une date est "manuelle" si elle existe dans la DB ET n'est pas l'étape focus actuelle
+    // Identifier les étapes avec dates manuelles (is_manual_date = true)
     const manualDateStepIds = new Set<string>();
     for (const s of sorted) {
-      if (s.status !== "completed" && s.start_date && s.id !== focusScheduleId) {
-        // Cette étape a une date existante qui n'est pas en train d'être modifiée
+      if (s.status !== "completed" && s.is_manual_date && s.id !== focusScheduleId) {
         manualDateStepIds.add(s.id);
       }
     }

@@ -170,6 +170,7 @@ export type Database = {
           fabrication_lead_days: number | null
           fabrication_start_date: string | null
           id: string
+          is_manual_date: boolean
           measurement_after_step_id: string | null
           measurement_notes: string | null
           measurement_required: boolean | null
@@ -194,6 +195,7 @@ export type Database = {
           fabrication_lead_days?: number | null
           fabrication_start_date?: string | null
           id?: string
+          is_manual_date?: boolean
           measurement_after_step_id?: string | null
           measurement_notes?: string | null
           measurement_required?: boolean | null
@@ -218,6 +220,7 @@ export type Database = {
           fabrication_lead_days?: number | null
           fabrication_start_date?: string | null
           id?: string
+          is_manual_date?: boolean
           measurement_after_step_id?: string | null
           measurement_notes?: string | null
           measurement_required?: boolean | null

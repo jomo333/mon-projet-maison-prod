@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Clock, ChevronLeft, ChevronRight, Lightbulb, FileText, CheckCircle2, ClipboardList, DollarSign, Home, Umbrella, DoorOpen, Zap, Droplets, Wind, Thermometer, PaintBucket, Square, ChefHat, Sparkles, Building, ClipboardCheck, Circle, Loader2, AlertTriangle, X } from "lucide-react";
+import { Clock, ChevronLeft, ChevronRight, Lightbulb, FileText, CheckCircle2, ClipboardList, DollarSign, Home, Umbrella, DoorOpen, Zap, Droplets, Wind, Thermometer, PaintBucket, Square, ChefHat, Sparkles, Building, ClipboardCheck, Circle, Loader2, AlertTriangle, X, Lock, Unlock } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { TaskAttachments } from "./TaskAttachments";
 import { StepPhotoUpload } from "@/components/project/StepPhotoUpload";
@@ -79,7 +79,7 @@ export function StepDetail({
     }
   };
 
-  // Mettre à jour directement l'échéancier quand les dates changent
+  // Mettre à jour directement l'échéancier quand les dates changent (sans marquer comme manuel)
   const handleStepDateChange = async (field: 'start_date' | 'end_date', value: string | null) => {
     if (!currentSchedule) return;
     
@@ -89,6 +89,7 @@ export function StepDetail({
     try {
       const result = await updateScheduleAndRecalculate(currentSchedule.id, {
         [field]: value,
+        // Ne pas marquer automatiquement comme manuel - l'utilisateur doit confirmer
       });
       
       // Si des warnings ont été retournés, les afficher de manière très visible
@@ -113,6 +114,32 @@ export function StepDetail({
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour la date",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Verrouiller/déverrouiller la date comme entrée manuelle (engagement sous-traitant)
+  const handleToggleManualDate = async () => {
+    if (!currentSchedule) return;
+    
+    try {
+      const newValue = !currentSchedule.is_manual_date;
+      await updateScheduleAndRecalculate(currentSchedule.id, {
+        is_manual_date: newValue,
+      });
+      
+      toast({
+        title: newValue ? "🔒 Date verrouillée" : "🔓 Date déverrouillée",
+        description: newValue 
+          ? "Cette date représente maintenant un engagement et ne sera pas modifiée automatiquement." 
+          : "Cette date peut maintenant être ajustée automatiquement lors des recalculs.",
+      });
+    } catch (error) {
+      console.error("Erreur lors du verrouillage:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier le verrouillage",
         variant: "destructive",
       });
     }
@@ -160,19 +187,57 @@ export function StepDetail({
                 )}
               </div>
               {currentSchedule ? (
-                <div className="flex flex-wrap gap-4">
-                  <TaskDatePicker
-                    label="Date de début"
-                    value={currentSchedule.start_date || null}
-                    onChange={(date) => handleStepDateChange('start_date', date)}
-                    disabled={isUpdating}
-                  />
-                  <TaskDatePicker
-                    label="Date de fin"
-                    value={currentSchedule.end_date || null}
-                    onChange={(date) => handleStepDateChange('end_date', date)}
-                    disabled={isUpdating}
-                  />
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-end gap-4">
+                    <TaskDatePicker
+                      label="Date de début"
+                      value={currentSchedule.start_date || null}
+                      onChange={(date) => handleStepDateChange('start_date', date)}
+                      disabled={isUpdating}
+                    />
+                    <TaskDatePicker
+                      label="Date de fin"
+                      value={currentSchedule.end_date || null}
+                      onChange={(date) => handleStepDateChange('end_date', date)}
+                      disabled={isUpdating}
+                    />
+                    
+                    {/* Bouton de verrouillage de date */}
+                    <Button
+                      variant={currentSchedule.is_manual_date ? "default" : "outline"}
+                      size="sm"
+                      onClick={handleToggleManualDate}
+                      disabled={isUpdating || !currentSchedule.start_date}
+                      className="flex items-center gap-2"
+                      title={currentSchedule.is_manual_date 
+                        ? "Date verrouillée (engagement sous-traitant)" 
+                        : "Cliquez pour verrouiller cette date"
+                      }
+                    >
+                      {currentSchedule.is_manual_date ? (
+                        <>
+                          <Lock className="h-4 w-4" />
+                          <span className="hidden sm:inline">Date verrouillée</span>
+                        </>
+                      ) : (
+                        <>
+                          <Unlock className="h-4 w-4" />
+                          <span className="hidden sm:inline">Verrouiller la date</span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  {/* Indicateur de date verrouillée */}
+                  {currentSchedule.is_manual_date && (
+                    <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 px-3 py-2 rounded-md">
+                      <Lock className="h-4 w-4" />
+                      <span>
+                        Cette date est verrouillée (engagement sous-traitant). 
+                        Elle ne sera pas modifiée automatiquement lors des recalculs.
+                      </span>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
