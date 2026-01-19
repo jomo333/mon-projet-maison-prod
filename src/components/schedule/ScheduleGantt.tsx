@@ -121,9 +121,19 @@ export const ScheduleGantt = ({ schedules, conflicts }: ScheduleGanttProps) => {
     if (!schedule.start_date || !schedule.end_date) return null;
 
     const start = parseISO(schedule.start_date);
-    const end = parseISO(schedule.end_date);
     const left = differenceInDays(start, minDate) * dayWidth;
-    const width = (differenceInDays(end, start) + 1) * dayWidth;
+    
+    // Pour les étapes complétées, utiliser actual_days pour la largeur
+    // Sinon, utiliser la différence entre end_date et start_date
+    let durationDays: number;
+    if (schedule.status === 'completed' && schedule.actual_days) {
+      durationDays = schedule.actual_days;
+    } else {
+      const end = parseISO(schedule.end_date);
+      durationDays = differenceInDays(end, start) + 1;
+    }
+    
+    const width = durationDays * dayWidth;
 
     return { left, width };
   };
