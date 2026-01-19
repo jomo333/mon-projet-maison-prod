@@ -9,7 +9,7 @@ import type { LucideIcon } from "lucide-react";
 import { TaskAttachments } from "./TaskAttachments";
 import { StepPhotoUpload } from "@/components/project/StepPhotoUpload";
 import { TaskDatePicker } from "./TaskDatePicker";
-import { useTaskDates } from "@/hooks/useTaskDates";
+import { useProjectSchedule } from "@/hooks/useProjectSchedule";
 
 const iconMap: Record<string, LucideIcon> = {
   ClipboardList,
@@ -54,7 +54,12 @@ export function StepDetail({
 }: StepDetailProps) {
   const phase = phases.find(p => p.id === step.phase);
   const IconComponent = iconMap[step.icon] || Circle;
-  const { getTaskDate, upsertTaskDate } = useTaskDates(projectId || null);
+  
+  // Utiliser directement useProjectSchedule pour synchroniser avec l'échéancier
+  const { schedules, updateScheduleAndRecalculate, isUpdating } = useProjectSchedule(projectId || null);
+  
+  // Trouver l'étape correspondante dans l'échéancier
+  const currentSchedule = schedules.find(s => s.step_id === step.id);
 
   const completedCount = step.tasks.filter(task => 
     isTaskCompleted?.(step.id, task.id)
@@ -68,20 +73,14 @@ export function StepDetail({
     }
   };
 
-  // Utiliser un taskId générique pour l'étape entière (on utilise le stepId comme taskId)
-  const stepDateKey = `step-${step.id}`;
-  
-  const handleStepDateChange = (field: 'start_date' | 'end_date', value: string | null) => {
-    const currentStepDate = getTaskDate(step.id, stepDateKey);
-    upsertTaskDate({
-      stepId: step.id,
-      taskId: stepDateKey,
-      startDate: field === 'start_date' ? value : currentStepDate?.start_date,
-      endDate: field === 'end_date' ? value : currentStepDate?.end_date,
+  // Mettre à jour directement l'échéancier quand les dates changent
+  const handleStepDateChange = async (field: 'start_date' | 'end_date', value: string | null) => {
+    if (!currentSchedule) return;
+    
+    await updateScheduleAndRecalculate(currentSchedule.id, {
+      [field]: value,
     });
   };
-
-  const stepDates = getTaskDate(step.id, stepDateKey);
 
   return (
     <div className="space-y-6">
@@ -113,26 +112,37 @@ export function StepDetail({
           </div>
         </CardHeader>
         
-        {/* Dates de l'étape */}
+        {/* Dates de l'étape - synchronisées avec l'échéancier */}
         {projectId && (
           <CardContent className="pt-0">
             <div className="bg-muted/50 rounded-lg p-4">
               <div className="flex items-center gap-2 text-foreground font-medium mb-3">
                 <Clock className="h-4 w-4" />
                 <span>Planification de l'étape</span>
+                {isUpdating && (
+                  <span className="text-xs text-muted-foreground ml-2">(synchronisation...)</span>
+                )}
               </div>
-              <div className="flex flex-wrap gap-4">
-                <TaskDatePicker
-                  label="Date de début"
-                  value={stepDates?.start_date || null}
-                  onChange={(date) => handleStepDateChange('start_date', date)}
-                />
-                <TaskDatePicker
-                  label="Date de fin"
-                  value={stepDates?.end_date || null}
-                  onChange={(date) => handleStepDateChange('end_date', date)}
-                />
-              </div>
+              {currentSchedule ? (
+                <div className="flex flex-wrap gap-4">
+                  <TaskDatePicker
+                    label="Date de début"
+                    value={currentSchedule.start_date || null}
+                    onChange={(date) => handleStepDateChange('start_date', date)}
+                    disabled={isUpdating}
+                  />
+                  <TaskDatePicker
+                    label="Date de fin"
+                    value={currentSchedule.end_date || null}
+                    onChange={(date) => handleStepDateChange('end_date', date)}
+                    disabled={isUpdating}
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Cette étape n'est pas encore dans l'échéancier. Générez l'échéancier depuis la page Échéancier.
+                </p>
+              )}
             </div>
           </CardContent>
         )}
