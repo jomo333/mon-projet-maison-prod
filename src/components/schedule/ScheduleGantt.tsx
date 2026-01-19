@@ -127,7 +127,7 @@ export const ScheduleGantt = ({ schedules, conflicts, onRegenerateSchedule, isUp
 
   const dayWidth = 30;
   const rowHeight = 40;
-  const headerHeight = 60;
+  const headerHeight = 80;
 
   const getBarPosition = (schedule: ScheduleItem) => {
     if (!schedule.start_date || !schedule.end_date) return null;
@@ -249,12 +249,17 @@ export const ScheduleGantt = ({ schedules, conflicts, onRegenerateSchedule, isUp
                         <div
                           key={dayIndex}
                           className={cn(
-                            "text-center text-xs",
+                            "text-center",
                             isWeekend && "text-muted-foreground"
                           )}
                           style={{ width: dayWidth }}
                         >
-                          {format(day, "EEE", { locale: fr }).charAt(0)}
+                          <div className="text-xs font-medium">
+                            {format(day, "EEE", { locale: fr }).charAt(0)}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground">
+                            {format(day, "d", { locale: fr })}
+                          </div>
                         </div>
                       );
                     })}
