@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Clock, ChevronLeft, ChevronRight, Lightbulb, FileText, CheckCircle2, ClipboardList, DollarSign, Home, Umbrella, DoorOpen, Zap, Droplets, Wind, Thermometer, PaintBucket, Square, ChefHat, Sparkles, Building, ClipboardCheck, Circle, Loader2, AlertTriangle, X, Lock, Unlock } from "lucide-react";
+import { Clock, ChevronLeft, ChevronRight, Lightbulb, FileText, CheckCircle2, ClipboardList, DollarSign, Home, Umbrella, DoorOpen, Zap, Droplets, Wind, Thermometer, PaintBucket, Square, ChefHat, Sparkles, Building, ClipboardCheck, Circle, Loader2, AlertTriangle, X, Lock, Unlock, RotateCcw } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { TaskAttachments } from "./TaskAttachments";
 import { StepPhotoUpload } from "@/components/project/StepPhotoUpload";
@@ -145,6 +145,32 @@ export function StepDetail({
     }
   };
 
+  // Réinitialiser les dates selon l'échéancier initial (recalcul automatique)
+  const handleResetToCalculated = async () => {
+    if (!currentSchedule) return;
+    
+    try {
+      // Déverrouiller et effacer les dates pour forcer un recalcul
+      await updateScheduleAndRecalculate(currentSchedule.id, {
+        is_manual_date: false,
+        start_date: null,
+        end_date: null,
+      });
+      
+      toast({
+        title: "🔄 Dates réinitialisées",
+        description: "Les dates ont été recalculées automatiquement selon l'échéancier.",
+      });
+    } catch (error) {
+      console.error("Erreur lors de la réinitialisation:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de réinitialiser les dates",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -202,30 +228,46 @@ export function StepDetail({
                       disabled={isUpdating}
                     />
                     
-                    {/* Bouton de verrouillage de date */}
-                    <Button
-                      variant={currentSchedule.is_manual_date ? "default" : "outline"}
-                      size="sm"
-                      onClick={handleToggleManualDate}
-                      disabled={isUpdating || !currentSchedule.start_date}
-                      className="flex items-center gap-2"
-                      title={currentSchedule.is_manual_date 
-                        ? "Date verrouillée (engagement sous-traitant)" 
-                        : "Cliquez pour verrouiller cette date"
-                      }
-                    >
-                      {currentSchedule.is_manual_date ? (
-                        <>
-                          <Lock className="h-4 w-4" />
-                          <span className="hidden sm:inline">Date verrouillée</span>
-                        </>
-                      ) : (
-                        <>
-                          <Unlock className="h-4 w-4" />
-                          <span className="hidden sm:inline">Verrouiller la date</span>
-                        </>
-                      )}
-                    </Button>
+                    {/* Boutons de gestion des dates */}
+                    <div className="flex items-center gap-2">
+                      {/* Bouton de réinitialisation */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleResetToCalculated}
+                        disabled={isUpdating || !currentSchedule.start_date}
+                        className="flex items-center gap-2"
+                        title="Réinitialiser les dates selon l'échéancier calculé"
+                      >
+                        <RotateCcw className="h-4 w-4" />
+                        <span className="hidden sm:inline">Réinitialiser</span>
+                      </Button>
+                      
+                      {/* Bouton de verrouillage de date */}
+                      <Button
+                        variant={currentSchedule.is_manual_date ? "default" : "outline"}
+                        size="sm"
+                        onClick={handleToggleManualDate}
+                        disabled={isUpdating || !currentSchedule.start_date}
+                        className="flex items-center gap-2"
+                        title={currentSchedule.is_manual_date 
+                          ? "Date verrouillée (engagement sous-traitant)" 
+                          : "Cliquez pour verrouiller cette date"
+                        }
+                      >
+                        {currentSchedule.is_manual_date ? (
+                          <>
+                            <Lock className="h-4 w-4" />
+                            <span className="hidden sm:inline">Verrouillée</span>
+                          </>
+                        ) : (
+                          <>
+                            <Unlock className="h-4 w-4" />
+                            <span className="hidden sm:inline">Verrouiller</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                   
                   {/* Indicateur de date verrouillée */}
