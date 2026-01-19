@@ -68,15 +68,20 @@ export function StepDetail({
     }
   };
 
-  const handleDateChange = (taskId: string, field: 'start_date' | 'end_date', value: string | null) => {
-    const currentTaskDate = getTaskDate(step.id, taskId);
+  // Utiliser un taskId générique pour l'étape entière (on utilise le stepId comme taskId)
+  const stepDateKey = `step-${step.id}`;
+  
+  const handleStepDateChange = (field: 'start_date' | 'end_date', value: string | null) => {
+    const currentStepDate = getTaskDate(step.id, stepDateKey);
     upsertTaskDate({
       stepId: step.id,
-      taskId,
-      startDate: field === 'start_date' ? value : currentTaskDate?.start_date,
-      endDate: field === 'end_date' ? value : currentTaskDate?.end_date,
+      taskId: stepDateKey,
+      startDate: field === 'start_date' ? value : currentStepDate?.start_date,
+      endDate: field === 'end_date' ? value : currentStepDate?.end_date,
     });
   };
+
+  const stepDates = getTaskDate(step.id, stepDateKey);
 
   return (
     <div className="space-y-6">
@@ -107,6 +112,30 @@ export function StepDetail({
             </div>
           </div>
         </CardHeader>
+        
+        {/* Dates de l'étape */}
+        {projectId && (
+          <CardContent className="pt-0">
+            <div className="bg-muted/50 rounded-lg p-4">
+              <div className="flex items-center gap-2 text-foreground font-medium mb-3">
+                <Clock className="h-4 w-4" />
+                <span>Planification de l'étape</span>
+              </div>
+              <div className="flex flex-wrap gap-4">
+                <TaskDatePicker
+                  label="Date de début"
+                  value={stepDates?.start_date || null}
+                  onChange={(date) => handleStepDateChange('start_date', date)}
+                />
+                <TaskDatePicker
+                  label="Date de fin"
+                  value={stepDates?.end_date || null}
+                  onChange={(date) => handleStepDateChange('end_date', date)}
+                />
+              </div>
+            </div>
+          </CardContent>
+        )}
       </Card>
 
       {/* Tasks */}
@@ -154,28 +183,6 @@ export function StepDetail({
                       <p className="text-muted-foreground">
                         {task.description}
                       </p>
-
-                      {/* Task Dates */}
-                      {projectId && (
-                        <div className="bg-muted/50 rounded-lg p-4">
-                          <div className="flex items-center gap-2 text-foreground font-medium mb-3">
-                            <Clock className="h-4 w-4" />
-                            <span>Planification</span>
-                          </div>
-                          <div className="flex flex-wrap gap-4">
-                            <TaskDatePicker
-                              label="Date début"
-                              value={getTaskDate(step.id, task.id)?.start_date || null}
-                              onChange={(date) => handleDateChange(task.id, 'start_date', date)}
-                            />
-                            <TaskDatePicker
-                              label="Date fin"
-                              value={getTaskDate(step.id, task.id)?.end_date || null}
-                              onChange={(date) => handleDateChange(task.id, 'end_date', date)}
-                            />
-                          </div>
-                        </div>
-                      )}
                       
                       {task.tips && task.tips.length > 0 && (
                         <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4">
