@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -70,6 +71,28 @@ export const useProjectSchedule = (projectId: string | null) => {
     },
     enabled: !!projectId,
   });
+
+  // Auto-réparation (1 seule fois) si des étapes "terminées" ont des dates incohérentes
+  const hasAutoRepairedRef = useRef(false);
+  useEffect(() => {
+    if (!projectId) {
+      hasAutoRepairedRef.current = false;
+      return;
+    }
+    if (hasAutoRepairedRef.current) return;
+
+    const data = (schedulesQuery.data || []) as ScheduleItem[];
+    const hasIncoherentCompleted = data.some((s) => {
+      if (s.status !== "completed" || !s.start_date || !s.end_date) return false;
+      return parseISO(s.end_date) < parseISO(s.start_date);
+    });
+
+    if (hasIncoherentCompleted) {
+      hasAutoRepairedRef.current = true;
+      // Répare et régénère tout l'échéancier
+      void fetchAndRegenerateSchedule();
+    }
+  }, [projectId, schedulesQuery.data]);
 
   const alertsQuery = useQuery({
     queryKey: ["schedule-alerts", projectId],
@@ -257,9 +280,212 @@ export const useProjectSchedule = (projectId: string | null) => {
     return format(end, "yyyy-MM-dd");
   };
 
+  const normalizeCompletedDates = (s: ScheduleItem): { start: string | null; end: string | null } => {
+    const duration = (s.actual_days ?? s.estimated_days ?? 1) || 1;
+
+    // Si on n'a aucune date, impossible d'inférer
+    if (!s.start_date && !s.end_date) {
+      return { start: null, end: null };
+    }
+
+    // end_date manquant → on le calcule
+    if (s.start_date && !s.end_date) {
+      return {
+        start: s.start_date,
+        end: calculateEndDate(s.start_date, duration),
+      };
+    }
+
+    // start_date manquant → on l'infère depuis end_date
+    if (!s.start_date && s.end_date) {
+      const inferredStart = format(
+        subBusinessDays(parseISO(s.end_date), duration - 1),
+        "yyyy-MM-dd"
+      );
+      return { start: inferredStart, end: s.end_date };
+    }
+
+    // Les deux existent → si incohérent (end < start), on corrige en ancrant sur end_date
+    if (s.start_date && s.end_date) {
+      const start = parseISO(s.start_date);
+      const end = parseISO(s.end_date);
+      if (end < start) {
+        const fixedStart = format(subBusinessDays(end, duration - 1), "yyyy-MM-dd");
+        return { start: fixedStart, end: s.end_date };
+      }
+      return { start: s.start_date, end: s.end_date };
+    }
+
+    return { start: s.start_date, end: s.end_date };
+  };
+
+  /**
+   * Régénère l'échéancier complet (anti-chevauchement):
+   * - Corrige les étapes "terminées" incohérentes (end_date < start_date)
+   * - Recalcule toutes les étapes non terminées en chaîne
+   * - Applique optionnellement une mise à jour "focus" (retard/avance) avant recalcul
+   */
+  const regenerateScheduleFromSchedules = async (
+    allSchedules: ScheduleItem[],
+    focusScheduleId?: string,
+    focusUpdates?: Partial<ScheduleItem>
+  ) => {
+    if (!projectId) return;
+
+    const sorted = sortSchedulesByExecutionOrder(allSchedules);
+
+    // Appliquer les updates focus en mémoire avant le recalcul
+    const schedules = sorted.map((s) =>
+      s.id === focusScheduleId ? ({ ...s, ...focusUpdates } as ScheduleItem) : s
+    );
+
+    // Point de départ: la plus petite start_date connue (sinon aujourd'hui)
+    const startCandidatesMs: number[] = [];
+    for (const s of schedules) {
+      if (s.status === "completed") {
+        const norm = normalizeCompletedDates(s);
+        if (norm.start) startCandidatesMs.push(parseISO(norm.start).getTime());
+        else if (s.start_date) startCandidatesMs.push(parseISO(s.start_date).getTime());
+      } else if (s.start_date) {
+        startCandidatesMs.push(parseISO(s.start_date).getTime());
+      }
+    }
+
+    let cursor = startCandidatesMs.length
+      ? new Date(Math.min(...startCandidatesMs))
+      : new Date();
+
+    // Délais minimum (ex: cure béton)
+    const previousStepEndDates: Record<string, string> = {};
+
+    const updatesToApply: Array<{ id: string; patch: Partial<ScheduleItem> }> = [];
+
+    for (const s of schedules) {
+      const duration = (s.actual_days ?? s.estimated_days ?? 1) || 1;
+
+      // 1) Étapes terminées = points fixes (on corrige seulement si incohérent)
+      if (s.status === "completed") {
+        const norm = normalizeCompletedDates(s);
+
+        if (norm.start && norm.end) {
+          const patch: Partial<ScheduleItem> = {};
+
+          if (s.start_date !== norm.start) patch.start_date = norm.start;
+          if (s.end_date !== norm.end) patch.end_date = norm.end;
+
+          // Si c'est l'étape focus, on persiste aussi ses champs (status/actual_days/etc.)
+          if (s.id === focusScheduleId && focusUpdates) {
+            const { start_date, end_date, ...rest } = focusUpdates;
+            Object.assign(patch, rest);
+            if (focusUpdates.actual_days === null) patch.actual_days = null;
+          }
+
+          if (Object.keys(patch).length > 0) {
+            updatesToApply.push({ id: s.id, patch });
+          }
+
+          previousStepEndDates[s.step_id] = norm.end;
+
+          // Ne jamais faire reculer le curseur
+          const next = addBusinessDays(parseISO(norm.end), 1);
+          if (next > cursor) cursor = next;
+        }
+
+        continue;
+      }
+
+      // 2) Étapes non terminées = recalcul en chaîne
+      const delayConfig = minimumDelayAfterStep[s.step_id];
+      if (delayConfig && previousStepEndDates[delayConfig.afterStep]) {
+        const requiredStart = addDays(
+          parseISO(previousStepEndDates[delayConfig.afterStep]),
+          delayConfig.days
+        );
+        if (requiredStart > cursor) cursor = requiredStart;
+      }
+
+      // Si l'utilisateur a explicitement mis une date de début sur l'étape focus,
+      // on la respecte si elle est PLUS TARD que le curseur (retard), sinon on la clamp.
+      if (s.id === focusScheduleId && focusUpdates?.start_date) {
+        const desired = parseISO(focusUpdates.start_date);
+        if (desired > cursor) cursor = desired;
+      }
+
+      const startStr = format(cursor, "yyyy-MM-dd");
+      const endStr = format(addBusinessDays(cursor, duration - 1), "yyyy-MM-dd");
+
+      previousStepEndDates[s.step_id] = endStr;
+
+      const patch: Partial<ScheduleItem> = {};
+      if (s.start_date !== startStr) patch.start_date = startStr;
+      if (s.end_date !== endStr) patch.end_date = endStr;
+
+      if (s.id === focusScheduleId && focusUpdates) {
+        const { start_date, end_date, ...rest } = focusUpdates;
+        Object.assign(patch, rest);
+        if (focusUpdates.actual_days === null) patch.actual_days = null;
+      }
+
+      if (Object.keys(patch).length > 0) {
+        updatesToApply.push({ id: s.id, patch });
+      }
+
+      cursor = addBusinessDays(parseISO(endStr), 1);
+    }
+
+    if (updatesToApply.length > 0) {
+      const results = await Promise.all(
+        updatesToApply.map((u) =>
+          supabase.from("project_schedules").update(u.patch).eq("id", u.id)
+        )
+      );
+
+      const errors = results.map((r) => r.error).filter(Boolean);
+      if (errors.length > 0) {
+        toast({
+          title: "Erreur",
+          description: errors[0]!.message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["project-schedules", projectId] });
+    queryClient.invalidateQueries({ queryKey: ["schedule-alerts", projectId] });
+
+    toast({
+      title: "Échéancier régénéré",
+      description:
+        updatesToApply.length > 0
+          ? `${updatesToApply.length} ligne(s) recalculée(s) sans chevauchement.`
+          : "Aucun changement nécessaire.",
+    });
+  };
+
+  const fetchAndRegenerateSchedule = async (
+    focusScheduleId?: string,
+    focusUpdates?: Partial<ScheduleItem>
+  ) => {
+    if (!projectId) return;
+
+    const { data, error } = await supabase
+      .from("project_schedules")
+      .select("*")
+      .eq("project_id", projectId);
+
+    if (error) {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+      return;
+    }
+
+    await regenerateScheduleFromSchedules((data || []) as ScheduleItem[], focusScheduleId, focusUpdates);
+  };
+
   // Métiers intérieurs qui peuvent coexister avec l'extérieur
   const interiorTrades = ["gypse", "peinture", "plancher", "ceramique", "armoires", "comptoirs", "finitions"];
   const exteriorTrades = ["exterieur", "amenagement"];
+
 
   // Vérifie si deux métiers peuvent travailler en parallèle sans conflit
   const canWorkInParallel = (trade1: string, trade2: string): boolean => {
@@ -475,25 +701,25 @@ export const useProjectSchedule = (projectId: string | null) => {
   /**
    * Marquer une étape comme complétée et ajuster l'échéancier
    */
-  const completeStep = async (
-    scheduleId: string,
-    actualDays?: number
-  ) => {
+  const completeStep = async (scheduleId: string, actualDays?: number) => {
     const todayDate = new Date();
     const today = format(todayDate, "yyyy-MM-dd");
 
-    // Sécurité: ne jamais écrire un end_date < start_date.
-    // Si l'utilisateur ne fournit pas de durée, on considère 1 jour (aujourd'hui).
+    // Durée minimale 1 jour
     const usedDays = actualDays && actualDays > 0 ? actualDays : 1;
     const actualEndDate = today;
     const actualStartDate = format(subBusinessDays(todayDate, usedDays - 1), "yyyy-MM-dd");
 
-    return recalculateScheduleFromCompleted(
-      scheduleId,
-      actualEndDate,
-      usedDays,
-      actualStartDate
-    );
+    // Régénérer l'échéancier complet en prenant cette étape comme point fixe "completed"
+    await fetchAndRegenerateSchedule(scheduleId, {
+      status: "completed",
+      actual_days: usedDays,
+      start_date: actualStartDate,
+      end_date: actualEndDate,
+    });
+
+    // Pour compat: on renvoie une structure similaire
+    return { daysAhead: 0, alertsCreated: 0 };
   };
 
   /**
@@ -792,103 +1018,10 @@ export const useProjectSchedule = (projectId: string | null) => {
    * Recalcule toutes les dates suivantes en utilisant les durées estimées
    */
   const uncompleteStep = async (scheduleId: string) => {
-    if (!projectId) return;
-
-    // Sort by execution order, not by date
-    const sortedSchedules = sortSchedulesByExecutionOrder(schedulesQuery.data || []);
-
-    const uncompleteIndex = sortedSchedules.findIndex((s) => s.id === scheduleId);
-    if (uncompleteIndex === -1) return;
-
-    const uncompleteSchedule = sortedSchedules[uncompleteIndex];
-
-    // Trouver la dernière étape complétée AVANT celle-ci
-    let previousEndDate: string | null = null;
-    for (let i = uncompleteIndex - 1; i >= 0; i--) {
-      const prev = sortedSchedules[i];
-      if (prev.status === "completed" && prev.end_date) {
-        previousEndDate = prev.end_date;
-        break;
-      }
-    }
-
-    // Si aucune étape précédente n'est complétée, on prend la date de début de la première étape
-    let newStartDate: Date;
-    if (previousEndDate) {
-      newStartDate = addBusinessDays(parseISO(previousEndDate), 1);
-    } else {
-      // Chercher la première date de début dans l'échéancier
-      const firstScheduleWithDate = sortedSchedules.find((s) => s.start_date);
-      if (firstScheduleWithDate?.start_date) {
-        // Recalculer depuis le début en utilisant les durées estimées
-        newStartDate = parseISO(firstScheduleWithDate.start_date);
-        // Si on annule une étape au milieu, on doit recalculer depuis le début
-        for (let i = 0; i < uncompleteIndex; i++) {
-          const s = sortedSchedules[i];
-          const duration = s.estimated_days;
-          newStartDate = addBusinessDays(newStartDate, duration);
-        }
-      } else {
-        // Fallback: utiliser la date actuelle de l'étape
-        newStartDate = uncompleteSchedule.start_date 
-          ? parseISO(uncompleteSchedule.start_date) 
-          : new Date();
-      }
-    }
-
-    // Stocker les dates de fin pour les délais minimum
-    const previousStepEndDates: Record<string, string> = {};
-    
-    // Collecter les dates de fin des étapes complétées avant celle qu'on annule
-    for (let i = 0; i < uncompleteIndex; i++) {
-      const s = sortedSchedules[i];
-      if (s.status === "completed" && s.end_date) {
-        previousStepEndDates[s.step_id] = s.end_date;
-      }
-    }
-
-    // Mettre à jour toutes les étapes directement via Supabase (batch)
-    for (let i = uncompleteIndex; i < sortedSchedules.length; i++) {
-      const schedule = sortedSchedules[i];
-      
-      // Vérifier s'il y a un délai minimum après une étape précédente
-      const delayConfig = minimumDelayAfterStep[schedule.step_id];
-      if (delayConfig && previousStepEndDates[delayConfig.afterStep]) {
-        const requiredStartDate = addDays(parseISO(previousStepEndDates[delayConfig.afterStep]), delayConfig.days);
-        // Si le délai impose une date plus tardive, on l'utilise
-        if (requiredStartDate > newStartDate) {
-          newStartDate = requiredStartDate;
-        }
-      }
-
-      // Utiliser toujours la durée estimée (pas actual_days) pour restaurer le plan original
-      const duration = schedule.estimated_days;
-      const newStart = format(newStartDate, "yyyy-MM-dd");
-      const newEnd = format(addBusinessDays(newStartDate, duration - 1), "yyyy-MM-dd");
-
-      // Stocker la date de fin pour les délais des étapes suivantes
-      previousStepEndDates[schedule.step_id] = newEnd;
-
-      await supabase
-        .from("project_schedules")
-        .update({
-          start_date: newStart,
-          end_date: newEnd,
-          status: i === uncompleteIndex ? "pending" : schedule.status,
-          actual_days: i === uncompleteIndex ? null : schedule.actual_days,
-        })
-        .eq("id", schedule.id);
-
-      // La prochaine étape commence après celle-ci
-      newStartDate = addBusinessDays(parseISO(newEnd), 1);
-    }
-
-    // Invalider une seule fois à la fin
-    queryClient.invalidateQueries({ queryKey: ["project-schedules", projectId] });
-
-    toast({
-      title: "Échéancier restauré",
-      description: `Les dates ont été recalculées selon le plan original.`,
+    // On repasse l'étape en "pending" et on régénère tout l'échéancier
+    await fetchAndRegenerateSchedule(scheduleId, {
+      status: "pending",
+      actual_days: null,
     });
   };
 
@@ -909,19 +1042,13 @@ export const useProjectSchedule = (projectId: string | null) => {
       .eq("project_id", projectId);
 
     if (fetchError) {
-      toast({
-        title: "Erreur",
-        description: fetchError.message,
-        variant: "destructive",
-      });
+      toast({ title: "Erreur", description: fetchError.message, variant: "destructive" });
       return;
     }
 
     const sortedSchedules = sortSchedulesByExecutionOrder((allSchedules || []) as ScheduleItem[]);
-    const scheduleIndex = sortedSchedules.findIndex((s) => s.id === scheduleId);
-    if (scheduleIndex === -1) return;
-
-    const schedule = sortedSchedules[scheduleIndex];
+    const schedule = sortedSchedules.find((s) => s.id === scheduleId);
+    if (!schedule) return;
 
     // Sécuriser les champs qu'on permet de mettre à jour (évite d'envoyer id/created_at/etc.)
     const allowedKeys: Array<keyof ScheduleItem> = [
@@ -952,137 +1079,12 @@ export const useProjectSchedule = (projectId: string | null) => {
       return acc;
     }, {} as Partial<ScheduleItem>);
 
-    // Calculer la nouvelle date de fin (si on a une date de début + une durée)
-    let newEndDate = safeUpdates.end_date ?? schedule.end_date;
-    const newStartDate = safeUpdates.start_date ?? schedule.start_date;
-    const newDuration =
-      safeUpdates.actual_days ??
-      safeUpdates.estimated_days ??
-      schedule.actual_days ??
-      schedule.estimated_days;
-
-    if (newStartDate && newDuration) {
-      newEndDate = format(
-        addBusinessDays(parseISO(newStartDate), newDuration - 1),
-        "yyyy-MM-dd"
-      );
-    }
-
-    const { error: updateError } = await supabase
-      .from("project_schedules")
-      .update({
-        ...safeUpdates,
-        end_date: newEndDate,
-      })
-      .eq("id", scheduleId);
-
-    if (updateError) {
-      toast({
-        title: "Erreur",
-        description: updateError.message,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!newEndDate) {
-      queryClient.invalidateQueries({ queryKey: ["project-schedules", projectId] });
-      toast({ title: "Étape mise à jour" });
-      return;
-    }
-
-    // Recalculer toutes les étapes suivantes (ordre d'exécution)
-    const subsequentSchedules = sortedSchedules.slice(scheduleIndex + 1);
-    let nextStartDate = addBusinessDays(parseISO(newEndDate), 1);
-
-    // Stocker les dates de fin pour les délais minimum
-    const previousStepEndDates: Record<string, string> = {};
-
-    // Construire l'historique des fins jusqu'à l'étape modifiée
-    for (let i = 0; i <= scheduleIndex; i++) {
-      const s = sortedSchedules[i];
-      if (s.id === scheduleId) {
-        previousStepEndDates[s.step_id] = newEndDate;
-      } else if (s.end_date) {
-        previousStepEndDates[s.step_id] = s.end_date;
-      }
-    }
-
-    const updatesToApply: { id: string; start_date: string; end_date: string }[] = [];
-
-    for (const subsequentSchedule of subsequentSchedules) {
-      // On ne touche pas aux étapes déjà terminées
-      if (subsequentSchedule.status === "completed") {
-        if (subsequentSchedule.end_date) {
-          previousStepEndDates[subsequentSchedule.step_id] = subsequentSchedule.end_date;
-          const completedNext = addBusinessDays(parseISO(subsequentSchedule.end_date), 1);
-          // Ne jamais faire reculer la timeline
-          if (completedNext > nextStartDate) {
-            nextStartDate = completedNext;
-          }
-        }
-        continue;
-      }
-
-      // Délais minimum (ex: cure béton)
-      const delayConfig = minimumDelayAfterStep[subsequentSchedule.step_id];
-      if (delayConfig && previousStepEndDates[delayConfig.afterStep]) {
-        const requiredStartDate = addDays(
-          parseISO(previousStepEndDates[delayConfig.afterStep]),
-          delayConfig.days
-        );
-        if (requiredStartDate > nextStartDate) {
-          nextStartDate = requiredStartDate;
-        }
-      }
-
-      const duration = subsequentSchedule.actual_days || subsequentSchedule.estimated_days;
-      const startStr = format(nextStartDate, "yyyy-MM-dd");
-      const endStr = format(
-        addBusinessDays(nextStartDate, (duration || 1) - 1),
-        "yyyy-MM-dd"
-      );
-
-      previousStepEndDates[subsequentSchedule.step_id] = endStr;
-      updatesToApply.push({
-        id: subsequentSchedule.id,
-        start_date: startStr,
-        end_date: endStr,
-      });
-
-      nextStartDate = addBusinessDays(parseISO(endStr), 1);
-    }
-
-    if (updatesToApply.length > 0) {
-      const results = await Promise.all(
-        updatesToApply.map((u) =>
-          supabase
-            .from("project_schedules")
-            .update({ start_date: u.start_date, end_date: u.end_date })
-            .eq("id", u.id)
-        )
-      );
-
-      const anyError = results.find((r) => r.error)?.error;
-      if (anyError) {
-        toast({
-          title: "Erreur",
-          description: anyError.message,
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-
-    queryClient.invalidateQueries({ queryKey: ["project-schedules", projectId] });
-
-    toast({
-      title: "Échéancier recalculé",
-      description:
-        updatesToApply.length > 0
-          ? `${updatesToApply.length} étape(s) suivante(s) ajustée(s).`
-          : "Étape mise à jour.",
-    });
+    // Régénération complète (anti-chevauchement) en appliquant la modif comme “source de vérité”
+    await regenerateScheduleFromSchedules(
+      sortSchedulesByExecutionOrder((allSchedules || []) as ScheduleItem[]),
+      scheduleId,
+      safeUpdates
+    );
   };
 
   return {
