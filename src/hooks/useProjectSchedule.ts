@@ -413,7 +413,26 @@ export const useProjectSchedule = (projectId: string | null) => {
         let newStartStr: string;
         let newEndStr: string;
 
-        if (focusUpdates.start_date) {
+        // Cas spécial: réinitialisation (start_date = null explicitement)
+        const isReset = 'start_date' in focusUpdates && focusUpdates.start_date === null;
+
+        if (isReset) {
+          // Recalculer la date basée sur le cursor (étape précédente)
+          let newStart = cursor || new Date();
+          
+          // Respecter les contraintes de délai (cure béton)
+          if (requiredStartDate && newStart < requiredStartDate) {
+            newStart = requiredStartDate;
+          }
+          
+          newStartStr = format(newStart, "yyyy-MM-dd");
+          newEndStr = format(addBusinessDays(newStart, duration - 1), "yyyy-MM-dd");
+          
+          // Appliquer aussi is_manual_date si présent
+          if ('is_manual_date' in focusUpdates) {
+            patch.is_manual_date = focusUpdates.is_manual_date;
+          }
+        } else if (focusUpdates.start_date) {
           newStartStr = focusUpdates.start_date;
           newEndStr = focusUpdates.end_date || format(addBusinessDays(parseISO(newStartStr), duration - 1), "yyyy-MM-dd");
           
@@ -448,8 +467,11 @@ export const useProjectSchedule = (projectId: string | null) => {
         if (s.start_date !== newStartStr) patch.start_date = newStartStr;
         if (s.end_date !== newEndStr) patch.end_date = newEndStr;
         
-        const { start_date, end_date, ...rest } = focusUpdates;
-        Object.assign(patch, rest);
+        // Pour les autres champs (sauf si c'est un reset où on a déjà traité is_manual_date)
+        if (!isReset) {
+          const { start_date, end_date, ...rest } = focusUpdates;
+          Object.assign(patch, rest);
+        }
         if (focusUpdates.actual_days === null) patch.actual_days = null;
 
         if (Object.keys(patch).length > 0) {
