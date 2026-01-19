@@ -1095,6 +1095,35 @@ export const useProjectSchedule = (projectId: string | null) => {
       return acc;
     }, {} as Partial<ScheduleItem>);
 
+
+    // Si l'utilisateur passe une étape à "completed" via l'édition (Select/checkbox),
+    // on considère qu'elle est terminée AUJOURD'HUI, sauf si l'utilisateur a réellement changé end_date.
+    if (safeUpdates.status === "completed" && schedule.status !== "completed") {
+      const todayStr = format(new Date(), "yyyy-MM-dd");
+
+      const providedEnd = safeUpdates.end_date;
+      const endUnchanged = providedEnd === schedule.end_date;
+      const endIsManual = providedEnd != null && !endUnchanged;
+
+      const usedDaysRaw =
+        (safeUpdates.actual_days ?? schedule.actual_days ?? schedule.estimated_days ?? 1) || 1;
+      const usedDays = Math.max(1, Number(usedDaysRaw));
+
+      const endToUse = endIsManual ? (providedEnd as string) : todayStr;
+
+      const providedStart = safeUpdates.start_date;
+      const startUnchanged = providedStart === schedule.start_date;
+      const startIsManual = providedStart != null && !startUnchanged;
+
+      const startToUse = startIsManual
+        ? (providedStart as string)
+        : format(subBusinessDays(parseISO(endToUse), usedDays - 1), "yyyy-MM-dd");
+
+      safeUpdates.end_date = endToUse;
+      safeUpdates.start_date = startToUse;
+      safeUpdates.actual_days = usedDays;
+    }
+
     // Régénération complète (anti-chevauchement) en appliquant la modif comme “source de vérité”
     await regenerateScheduleFromSchedules(
       sortSchedulesByExecutionOrder((allSchedules || []) as ScheduleItem[]),

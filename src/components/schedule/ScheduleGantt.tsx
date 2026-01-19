@@ -272,7 +272,7 @@ export const ScheduleGantt = ({ schedules, conflicts }: ScheduleGanttProps) => {
                     {delayInfo && (
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Clock className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                          <Clock className="h-4 w-4 text-primary flex-shrink-0" />
                         </TooltipTrigger>
                         <TooltipContent>
                           <p className="text-sm">{delayInfo.reason}</p>
@@ -316,7 +316,8 @@ export const ScheduleGantt = ({ schedules, conflicts }: ScheduleGanttProps) => {
                             style={{
                               left: getCuringPeriod.left,
                               width: getCuringPeriod.width,
-                              background: "repeating-linear-gradient(45deg, #fbbf24, #fbbf24 4px, #f59e0b 4px, #f59e0b 8px)",
+                              background:
+                                "repeating-linear-gradient(45deg, hsl(var(--accent)), hsl(var(--accent)) 4px, hsl(var(--muted)) 4px, hsl(var(--muted)) 8px)",
                             }}
                           >
                             <span className="text-xs text-white px-1 truncate block leading-6 font-medium drop-shadow-sm">
@@ -380,7 +381,7 @@ export const ScheduleGantt = ({ schedules, conflicts }: ScheduleGanttProps) => {
                             jours
                           </p>
                           {delayInfo && (
-                            <p className="text-sm text-amber-500 flex items-center gap-1">
+                            <p className="text-sm text-primary flex items-center gap-1">
                               <Clock className="h-3 w-3" /> {delayInfo.reason}
                             </p>
                           )}
