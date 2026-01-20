@@ -386,18 +386,73 @@ Retourne le JSON structuré avec des montants RÉALISTES reflétant les coûts d
       console.log('Skipping validation pass for multi-image analysis');
     }
 
-    // Parse the final JSON
+    // Parse the final JSON - handle text before/after JSON and truncation
     let budgetData;
     try {
-      const cleanContent = finalContent
+      // Remove markdown code blocks
+      let cleanContent = finalContent
         .replace(/```json\n?/g, '')
         .replace(/```\n?/g, '')
         .trim();
-      budgetData = JSON.parse(cleanContent);
+      
+      // Find JSON start - look for opening brace
+      const jsonStart = cleanContent.indexOf('{');
+      if (jsonStart > 0) {
+        cleanContent = cleanContent.substring(jsonStart);
+      }
+      
+      // Try to parse, if truncated try to fix
+      try {
+        budgetData = JSON.parse(cleanContent);
+      } catch (firstTry) {
+        // Response might be truncated - try to close JSON properly
+        console.log('JSON appears truncated, attempting to repair...');
+        
+        // Count open braces and brackets
+        let braceCount = 0;
+        let bracketCount = 0;
+        for (const char of cleanContent) {
+          if (char === '{') braceCount++;
+          if (char === '}') braceCount--;
+          if (char === '[') bracketCount++;
+          if (char === ']') bracketCount--;
+        }
+        
+        // Add missing closures
+        let repairedContent = cleanContent;
+        while (bracketCount > 0) {
+          repairedContent += ']';
+          bracketCount--;
+        }
+        while (braceCount > 0) {
+          repairedContent += '}';
+          braceCount--;
+        }
+        
+        try {
+          budgetData = JSON.parse(repairedContent);
+          console.log('JSON repair successful');
+        } catch (secondTry) {
+          // Last resort: create a minimal valid response
+          console.error('JSON repair failed, creating fallback response');
+          budgetData = {
+            extraction: {
+              type_projet: "ANALYSE_INCOMPLETE",
+              superficie_nouvelle_pi2: 0,
+              nombre_etages: 1,
+              categories: [],
+              elements_manquants: ["L'analyse a été interrompue - veuillez réessayer"]
+            },
+            totaux: { total_ttc: 0 },
+            recommandations: ["Veuillez relancer l'analyse - la réponse a été tronquée"],
+            resume_projet: "Analyse incomplète"
+          };
+        }
+      }
     } catch (parseError) {
-      console.error('Failed to parse AI response:', finalContent);
+      console.error('Failed to parse AI response:', finalContent?.substring(0, 500));
       return new Response(
-        JSON.stringify({ success: false, error: 'Failed to parse budget data - please try again', raw: finalContent?.substring(0, 500) }),
+        JSON.stringify({ success: false, error: 'Failed to parse budget data - please try again' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
