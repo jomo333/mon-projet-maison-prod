@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Step, phases } from "@/data/constructionSteps";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Clock, ChevronLeft, ChevronRight, Lightbulb, FileText, CheckCircle2, ClipboardList, DollarSign, Home, Umbrella, DoorOpen, Zap, Droplets, Wind, Thermometer, PaintBucket, Square, ChefHat, Sparkles, Building, ClipboardCheck, Circle, Loader2, AlertTriangle, X, Lock, Unlock, RotateCcw } from "lucide-react";
+import { Clock, ChevronLeft, ChevronRight, Lightbulb, FileText, CheckCircle2, ClipboardList, DollarSign, Home, Umbrella, DoorOpen, Zap, Droplets, Wind, Thermometer, PaintBucket, Square, ChefHat, Sparkles, Building, ClipboardCheck, Circle, Loader2, AlertTriangle, X, Lock, Unlock, RotateCcw, Calculator } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { TaskAttachments } from "./TaskAttachments";
 import { StepPhotoUpload } from "@/components/project/StepPhotoUpload";
@@ -57,6 +58,7 @@ export function StepDetail({
   isTaskCompleted,
   onToggleTask 
 }: StepDetailProps) {
+  const navigate = useNavigate();
   const phase = phases.find(p => p.id === step.phase);
   const IconComponent = iconMap[step.icon] || Circle;
   
@@ -384,6 +386,23 @@ export function StepDetail({
                       <p className="text-muted-foreground">
                         {task.description}
                       </p>
+                      
+                      {/* Bouton Analyse de budget pour la tâche budget-initial */}
+                      {task.id === 'budget-initial' && (
+                        <Button
+                          variant="outline"
+                          className="w-full sm:w-auto"
+                          onClick={() => {
+                            const url = projectId 
+                              ? `/budget?project=${projectId}&autoAnalyze=1` 
+                              : '/budget?autoAnalyze=1';
+                            navigate(url);
+                          }}
+                        >
+                          <Calculator className="h-4 w-4 mr-2" />
+                          Analyse de budget
+                        </Button>
+                      )}
                       
                       {task.tips && task.tips.length > 0 && (
                         <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4">
