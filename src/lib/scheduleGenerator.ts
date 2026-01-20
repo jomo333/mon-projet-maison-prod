@@ -28,9 +28,9 @@ const stepTradeMapping: Record<string, string> = {
   structure: "charpente",
   toiture: "toiture",
   "fenetres-portes": "fenetre",
-  electricite: "electricite",
+  "electricite-roughin": "electricite",
   "electricite-finition": "electricite",
-  plomberie: "plomberie",
+  "plomberie-roughin": "plomberie",
   "plomberie-finition": "plomberie",
   hvac: "hvac",
   isolation: "isolation",
@@ -51,9 +51,9 @@ const defaultDurations: Record<string, number> = {
   structure: 15,
   toiture: 2,
   "fenetres-portes": 2,
-  electricite: 4, // Rough-in
+  "electricite-roughin": 4,
   "electricite-finition": 3,
-  plomberie: 4, // Rough-in
+  "plomberie-roughin": 4,
   "plomberie-finition": 3,
   hvac: 7,
   isolation: 5,
@@ -86,7 +86,7 @@ const minimumDelayAfterStep: Record<string, { afterStep: string; days: number; r
     reason: "Cure du béton des fondations (minimum 3 semaines)",
   },
   exterieur: {
-    afterStep: "electricite",
+    afterStep: "electricite-roughin",
     days: 0,
     reason: "Travaux extérieurs peuvent commencer après le filage électrique",
   },

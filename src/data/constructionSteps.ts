@@ -277,13 +277,13 @@ export const constructionSteps: Step[] = [
 
   // SECOND ŒUVRE
   {
-    id: "electricite",
-    title: "Électricité",
-    description: "Installation du système électrique complet.",
+    id: "electricite-roughin",
+    title: "Électricité - Rough-in",
+    description: "Installation du filage électrique brut avant la fermeture des murs.",
     phase: "second-oeuvre",
     phaseLabel: "Second œuvre",
     icon: "Zap",
-    duration: "5-7 jours",
+    duration: "4 jours",
     tasks: [
       {
         id: "entree-electrique",
@@ -313,13 +313,13 @@ export const constructionSteps: Step[] = [
     ]
   },
   {
-    id: "plomberie",
-    title: "Plomberie",
-    description: "Installation des systèmes d'alimentation et d'évacuation d'eau.",
+    id: "plomberie-roughin",
+    title: "Plomberie - Rough-in",
+    description: "Installation de la plomberie brute avant la fermeture des murs.",
     phase: "second-oeuvre",
     phaseLabel: "Second œuvre",
     icon: "Droplets",
-    duration: "5-7 jours",
+    duration: "4 jours",
     tasks: [
       {
         id: "plomberie-brute",
@@ -548,6 +548,66 @@ export const constructionSteps: Step[] = [
         id: "escalier",
         title: "Escalier",
         description: "Finition de l'escalier (marches, contremarches, rampe).",
+      }
+    ]
+  },
+  {
+    id: "electricite-finition",
+    title: "Électricité - Finition",
+    description: "Installation finale des appareils électriques après les finitions intérieures.",
+    phase: "finitions",
+    phaseLabel: "Finitions",
+    icon: "Zap",
+    duration: "3 jours",
+    tasks: [
+      {
+        id: "prises-interrupteurs",
+        title: "Prises et interrupteurs",
+        description: "Installation des plaques de prises et interrupteurs.",
+        tips: [
+          "Vérifiez le fonctionnement de chaque circuit",
+          "Utilisez des plaques assorties à votre décor"
+        ]
+      },
+      {
+        id: "luminaires",
+        title: "Luminaires",
+        description: "Installation de tous les luminaires (plafonniers, appliques, etc.).",
+      },
+      {
+        id: "appareils-electriques",
+        title: "Raccordement des appareils",
+        description: "Branchement des électroménagers et équipements (cuisinière, sécheuse, etc.).",
+      }
+    ]
+  },
+  {
+    id: "plomberie-finition",
+    title: "Plomberie - Finition",
+    description: "Installation finale des appareils sanitaires après les finitions intérieures.",
+    phase: "finitions",
+    phaseLabel: "Finitions",
+    icon: "Droplets",
+    duration: "3 jours",
+    tasks: [
+      {
+        id: "robinetterie",
+        title: "Robinetterie",
+        description: "Installation des robinets (cuisine, salles de bain, buanderie).",
+        tips: [
+          "Vérifiez l'étanchéité de chaque raccord",
+          "Installez des robinets à économie d'eau"
+        ]
+      },
+      {
+        id: "toilettes-lavabos",
+        title: "Toilettes et lavabos",
+        description: "Installation des toilettes, lavabos et vanités.",
+      },
+      {
+        id: "douche-bain",
+        title: "Douche et baignoire",
+        description: "Raccordement final des douches et baignoires.",
       }
     ]
   },
