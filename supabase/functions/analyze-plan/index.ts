@@ -309,15 +309,32 @@ Retourne le JSON structuré avec des montants RÉALISTES reflétant les coûts d
 
     if (!extractionResponse.ok) {
       const errorText = await extractionResponse.text();
-      console.error('Extraction API error:', errorText);
+      console.error('Extraction API error:', extractionResponse.status, errorText);
       return new Response(
-        JSON.stringify({ success: false, error: 'Extraction failed' }),
+        JSON.stringify({ success: false, error: `Extraction failed: ${extractionResponse.status}` }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const extractionData = await extractionResponse.json();
-    const extractionContent = extractionData.choices?.[0]?.message?.content;
+    let extractionContent: string;
+    try {
+      const responseText = await extractionResponse.text();
+      if (!responseText || responseText.trim() === '') {
+        console.error('Empty response from AI');
+        return new Response(
+          JSON.stringify({ success: false, error: 'Empty response from AI - please try again' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      const extractionData = JSON.parse(responseText);
+      extractionContent = extractionData.choices?.[0]?.message?.content;
+    } catch (parseErr) {
+      console.error('Failed to parse extraction response:', parseErr);
+      return new Response(
+        JSON.stringify({ success: false, error: 'AI response was incomplete - please try again' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!extractionContent) {
       return new Response(
@@ -326,34 +343,47 @@ Retourne le JSON structuré avec des montants RÉALISTES reflétant les coûts d
       );
     }
 
-    // ============= PASSE 2: VALIDATION (with Pro for accuracy) =============
-    console.log('Pass 2: Validation with Gemini 2.5 Pro...');
-    const validationMessages = [
-      { role: "system", content: SYSTEM_PROMPT_VALIDATION },
-      { role: "user", content: `Voici l'extraction initiale à valider et corriger:\n\n${extractionContent}\n\nVérifie chaque élément et corrige les erreurs. Retourne le JSON final corrigé.` }
-    ];
-
-    const validationResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-pro',
-        messages: validationMessages,
-        temperature: 0.1,
-      }),
-    });
-
+    // Skip validation pass for plan mode with many images to avoid timeout
+    // The extraction with Gemini 2.5 Pro is already high quality
     let finalContent = extractionContent;
+    
+    // Only run validation for manual mode (no images, faster)
+    if (mode !== "plan" || imageUrls.length <= 2) {
+      console.log('Pass 2: Validation with Gemini 2.5 Pro...');
+      const validationMessages = [
+        { role: "system", content: SYSTEM_PROMPT_VALIDATION },
+        { role: "user", content: `Voici l'extraction initiale à valider et corriger:\n\n${extractionContent}\n\nVérifie chaque élément et corrige les erreurs. Retourne le JSON final corrigé.` }
+      ];
 
-    if (validationResponse.ok) {
-      const validationData = await validationResponse.json();
-      const validatedContent = validationData.choices?.[0]?.message?.content;
-      if (validatedContent) {
-        finalContent = validatedContent;
+      try {
+        const validationResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'google/gemini-2.5-pro',
+            messages: validationMessages,
+            temperature: 0.1,
+          }),
+        });
+
+        if (validationResponse.ok) {
+          const validationText = await validationResponse.text();
+          if (validationText && validationText.trim()) {
+            const validationData = JSON.parse(validationText);
+            const validatedContent = validationData.choices?.[0]?.message?.content;
+            if (validatedContent) {
+              finalContent = validatedContent;
+            }
+          }
+        }
+      } catch (validationErr) {
+        console.log('Validation pass skipped due to error, using extraction result');
       }
+    } else {
+      console.log('Skipping validation pass for multi-image analysis');
     }
 
     // Parse the final JSON
@@ -367,7 +397,7 @@ Retourne le JSON structuré avec des montants RÉALISTES reflétant les coûts d
     } catch (parseError) {
       console.error('Failed to parse AI response:', finalContent);
       return new Response(
-        JSON.stringify({ success: false, error: 'Failed to parse budget data', raw: finalContent }),
+        JSON.stringify({ success: false, error: 'Failed to parse budget data - please try again', raw: finalContent?.substring(0, 500) }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -375,7 +405,7 @@ Retourne le JSON structuré avec des montants RÉALISTES reflétant les coûts d
     // Transform to expected format for frontend compatibility
     const transformedData = transformToLegacyFormat(budgetData, finishQuality);
 
-    console.log('Analysis complete with 2-pass validation');
+    console.log('Analysis complete');
 
     return new Response(
       JSON.stringify({ success: true, data: transformedData, rawAnalysis: budgetData }),
