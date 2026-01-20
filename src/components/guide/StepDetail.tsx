@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Step, phases } from "@/data/constructionSteps";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Clock, ChevronLeft, ChevronRight, Lightbulb, FileText, CheckCircle2, ClipboardList, DollarSign, Home, Umbrella, DoorOpen, Zap, Droplets, Wind, Thermometer, PaintBucket, Square, ChefHat, Sparkles, Building, ClipboardCheck, Circle, Loader2, AlertTriangle, X, Lock, Unlock, RotateCcw, Calculator } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Clock, ChevronLeft, ChevronRight, Lightbulb, FileText, CheckCircle2, ClipboardList, DollarSign, Home, Umbrella, DoorOpen, Zap, Droplets, Wind, Thermometer, PaintBucket, Square, ChefHat, Sparkles, Building, ClipboardCheck, Circle, Loader2, AlertTriangle, X, Lock, Unlock, RotateCcw, Calculator, Save } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { TaskAttachments } from "./TaskAttachments";
 import { StepPhotoUpload } from "@/components/project/StepPhotoUpload";
 import { TaskDatePicker } from "./TaskDatePicker";
 import { useProjectSchedule } from "@/hooks/useProjectSchedule";
+import { useTaskDates } from "@/hooks/useTaskDates";
 import { toast } from "@/hooks/use-toast";
 
 const iconMap: Record<string, LucideIcon> = {
@@ -80,6 +82,23 @@ export function StepDetail({
   // Utiliser directement useProjectSchedule pour synchroniser avec l'échéancier
   const { schedules, updateScheduleAndRecalculate, isUpdating } = useProjectSchedule(projectId || null);
   
+  // Hook pour les notes des tâches
+  const { getTaskDate, upsertTaskDateAsync } = useTaskDates(projectId || null);
+  
+  // State pour la note de la tâche "besoins"
+  const [besoinsNote, setBesoinsNote] = useState("");
+  const [isSavingNote, setIsSavingNote] = useState(false);
+  
+  // Charger la note existante pour la tâche "besoins"
+  useEffect(() => {
+    if (projectId && step.id === "planification") {
+      const taskData = getTaskDate("planification", "besoins");
+      if (taskData?.notes) {
+        setBesoinsNote(taskData.notes);
+      }
+    }
+  }, [projectId, step.id, getTaskDate]);
+  
   // State pour afficher les avertissements de manière très visible
   const [scheduleWarnings, setScheduleWarnings] = useState<string[]>([]);
   
@@ -89,6 +108,31 @@ export function StepDetail({
   const completedCount = filteredTasks.filter(task => 
     isTaskCompleted?.(step.id, task.id)
   ).length;
+  
+  // Sauvegarder la note des besoins
+  const handleSaveBesoinsNote = async () => {
+    if (!projectId) return;
+    setIsSavingNote(true);
+    try {
+      await upsertTaskDateAsync({
+        stepId: "planification",
+        taskId: "besoins",
+        notes: besoinsNote,
+      });
+      toast({
+        title: "Note sauvegardée",
+        description: "Vos besoins ont été enregistrés.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder la note",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingNote(false);
+    }
+  };
 
   const handleTaskToggle = (taskId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -391,10 +435,12 @@ export function StepDetail({
                         className="shrink-0"
                         onClick={(e) => {
                           e.stopPropagation();
-                          const url = projectId 
-                            ? `/budget?project=${projectId}&autoAnalyze=1` 
-                            : '/budget?autoAnalyze=1';
-                          navigate(url);
+                          // Passer la note des besoins via URL pour pré-remplir l'analyse
+                          const params = new URLSearchParams();
+                          if (projectId) params.set('project', projectId);
+                          params.set('autoAnalyze', '1');
+                          if (besoinsNote) params.set('besoinsNote', encodeURIComponent(besoinsNote));
+                          navigate(`/budget?${params.toString()}`);
                         }}
                       >
                         <Calculator className="h-4 w-4 mr-1" />
@@ -408,6 +454,37 @@ export function StepDetail({
                       <p className="text-muted-foreground">
                         {task.description}
                       </p>
+                      
+                      {/* Zone de notes pour la tâche "besoins" */}
+                      {task.id === 'besoins' && projectId && (
+                        <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+                          <div className="flex items-center gap-2 font-medium">
+                            <FileText className="h-4 w-4 text-primary" />
+                            <span>Notes sur vos besoins</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Décrivez vos besoins ici. Ces informations seront utilisées pour pré-remplir l'analyse de budget.
+                          </p>
+                          <Textarea
+                            placeholder="Ex: Maison 2 étages, 3 chambres, 2 salles de bain, garage double, sous-sol fini, cuisine ouverte..."
+                            value={besoinsNote}
+                            onChange={(e) => setBesoinsNote(e.target.value)}
+                            className="min-h-[100px]"
+                          />
+                          <Button
+                            size="sm"
+                            onClick={handleSaveBesoinsNote}
+                            disabled={isSavingNote}
+                          >
+                            {isSavingNote ? (
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            ) : (
+                              <Save className="h-4 w-4 mr-2" />
+                            )}
+                            Sauvegarder
+                          </Button>
+                        </div>
+                      )}
                       
                       {task.tips && task.tips.length > 0 && (
                         <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4">

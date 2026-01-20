@@ -255,10 +255,11 @@ Génère une estimation budgétaire réaliste basée sur l'analyse ${imageUrls.l
         numberOfFloors, 
         hasGarage, 
         foundationSqft, 
-        floorSqftDetails 
+        floorSqftDetails,
+        additionalNotes
       } = body;
 
-      console.log('Manual analysis:', { projectType, squareFootage, numberOfFloors, hasGarage, foundationSqft });
+      console.log('Manual analysis:', { projectType, squareFootage, numberOfFloors, hasGarage, foundationSqft, additionalNotes: additionalNotes?.substring(0, 100) });
 
       systemPrompt = `Tu es un expert en estimation de coûts de construction résidentielle au QUÉBEC, CANADA. 
 Tu dois analyser les informations fournies sur un projet de construction et générer une estimation budgétaire détaillée.
@@ -367,10 +368,19 @@ ${floorDetailsStr ? `- Détail par étage:\n${floorDetailsStr}` : ''}
 - Garage: ${hasGarage ? 'Oui (simple ou double selon la superficie)' : 'Non'}
 - QUALITÉ DE FINITION: ${qualityLabel}
 - Région: Québec, Canada
-
+${additionalNotes ? `
+NOTES ADDITIONNELLES DU CLIENT (TRÈS IMPORTANT - tenir compte de ces besoins spécifiques):
+${additionalNotes}
+` : ''}
 IMPORTANT - QUALITÉ ${qualityLabel}:
 Le client a choisi un niveau de finition ${qualityLabel.toLowerCase()}. Adapte TOUS les matériaux de finition (planchers, armoires, comptoirs, portes, moulures, robinetterie) en conséquence.
-
+${additionalNotes ? `
+IMPORTANT - BESOINS DU CLIENT:
+Analyse attentivement les notes du client ci-dessus et intègre ces besoins spécifiques dans ton estimation:
+- Si le client mentionne un nombre de chambres, adapte les superficies et finitions
+- Si le client mentionne des caractéristiques spéciales (sous-sol fini, cuisine ouverte, etc.), inclus les coûts correspondants
+- Si le client mentionne des pièces spéciales (bureau, salle de cinéma, etc.), ajoute les catégories appropriées
+` : ''}
 Pour chaque item du budget, utilise des noms TRÈS DESCRIPTIFS avec:
 - La PIÈCE ou l'ÉTAGE concerné (ex: "Salon rez-de-chaussée", "Chambres étage")
 - Le TYPE EXACT de matériau selon la qualité ${qualityLabel}

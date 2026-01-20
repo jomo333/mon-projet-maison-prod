@@ -57,9 +57,11 @@ interface PlanAnalyzerProps {
   autoSelectPlanTab?: boolean;
   /** Callback when user wants to generate schedule after analysis */
   onGenerateSchedule?: () => void;
+  /** Pre-filled requirements note from step 1 */
+  besoinsNote?: string;
 }
 
-export function PlanAnalyzer({ onBudgetGenerated, projectId, autoSelectPlanTab = false, onGenerateSchedule }: PlanAnalyzerProps) {
+export function PlanAnalyzer({ onBudgetGenerated, projectId, autoSelectPlanTab = false, onGenerateSchedule, besoinsNote }: PlanAnalyzerProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<BudgetAnalysis | null>(null);
   const [analysisMode, setAnalysisMode] = useState<"manual" | "plan">(autoSelectPlanTab ? "plan" : "manual");
@@ -71,6 +73,9 @@ export function PlanAnalyzer({ onBudgetGenerated, projectId, autoSelectPlanTab =
   const [hasGarage, setHasGarage] = useState(false);
   const [foundationSqft, setFoundationSqft] = useState("");
   const [floorSqftDetails, setFloorSqftDetails] = useState<string[]>([""]);
+  
+  // Additional notes from user (e.g., from besoins task)
+  const [additionalNotes, setAdditionalNotes] = useState(besoinsNote || "");
   
   // Quality level state (shared between manual and plan modes)
   const [finishQuality, setFinishQuality] = useState<"economique" | "standard" | "haut-de-gamme">("standard");
@@ -86,6 +91,13 @@ export function PlanAnalyzer({ onBudgetGenerated, projectId, autoSelectPlanTab =
   
   // PDF conversion hook
   const { convertPdfToImages, isPdf, isConverting, progress } = usePdfToImage();
+  
+  // Update additionalNotes when besoinsNote prop changes
+  useEffect(() => {
+    if (besoinsNote && !additionalNotes) {
+      setAdditionalNotes(besoinsNote);
+    }
+  }, [besoinsNote]);
 
   // Fetch uploaded plans/documents from project tasks AND project photos
   const { data: plans = [] } = useQuery({
@@ -425,11 +437,13 @@ export function PlanAnalyzer({ onBudgetGenerated, projectId, autoSelectPlanTab =
             foundationSqft: parseInt(foundationSqft) || null,
             floorSqftDetails: floorSqftDetails.filter(s => s).map(s => parseInt(s)),
             finishQuality,
+            additionalNotes: additionalNotes || undefined,
           }
         : {
             mode: "plan",
             imageUrls: selectedPlanUrls,
             finishQuality,
+            additionalNotes: additionalNotes || undefined,
           };
 
       const { data, error } = await supabase.functions.invoke('analyze-plan', {
@@ -620,6 +634,24 @@ export function PlanAnalyzer({ onBudgetGenerated, projectId, autoSelectPlanTab =
                 <p className="text-xs text-muted-foreground">
                   Ce choix affecte les coûts des planchers, armoires, comptoirs, quincaillerie et finitions.
                 </p>
+              </div>
+              
+              {/* Notes additionnelles (pré-remplies depuis la tâche Besoins) */}
+              <div className="space-y-2 sm:col-span-2 lg:col-span-3">
+                <Label htmlFor="additionalNotes">Notes sur vos besoins (optionnel)</Label>
+                <textarea
+                  id="additionalNotes"
+                  value={additionalNotes}
+                  onChange={(e) => setAdditionalNotes(e.target.value)}
+                  placeholder="Ex: Cuisine ouverte sur salon, 3 chambres dont 1 suite parentale, sous-sol fini avec salle de cinéma..."
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                {besoinsNote && (
+                  <p className="text-xs text-primary flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Pré-rempli depuis vos besoins définis à l'étape 1
+                  </p>
+                )}
               </div>
             </div>
           </TabsContent>

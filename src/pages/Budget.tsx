@@ -76,6 +76,9 @@ const Budget = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const projectFromUrl = searchParams.get("project");
   const autoAnalyze = searchParams.get("autoAnalyze") === "1";
+  const besoinsNoteFromUrl = searchParams.get("besoinsNote") 
+    ? decodeURIComponent(searchParams.get("besoinsNote") || "") 
+    : undefined;
 
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [budgetCategories, setBudgetCategories] = useState<BudgetCategory[]>(defaultCategories);
@@ -359,6 +362,7 @@ const Budget = () => {
               projectId={selectedProjectId}
               autoSelectPlanTab={autoAnalyze}
               onGenerateSchedule={() => setShowScheduleDialog(true)}
+              besoinsNote={besoinsNoteFromUrl}
             />
           </div>
 
