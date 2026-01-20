@@ -647,8 +647,10 @@ export function StepDetail({
                         </div>
                       )}
 
-                      {/* Task Attachments */}
-                      <TaskAttachments stepId={step.id} taskId={task.id} projectId={projectId} />
+                      {/* Task Attachments - sauf pour soumissions qui a son propre gestionnaire */}
+                      {task.id !== 'soumissions' && (
+                        <TaskAttachments stepId={step.id} taskId={task.id} projectId={projectId} />
+                      )}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
