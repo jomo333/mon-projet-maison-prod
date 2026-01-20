@@ -466,7 +466,11 @@ export function PlanAnalyzer({
       // Get style photo URLs to include in analysis
       const stylePhotoUrls = stylePhotos.map((p: any) => p.file_url);
       
-      const body = analysisMode === "manual" 
+      // IMPORTANT: Quand des plans sont sélectionnés, TOUJOURS utiliser mode "plan"
+      // et fournir les infos de base pour compléter les catégories manquantes
+      const hasPlansSelected = selectedPlanUrls.length > 0;
+      
+      const body = (analysisMode === "manual" && !hasPlansSelected)
         ? {
             mode: "manual",
             projectType: projectType === "maison-unifamiliale" ? "Maison unifamiliale" :
@@ -483,9 +487,13 @@ export function PlanAnalyzer({
             stylePhotoUrls: stylePhotoUrls.length > 0 ? stylePhotoUrls : undefined,
           }
         : {
+            // Mode plan: envoyer les plans sélectionnés + infos contextuelles
             mode: "plan",
             imageUrls: selectedPlanUrls,
             finishQuality,
+            // Inclure squareFootage pour aider à compléter les catégories manquantes
+            squareFootage: parseInt(squareFootage) || undefined,
+            numberOfFloors: parseInt(numberOfFloors) || undefined,
             additionalNotes: additionalNotes || undefined,
             stylePhotoUrls: stylePhotoUrls.length > 0 ? stylePhotoUrls : undefined,
           };
