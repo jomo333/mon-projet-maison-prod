@@ -79,15 +79,6 @@ export const constructionSteps: Step[] = [
     duration: "2 semaines",
     tasks: [
       {
-        id: "preapprobation",
-        title: "Pré-approbation hypothécaire",
-        description: "Obtenez une pré-approbation pour connaître votre capacité d'emprunt.",
-        tips: [
-          "Magasinez plusieurs institutions financières",
-          "Les prêts construction ont des conditions particulières"
-        ]
-      },
-      {
         id: "pret-construction",
         title: "Prêt construction",
         description: "Négociez votre prêt construction avec déboursements progressifs.",
