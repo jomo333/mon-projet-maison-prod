@@ -411,6 +411,29 @@ function transformToLegacyFormat(data: any, finishQuality: string): any {
     ...(validation.alertes || [])
   ];
 
+  // Ajouter avertissements automatiques pour travaux de préparation
+  const projectType = (extraction.type_projet || "").toUpperCase();
+  const isAttachedOrExtension = projectType.includes("AGRANDISSEMENT") || 
+                                 projectType.includes("GARAGE") || 
+                                 projectType.includes("JUMELÉ") ||
+                                 projectType.includes("JUMELE") ||
+                                 projectType.includes("ANNEXE");
+
+  // Avertissements travaux de préparation (toujours affichés)
+  warnings.push("🏗️ PRÉPARATION DU SITE: Vérifier les coûts d'excavation, nivellement, et accès chantier");
+  warnings.push("🚧 PERMIS ET INSPECTIONS: Frais de permis de construction et inspections municipales à prévoir");
+  warnings.push("📋 SERVICES PUBLICS: Confirmer les raccordements (eau, égout, électricité, gaz) et frais associés");
+
+  // Avertissements spécifiques au jumelage à l'existant
+  if (isAttachedOrExtension) {
+    warnings.push("🔗 JUMELAGE STRUCTUREL: Travaux de connexion à la structure existante (linteaux, ancrages, renfort fondation)");
+    warnings.push("⚡ RACCORDEMENT ÉLECTRIQUE: Extension du panneau existant et mise aux normes possiblement requise");
+    warnings.push("🔌 RACCORDEMENT PLOMBERIE: Connexion aux systèmes existants (eau, drainage, chauffage)");
+    warnings.push("🏠 IMPERMÉABILISATION: Joint d'étanchéité entre nouvelle et ancienne construction critique");
+    warnings.push("🎨 HARMONISATION: Travaux de finition pour raccorder les matériaux extérieurs existants");
+    warnings.push("🔥 COUPE-FEU: Vérifier les exigences de séparation coupe-feu entre garage et habitation");
+  }
+
   return {
     projectType: extraction.type_projet || "CONSTRUCTION_NEUVE",
     projectSummary: data.resume_projet || `Projet de ${extraction.superficie_nouvelle_pi2 || 0} pi² - ${extraction.nombre_etages || 1} étage(s)`,
