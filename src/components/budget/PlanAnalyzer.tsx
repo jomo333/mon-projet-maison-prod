@@ -971,15 +971,18 @@ export function PlanAnalyzer({
         {/* Results */}
         {analysis && (
           <div className="space-y-4 pt-4 border-t">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h3 className="font-semibold text-lg flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-green-500" />
                 Résultat de l'analyse
               </h3>
-              <Badge variant="secondary" className="text-lg px-4 py-1">
-                <DollarSign className="h-4 w-4 mr-1" />
-                {analysis.estimatedTotal.toLocaleString()} $
-              </Badge>
+              <div className="flex flex-col items-end">
+                <Badge variant="secondary" className="text-lg px-4 py-1">
+                  <DollarSign className="h-4 w-4 mr-1" />
+                  {Math.round(analysis.estimatedTotal * 0.85).toLocaleString()} $ à {Math.round(analysis.estimatedTotal * 1.15).toLocaleString()} $
+                </Badge>
+                <span className="text-xs text-muted-foreground mt-1">Fourchette ±15%</span>
+              </div>
             </div>
 
             <p className="text-muted-foreground">{analysis.projectSummary}</p>
@@ -997,14 +1000,14 @@ export function PlanAnalyzer({
                     </span>
                     <span className="font-medium">{cat.name}</span>
                   </div>
-                  <span className="text-muted-foreground font-medium">
-                    {cat.budget.toLocaleString()} $
+                  <span className="text-muted-foreground font-medium text-sm">
+                    {Math.round(cat.budget * 0.85).toLocaleString()} $ - {Math.round(cat.budget * 1.15).toLocaleString()} $
                   </span>
                 </div>
               ))}
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              {analysis.categories.length} catégorie(s) au total
+              {analysis.categories.length} catégorie(s) • Estimation préliminaire ±15%
             </p>
 
             {/* Warnings */}
