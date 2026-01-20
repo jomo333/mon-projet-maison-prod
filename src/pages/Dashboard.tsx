@@ -133,7 +133,7 @@ const Dashboard = () => {
   // Scroll to top when a step is selected
   useEffect(() => {
     if (selectedStepId) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [selectedStepId]);
 

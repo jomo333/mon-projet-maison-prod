@@ -158,6 +158,13 @@ const Project = () => {
     }
   }, [stepFromUrl]);
 
+  // Scroll to top when a step is selected
+  useEffect(() => {
+    if (selectedStepId) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [selectedStepId]);
+
   const selectedStep = selectedStepId 
     ? constructionSteps.find(s => s.id === selectedStepId) 
     : null;
