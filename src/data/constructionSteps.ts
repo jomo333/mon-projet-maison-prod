@@ -265,6 +265,15 @@ export const constructionSteps: Step[] = [
           "Protégez le pontage des intempéries rapidement",
           "Vérifiez l'alignement des panneaux"
         ]
+      },
+      {
+        id: "etancheite",
+        title: "Étanchéité",
+        description: "Installation des membranes d'étanchéité et protection contre les infiltrations.",
+        tips: [
+          "Assurez-vous que toutes les jonctions sont bien scellées",
+          "Vérifiez l'étanchéité autour des ouvertures (fenêtres, portes)"
+        ]
       }
     ]
   },
