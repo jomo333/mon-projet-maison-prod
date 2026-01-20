@@ -285,10 +285,13 @@ Retourne le JSON structuré avec des montants RÉALISTES reflétant les coûts d
     if (imageUrls.length > 0) {
       console.log(`Converting ${imageUrls.length} images to base64...`);
 
-      // Guardrails: avoid crashing on very large images (and keep payload reasonable)
-      const MAX_IMAGE_BYTES = 4_000_000; // ~4MB per image before base64 expansion
-      const MAX_IMAGES = 6;
+      // Guardrails: avoid worker memory limit (546 error)
+      // Edge functions have ~150MB memory - each large PNG can be 5-10MB+ in RAM
+      const MAX_IMAGE_BYTES = 1_500_000; // ~1.5MB per image max (after base64 ~2MB)
+      const MAX_IMAGES = 3; // Process max 3 images to stay within memory limits
+      const MAX_TOTAL_BYTES = 4_000_000; // Total payload limit
       const urlsToProcess = imageUrls.slice(0, MAX_IMAGES);
+      let totalBytes = 0;
 
       for (const url of urlsToProcess) {
         try {
@@ -297,10 +300,19 @@ Retourne le JSON structuré avec des montants RÉALISTES reflétant les coûts d
             const arrayBuffer = await imageResponse.arrayBuffer();
             const bytes = new Uint8Array(arrayBuffer);
 
-            if (bytes.byteLength > MAX_IMAGE_BYTES) {
-              console.log(`Skipping large image (${bytes.byteLength} bytes): ${url}`);
+            const imageSize = bytes.byteLength;
+            
+            if (imageSize > MAX_IMAGE_BYTES) {
+              console.log(`Skipping large image (${imageSize} bytes > ${MAX_IMAGE_BYTES}): ${url}`);
               continue;
             }
+            
+            if (totalBytes + imageSize > MAX_TOTAL_BYTES) {
+              console.log(`Stopping - total payload would exceed limit (${totalBytes + imageSize} bytes)`);
+              break;
+            }
+            
+            totalBytes += imageSize;
 
             // Use std base64 encoder (avoids call stack overflow from String.fromCharCode spread)
             const base64 = encodeBase64(arrayBuffer);
