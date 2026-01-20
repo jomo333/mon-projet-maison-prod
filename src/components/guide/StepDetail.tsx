@@ -258,7 +258,7 @@ export function StepDetail({
                       >
                         {currentSchedule.is_manual_date ? (
                           <>
-                            <Lock className="h-4 w-4" />
+                            <Lock className="h-4 w-4 text-amber-500" />
                             <span className="hidden sm:inline">Verrouillée</span>
                           </>
                         ) : (
@@ -273,8 +273,8 @@ export function StepDetail({
                   
                   {/* Indicateur de date verrouillée */}
                   {currentSchedule.is_manual_date && (
-                    <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 px-3 py-2 rounded-md">
-                      <Lock className="h-4 w-4" />
+                    <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/30 px-3 py-2 rounded-md">
+                      <Lock className="h-4 w-4 text-amber-500" />
                       <span>
                         Cette date est verrouillée (engagement sous-traitant). 
                         Elle ne sera pas modifiée automatiquement lors des recalculs.
