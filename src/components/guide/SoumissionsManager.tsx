@@ -1107,15 +1107,18 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
                 </div>
               )}
               
-              {/* Options de la soumission sélectionnée */}
-              {supplierInputs[selectingSupplier.tradeId]?.selectedDocId && docOptions.length > 0 && (
+              {/* Options de la soumission sélectionnée ou toutes les options */}
+              {extractedOptions.length > 0 && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium flex items-center gap-2">
                     Options disponibles
-                    <Badge variant="secondary" className="text-xs">{docOptions.length} options</Badge>
+                    <Badge variant="secondary" className="text-xs">{extractedOptions.length} options</Badge>
                   </label>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {docOptions.map((option, idx) => {
+                  <p className="text-xs text-muted-foreground">
+                    Sélectionnez l'option que vous souhaitez retenir. Le montant sera automatiquement mis à jour.
+                  </p>
+                  <div className="space-y-2 max-h-52 overflow-y-auto">
+                    {extractedOptions.map((option, idx) => {
                       const isOptionSelected = supplierInputs[selectingSupplier.tradeId]?.selectedOption === option.optionName;
                       
                       return (
@@ -1141,6 +1144,11 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
                             </div>
                             {option.description && (
                               <p className="text-xs text-muted-foreground mt-1">{option.description}</p>
+                            )}
+                            {option.docName && (
+                              <p className="text-xs text-muted-foreground/70 mt-1 italic">
+                                Source: {option.docName}
+                              </p>
                             )}
                           </div>
                         </div>
