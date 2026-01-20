@@ -89,6 +89,17 @@ export const constructionSteps: Step[] = [
         documents: ["Plans d'architecture", "Plans de structure", "Plans mécaniques"]
       },
       {
+        id: "test-sol",
+        title: "Test de sol (étude géotechnique)",
+        description: "Faites réaliser une étude géotechnique pour déterminer la capacité portante du sol et le type de fondation requis.",
+        tips: [
+          "Obligatoire pour obtenir le permis dans plusieurs municipalités",
+          "Permet de déterminer le type de fondation approprié",
+          "Identifie les risques de nappe phréatique élevée"
+        ],
+        documents: ["Rapport géotechnique", "Recommandations de fondation"]
+      },
+      {
         id: "permis-construction",
         title: "Demande de permis de construction",
         description: "Soumettez votre demande à la municipalité avec tous les documents requis.",
