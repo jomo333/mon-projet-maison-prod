@@ -218,27 +218,63 @@ INSTRUCTIONS:
 
 Retourne le JSON structuré tel que spécifié.`;
     } else {
-      // Manual mode
+      // Manual mode - with realistic Quebec 2025 cost benchmarks
       const { projectType, squareFootage, numberOfFloors, hasGarage, foundationSqft, floorSqftDetails, additionalNotes } = body;
       
-      extractionPrompt = `Génère une estimation budgétaire PRÉCISE pour ce projet au QUÉBEC:
+      extractionPrompt = `Génère une estimation budgétaire RÉALISTE pour ce projet au QUÉBEC en 2025.
 
-TYPE: ${projectType || 'Maison unifamiliale'}
-ÉTAGES: ${numberOfFloors || 1}
-SUPERFICIE: ${squareFootage || 1500} pi²
-${foundationSqft ? `FONDATION: ${foundationSqft} pi²` : ''}
-${floorSqftDetails?.length ? `DÉTAIL ÉTAGES: ${floorSqftDetails.join(', ')} pi²` : ''}
-GARAGE: ${hasGarage ? 'Oui' : 'Non'}
-QUALITÉ: ${qualityDescriptions[finishQuality] || qualityDescriptions["standard"]}
-${additionalNotes ? `NOTES CLIENT: ${additionalNotes}` : ''}
+## PROJET À ESTIMER
+- TYPE: ${projectType || 'Maison unifamiliale'}
+- ÉTAGES: ${numberOfFloors || 1}
+- SUPERFICIE TOTALE: ${squareFootage || 1500} pi²
+${foundationSqft ? `- FONDATION: ${foundationSqft} pi²` : ''}
+${floorSqftDetails?.length ? `- DÉTAIL ÉTAGES: ${floorSqftDetails.join(', ')} pi²` : ''}
+- GARAGE: ${hasGarage ? 'Oui (attaché)' : 'Non'}
+- QUALITÉ: ${qualityDescriptions[finishQuality] || qualityDescriptions["standard"]}
+${additionalNotes ? `- NOTES CLIENT: ${additionalNotes}` : ''}
 
-Génère une estimation ULTRA DÉTAILLÉE avec:
-- Quantités calculées selon la superficie
-- Prix unitaires Québec 2025
-- Main-d'œuvre selon taux CCQ 2025
-- Taxes TPS 5% + TVQ 9.975%
+## COÛTS DE RÉFÉRENCE QUÉBEC 2025 (MATÉRIAUX + MAIN-D'ŒUVRE INCLUS)
 
-Retourne le JSON structuré tel que spécifié.`;
+### Par catégorie ($/pi² de superficie):
+| Catégorie | Économique | Standard | Haut de gamme |
+|-----------|------------|----------|---------------|
+| Fondation (semelle + mur + dalle) | 35-45$/pi² | 45-60$/pi² | 60-80$/pi² |
+| Structure (charpente bois) | 25-35$/pi² | 35-50$/pi² | 50-70$/pi² |
+| Toiture complète | 15-20$/pi² | 20-30$/pi² | 30-45$/pi² |
+| Revêtement extérieur | 15-25$/pi² | 25-40$/pi² | 40-70$/pi² |
+| Fenêtres et portes | 20-30$/pi² | 30-50$/pi² | 50-80$/pi² |
+| Isolation et pare-air | 8-12$/pi² | 12-18$/pi² | 18-25$/pi² |
+| Électricité complète | 15-20$/pi² | 20-30$/pi² | 30-50$/pi² |
+| Plomberie complète | 12-18$/pi² | 18-28$/pi² | 28-45$/pi² |
+| Chauffage/CVAC | 15-25$/pi² | 25-40$/pi² | 40-60$/pi² |
+| Gypse et peinture | 12-18$/pi² | 18-25$/pi² | 25-35$/pi² |
+| Planchers | 8-15$/pi² | 15-30$/pi² | 30-60$/pi² |
+| Cuisine (armoires + comptoirs) | 8000-15000$ | 15000-35000$ | 35000-80000$ |
+| Salle de bain (par unité) | 5000-10000$ | 10000-25000$ | 25000-50000$ |
+
+### Coûts fixes typiques:
+- Excavation et terrassement: 8000-15000$
+- Permis de construction: 1500-5000$
+- Raccordements (eau, égout, électricité): 5000-15000$
+- Entrée de garage/stationnement: 3000-8000$
+
+### Taux main-d'œuvre CCQ 2025:
+- Charpentier: 48.50$/h (ratio: 40-50% du coût matériaux)
+- Électricien: 52.00$/h
+- Plombier: 54.00$/h
+- Maçon: 49.00$/h
+
+## RÈGLES DE CALCUL OBLIGATOIRES
+
+1. **CHAQUE catégorie DOIT inclure**: matériaux + main-d'œuvre
+2. Utilise le MILIEU de la fourchette pour la qualité sélectionnée
+3. Calcule: sous_total_materiaux + sous_total_main_oeuvre = sous_total_categorie
+4. Le ratio main-d'œuvre/matériaux doit être entre 35-50%
+5. Ajoute contingence 5% sur le sous-total
+6. Calcule TPS 5% + TVQ 9.975% sur (sous-total + contingence)
+
+## FORMAT DE RÉPONSE
+Retourne le JSON structuré avec des montants RÉALISTES reflétant les coûts de construction actuels au Québec.`;
     }
 
     // Build messages for extraction pass
