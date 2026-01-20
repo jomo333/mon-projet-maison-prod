@@ -234,7 +234,8 @@ export const constructionSteps: Step[] = [
         description: "Installation des solives et du sous-plancher.",
         tips: [
           "Protégez le sous-plancher des intempéries durant la construction",
-          "Vérifiez le niveau avant de continuer"
+          "Vérifiez le niveau avant de continuer",
+          "Utilisez des poutrelles ajourées pour faciliter le passage des fils électriques et des conduits de plomberie"
         ]
       },
       {
@@ -250,6 +251,9 @@ export const constructionSteps: Step[] = [
         id: "etage",
         title: "Structure de l'étage",
         description: "Si applicable, construction du plancher et des murs de l'étage.",
+        tips: [
+          "Utilisez des poutrelles ajourées pour faciliter le passage des fils électriques et des conduits de plomberie"
+        ]
       },
       {
         id: "fermes-toit",
