@@ -46,70 +46,72 @@ const PRIX_QUEBEC_2025 = {
 
 const SYSTEM_PROMPT_EXTRACTION = `Tu es un ESTIMATEUR PROFESSIONNEL QUÉBÉCOIS CERTIFIÉ avec 25 ans d'expérience.
 
-MISSION: Analyser ce document de construction avec une PRÉCISION EXTRÊME.
+MISSION: Analyser TOUS les plans de construction fournis simultanément pour produire une estimation COMPLÈTE.
 
-## EXTRACTION REQUISE
+## EXTRACTION REQUISE - TOUTES LES CATÉGORIES
 
-1. **MATÉRIAUX** - Pour CHAQUE matériau identifiable:
-   - Description EXACTE (ex: "Bois 2x4 SPF #2")
-   - Quantité PRÉCISE (mesure au 1/8 de pouce près)
-   - Unités québécoises standard: pi² (pieds carrés), vg³ (verges cubes), ml (mètres linéaires), pcs (pièces)
-   - Dimension complète (ex: "8 pieds", "4x8 pieds")
-   - Localisation exacte dans le plan (ex: "Mur Nord - Page 3, Section A-A")
+Tu DOIS produire des estimations pour CHAQUE catégorie suivante, même si les plans ne montrent pas tous les détails:
 
-2. **MAIN-D'ŒUVRE** selon taux CCQ 2025:
-   - Charpentier-menuisier: 48.50$/h
-   - Électricien: 52.00$/h
-   - Plombier: 54.00$/h
-   - Frigoriste (CVAC): 56.00$/h
-   - Ferblantier: 50.00$/h
-   - Briqueteur-maçon: 49.00$/h
-   - Plâtrier: 46.00$/h
-   - Peintre: 42.00$/h
-
-3. **PRIX UNITAIRES** CAD région Montréal 2025:
-   - Bois 2x4x8 SPF: 4.50$
-   - Bois 2x6x8 SPF: 7.25$
-   - Bois 2x8x12 SPF: 16.80$
-   - Contreplaqué 3/4" 4x8: 52.00$
-   - OSB 7/16" 4x8: 24.50$
-   - Gypse régulier 1/2" 4x8: 18.50$
-   - Gypse résistant 1/2" 4x8: 22.00$
-   - Isolation R20 fibre verre: 0.85$/pi²
-   - Isolation R30 fibre verre: 1.15$/pi²
-   - Bardeau asphalte 25 ans: 95.00$/carré (100 pi²)
-   - Membrane Tyvek: 0.42$/pi²
-   - Ciment Portland 30kg: 12.50$
-   - Béton 30 MPa livré: 165.00$/m³
+1. **Fondation** - Semelles, murs de fondation, dalle de béton, imperméabilisation
+2. **Structure** - Charpente, solives, colombages, poutres, poutrelles
+3. **Toiture** - Fermes de toit, couverture, bardeaux, soffites, fascias
+4. **Revêtement extérieur** - Parement, briques, pierre, vinyle
+5. **Fenêtres et portes** - Toutes fenêtres, portes extérieures, portes intérieures
+6. **Isolation et pare-air** - Isolation murs, plafonds, pare-vapeur, Tyvek
+7. **Électricité** - Panneau, filage, prises, interrupteurs, luminaires
+8. **Plomberie** - Tuyauterie, drains, robinetterie, chauffe-eau
+9. **Chauffage/CVAC** - Système de chauffage, ventilation, climatisation
+10. **Finition intérieure** - Gypse, peinture, moulures, planchers
+11. **Cuisine** - Armoires, comptoirs, électroménagers
+12. **Salle(s) de bain** - Vanités, toilettes, douches/bains
 
 ## RÈGLES CRITIQUES
 
-- Sois ULTRA PRÉCIS sur les quantités. N'ARRONDIS JAMAIS à la baisse.
-- Identifie TOUTE information manquante ou ambiguë
-- Signale les incohérences entre vues/plans différents
-- Vérifie que toutes surfaces sont calculées: planchers + murs + toiture
-- Compare avec ratio typique: main-d'œuvre = 35-45% du coût total matériaux
+- Analyse TOUTES les pages/images fournies ENSEMBLE
+- Pour les éléments non visibles sur les plans, ESTIME en fonction de la superficie et du type de projet
+- Utilise les prix du marché Québec 2025
+- Ratio main-d'œuvre/matériaux: 35-50% selon le type de travail
+- TOUJOURS inclure TPS 5% + TVQ 9.975%
+- TOUJOURS ajouter contingence 5%
+
+## PRIX DE RÉFÉRENCE QUÉBEC 2025 (par pi² de superficie habitable)
+
+| Catégorie | Économique | Standard | Haut de gamme |
+|-----------|------------|----------|---------------|
+| Fondation | 35-45$ | 45-60$ | 60-80$ |
+| Structure | 25-35$ | 35-50$ | 50-70$ |
+| Toiture | 15-20$ | 20-30$ | 30-45$ |
+| Revêtement | 15-25$ | 25-40$ | 40-70$ |
+| Fenêtres/Portes | 20-30$ | 30-50$ | 50-80$ |
+| Isolation | 8-12$ | 12-18$ | 18-25$ |
+| Électricité | 15-20$ | 20-30$ | 30-50$ |
+| Plomberie | 12-18$ | 18-28$ | 28-45$ |
+| CVAC | 15-25$ | 25-40$ | 40-60$ |
+| Gypse/Peinture | 12-18$ | 18-25$ | 25-35$ |
+| Planchers | 8-15$ | 15-30$ | 30-60$ |
+| Cuisine | 8k-15k$ | 15k-35k$ | 35k-80k$ |
+| Salle de bain | 5k-10k$ | 10k-25k$ | 25k-50k$ |
 
 ## FORMAT DE RÉPONSE JSON STRICT
 
 {
   "extraction": {
-    "type_projet": "CONSTRUCTION_NEUVE | AGRANDISSEMENT | RENOVATION | SURELEVATION | GARAGE",
+    "type_projet": "CONSTRUCTION_NEUVE | AGRANDISSEMENT | RENOVATION | GARAGE | GARAGE_AVEC_ETAGE",
     "superficie_nouvelle_pi2": number,
     "nombre_etages": number,
     "plans_analyses": number,
     "categories": [
       {
-        "nom": "Structure" | "Fondation" | "Enveloppe" | "Finition intérieure" | "Finition extérieure" | "Électricité" | "Plomberie" | "CVC",
+        "nom": "Nom de la catégorie",
         "items": [
           {
-            "description": "Nom EXACT du matériau/travail",
+            "description": "Description du matériau/travail",
             "quantite": number,
-            "unite": "pi² | vg³ | ml | pcs | unité",
+            "unite": "pi² | vg³ | ml | pcs | unité | forfait",
             "dimension": "dimension si applicable",
             "prix_unitaire": number,
             "total": number,
-            "source": "Page X, Section Y",
+            "source": "Page X ou Estimé",
             "confiance": "haute | moyenne | basse"
           }
         ],
@@ -120,9 +122,9 @@ MISSION: Analyser ce document de construction avec une PRÉCISION EXTRÊME.
         "sous_total_categorie": number
       }
     ],
-    "elements_manquants": ["Liste des éléments non spécifiés dans les plans"],
-    "ambiguites": ["Liste des informations ambiguës nécessitant clarification"],
-    "incoherences": ["Incohérences détectées entre les vues"]
+    "elements_manquants": ["Éléments non spécifiés"],
+    "ambiguites": ["Informations ambiguës"],
+    "incoherences": ["Incohérences détectées"]
   },
   "totaux": {
     "total_materiaux": number,
@@ -138,25 +140,11 @@ MISSION: Analyser ce document de construction avec une PRÉCISION EXTRÊME.
     "surfaces_completes": boolean,
     "ratio_main_oeuvre_materiaux": number,
     "ratio_acceptable": boolean,
-    "alertes": ["Alertes importantes pour l'estimateur"]
+    "alertes": ["Alertes importantes"]
   },
-  "recommandations": ["Recommandations basées sur l'analyse"],
-  "resume_projet": "Description concise du projet analysé"
+  "recommandations": ["Recommandations"],
+  "resume_projet": "Description du projet"
 }`;
-
-const SYSTEM_PROMPT_VALIDATION = `Tu es un VÉRIFICATEUR D'ESTIMATIONS senior. 
-
-Ton rôle est de VALIDER l'extraction initiale et corriger les erreurs.
-
-VÉRIFICATIONS À EFFECTUER:
-1. Les quantités sont-elles cohérentes avec la superficie?
-2. Les prix unitaires correspondent-ils au marché Québec 2025?
-3. Y a-t-il des doublons (même élément compté 2 fois)?
-4. Manque-t-il des éléments évidents (ex: isolation si murs présents)?
-5. Le ratio main-d'œuvre/matériaux est-il réaliste (35-45%)?
-6. Les taxes sont-elles bien calculées (TPS 5%, TVQ 9.975%)?
-
-Corrige les erreurs et retourne le JSON validé avec les corrections appliquées.`;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -199,9 +187,9 @@ serve(async (req) => {
       imageUrls = [...stylePhotoUrls];
     }
 
-    console.log('Analyzing with 2-pass extraction:', { mode, imageCount: imageUrls.length, quality: finishQuality });
+    console.log('Analyzing:', { mode, imageCount: imageUrls.length, quality: finishQuality });
 
-    // ============= PASSE 1: EXTRACTION =============
+    // Build the prompt
     let extractionPrompt: string;
     
     if (mode === "plan") {
@@ -209,20 +197,21 @@ serve(async (req) => {
 
 QUALITÉ DE FINITION: ${qualityDescriptions[finishQuality] || qualityDescriptions["standard"]}
 
-INSTRUCTIONS:
-1. Examine ATTENTIVEMENT chaque plan/image fourni
-2. Extrait TOUTES les quantités visibles avec précision au 1/8"
-3. Identifie le type de projet (neuf, agrandissement, réno)
-4. Calcule la superficie de la NOUVELLE construction seulement
-5. Liste les éléments manquants ou ambigus
-6. Applique les prix du marché Québec 2025
+${body.additionalNotes ? `NOTES CLIENT: ${body.additionalNotes}` : ''}
 
-Retourne le JSON structuré tel que spécifié.`;
+INSTRUCTIONS CRITIQUES:
+1. Examine TOUTES les pages/images fournies ensemble
+2. Extrait les dimensions et quantités visibles
+3. Pour chaque catégorie NON VISIBLE, ESTIME les coûts basés sur la superficie totale
+4. Tu DOIS retourner TOUTES les 12 catégories principales (Fondation, Structure, Toiture, Revêtement, Fenêtres, Isolation, Électricité, Plomberie, CVAC, Finition, Cuisine, Salle de bain)
+5. Applique les prix du marché Québec 2025
+
+Retourne le JSON structuré COMPLET avec TOUTES les catégories.`;
     } else {
-      // Manual mode - with realistic Quebec 2025 cost benchmarks
+      // Manual mode
       const { projectType, squareFootage, numberOfFloors, hasGarage, foundationSqft, floorSqftDetails, additionalNotes } = body;
       
-      extractionPrompt = `Génère une estimation budgétaire RÉALISTE pour ce projet au QUÉBEC en 2025.
+      extractionPrompt = `Génère une estimation budgétaire COMPLÈTE pour ce projet au QUÉBEC en 2025.
 
 ## PROJET À ESTIMER
 - TYPE: ${projectType || 'Maison unifamiliale'}
@@ -234,196 +223,92 @@ ${floorSqftDetails?.length ? `- DÉTAIL ÉTAGES: ${floorSqftDetails.join(', ')} 
 - QUALITÉ: ${qualityDescriptions[finishQuality] || qualityDescriptions["standard"]}
 ${additionalNotes ? `- NOTES CLIENT: ${additionalNotes}` : ''}
 
-## COÛTS DE RÉFÉRENCE QUÉBEC 2025 (MATÉRIAUX + MAIN-D'ŒUVRE INCLUS)
+INSTRUCTIONS CRITIQUES:
+1. Tu DOIS retourner TOUTES les 12 catégories principales
+2. Utilise les prix du MILIEU de la fourchette pour la qualité sélectionnée
+3. Inclus matériaux ET main-d'œuvre pour chaque catégorie
+4. Calcule contingence 5% + TPS 5% + TVQ 9.975%
 
-### Par catégorie ($/pi² de superficie):
-| Catégorie | Économique | Standard | Haut de gamme |
-|-----------|------------|----------|---------------|
-| Fondation (semelle + mur + dalle) | 35-45$/pi² | 45-60$/pi² | 60-80$/pi² |
-| Structure (charpente bois) | 25-35$/pi² | 35-50$/pi² | 50-70$/pi² |
-| Toiture complète | 15-20$/pi² | 20-30$/pi² | 30-45$/pi² |
-| Revêtement extérieur | 15-25$/pi² | 25-40$/pi² | 40-70$/pi² |
-| Fenêtres et portes | 20-30$/pi² | 30-50$/pi² | 50-80$/pi² |
-| Isolation et pare-air | 8-12$/pi² | 12-18$/pi² | 18-25$/pi² |
-| Électricité complète | 15-20$/pi² | 20-30$/pi² | 30-50$/pi² |
-| Plomberie complète | 12-18$/pi² | 18-28$/pi² | 28-45$/pi² |
-| Chauffage/CVAC | 15-25$/pi² | 25-40$/pi² | 40-60$/pi² |
-| Gypse et peinture | 12-18$/pi² | 18-25$/pi² | 25-35$/pi² |
-| Planchers | 8-15$/pi² | 15-30$/pi² | 30-60$/pi² |
-| Cuisine (armoires + comptoirs) | 8000-15000$ | 15000-35000$ | 35000-80000$ |
-| Salle de bain (par unité) | 5000-10000$ | 10000-25000$ | 25000-50000$ |
-
-### Coûts fixes typiques:
-- Excavation et terrassement: 8000-15000$
-- Permis de construction: 1500-5000$
-- Raccordements (eau, égout, électricité): 5000-15000$
-- Entrée de garage/stationnement: 3000-8000$
-
-### Taux main-d'œuvre CCQ 2025:
-- Charpentier: 48.50$/h (ratio: 40-50% du coût matériaux)
-- Électricien: 52.00$/h
-- Plombier: 54.00$/h
-- Maçon: 49.00$/h
-
-## RÈGLES DE CALCUL OBLIGATOIRES
-
-1. **CHAQUE catégorie DOIT inclure**: matériaux + main-d'œuvre
-2. Utilise le MILIEU de la fourchette pour la qualité sélectionnée
-3. Calcule: sous_total_materiaux + sous_total_main_oeuvre = sous_total_categorie
-4. Le ratio main-d'œuvre/matériaux doit être entre 35-50%
-5. Ajoute contingence 5% sur le sous-total
-6. Calcule TPS 5% + TVQ 9.975% sur (sous-total + contingence)
-
-## FORMAT DE RÉPONSE
-Retourne le JSON structuré avec des montants RÉALISTES reflétant les coûts de construction actuels au Québec.`;
+Retourne le JSON structuré COMPLET.`;
     }
 
-    // ============= CLAUDE MULTI-PASS VISION =============
-    // Analyse chaque page séparément (1 image à la fois) puis fusionne.
-    // Cela évite le dépassement mémoire (546) et gère toutes les pages.
+    let finalContent: string;
 
-    const MAX_IMAGE_SIZE = 6_000_000; // ~6MB (traité 1 à la fois => OK mémoire)
-
-    function safeParseJsonFromModel(text: string): any | null {
-      try {
-        let cleanContent = String(text || '')
-          .replace(/```json\n?/g, '')
-          .replace(/```\n?/g, '')
-          .trim();
-
-        const jsonStart = cleanContent.indexOf('{');
-        if (jsonStart > 0) cleanContent = cleanContent.substring(jsonStart);
-
+    if (mode === 'plan' && imageUrls.length > 0) {
+      // Fetch and convert all images to base64
+      console.log(`Converting ${imageUrls.length} images to base64...`);
+      
+      const imageContents: any[] = [];
+      
+      for (let i = 0; i < imageUrls.length; i++) {
+        const url = imageUrls[i];
+        console.log(`Fetching image ${i + 1}/${imageUrls.length}...`);
+        
         try {
-          return JSON.parse(cleanContent);
-        } catch {
-          // Attempt basic repair (same strategy as final parse)
-          let braceCount = 0;
-          let bracketCount = 0;
-          for (const char of cleanContent) {
-            if (char === '{') braceCount++;
-            if (char === '}') braceCount--;
-            if (char === '[') bracketCount++;
-            if (char === ']') bracketCount--;
+          const resp = await fetch(url);
+          if (!resp.ok) {
+            console.log(`Failed to fetch image ${i + 1}: ${resp.status}`);
+            continue;
           }
-
-          let repaired = cleanContent;
-          while (bracketCount > 0) {
-            repaired += ']';
-            bracketCount--;
+          
+          const arrayBuffer = await resp.arrayBuffer();
+          const bytes = arrayBuffer.byteLength;
+          
+          // Skip very large images (>5MB)
+          if (bytes > 5_000_000) {
+            console.log(`Skipping large image ${i + 1} (${Math.round(bytes / 1024 / 1024)}MB)`);
+            continue;
           }
-          while (braceCount > 0) {
-            repaired += '}';
-            braceCount--;
-          }
-          return JSON.parse(repaired);
+          
+          const base64 = encodeBase64(arrayBuffer);
+          const contentType = resp.headers.get('content-type') || 'image/png';
+          const mediaType = contentType.includes('jpeg') || contentType.includes('jpg')
+            ? 'image/jpeg'
+            : contentType.includes('webp')
+              ? 'image/webp'
+              : 'image/png';
+          
+          imageContents.push({
+            type: 'image',
+            source: { type: 'base64', media_type: mediaType, data: base64 }
+          });
+          
+          console.log(`Image ${i + 1} converted (${Math.round(bytes / 1024)}KB)`);
+        } catch (err) {
+          console.log(`Error fetching image ${i + 1}:`, err);
         }
-      } catch {
-        return null;
       }
-    }
 
-    // Helper to fetch an image and convert to base64 (one at a time to save memory)
-    async function fetchImageAsBase64(url: string): Promise<{ base64: string; mediaType: string } | null> {
-      try {
-        const resp = await fetch(url);
-        if (!resp.ok) {
-          console.log(`Failed to fetch ${url}: ${resp.status}`);
-          return null;
-        }
-        const arrayBuffer = await resp.arrayBuffer();
-        if (arrayBuffer.byteLength > MAX_IMAGE_SIZE) {
-          console.log(`Skipping large image (${arrayBuffer.byteLength} bytes): ${url}`);
-          return null;
-        }
-        const base64 = encodeBase64(arrayBuffer);
-        const contentType = resp.headers.get('content-type') || 'image/png';
-        const mediaType = contentType.includes('jpeg') || contentType.includes('jpg')
-          ? 'image/jpeg'
-          : contentType.includes('webp')
-            ? 'image/webp'
-            : 'image/png';
-        return { base64, mediaType };
-      } catch (err) {
-        console.log(`Error fetching image ${url}:`, err);
-        return null;
+      if (imageContents.length === 0) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "Impossible de charger les images. Vérifiez qu'elles sont accessibles.",
+          }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
-    }
 
-    // Helper to call Claude with a single image and get partial extraction
-    async function analyzeOnePage(
-      apiKey: string,
-      imageBase64: string,
-      mediaType: string,
-      pageNumber: number,
-      totalPages: number,
-      additionalContext: string,
-    ): Promise<string | null> {
-      const pagePrompt = `Tu analyses la PAGE ${pageNumber}/${totalPages} d'un ensemble de plans de construction au Québec.
-${additionalContext}
+      console.log(`Sending ${imageContents.length} images to Claude for analysis...`);
 
-QUALITÉ DE FINITION: ${qualityDescriptions[finishQuality] || qualityDescriptions["standard"]}
-
-INSTRUCTIONS:
-- Concentre-toi sur les quantités/dimensions utiles pour estimer un budget.
-- Ignore les cartouches, logos, répétitions.
-- IMPORTANT: retourne un JSON STRICT (sans texte autour) au format global, mais seulement avec les infos de cette page.
-
-FORMAT (JSON STRICT):
-{
-  "extraction": {
-    "type_projet": "CONSTRUCTION_NEUVE | AGRANDISSEMENT | RENOVATION | SURELEVATION | GARAGE",
-    "superficie_nouvelle_pi2": number,
-    "nombre_etages": number,
-    "plans_analyses": 1,
-    "categories": [
-      {
-        "nom": "Structure" | "Fondation" | "Enveloppe" | "Finition intérieure" | "Finition extérieure" | "Électricité" | "Plomberie" | "CVC",
-        "items": [
-          {
-            "description": string,
-            "quantite": number,
-            "unite": string,
-            "dimension": string,
-            "prix_unitaire": number,
-            "total": number,
-            "source": "Page ${pageNumber}",
-            "confiance": "haute" | "moyenne" | "basse"
-          }
-        ],
-        "sous_total_materiaux": number,
-        "heures_main_oeuvre": number,
-        "taux_horaire_CCQ": number,
-        "sous_total_main_oeuvre": number,
-        "sous_total_categorie": number
-      }
-    ],
-    "elements_manquants": string[],
-    "ambiguites": string[],
-    "incoherences": string[]
-  }
-}`;
-
+      // Single call with ALL images
       const claudeResp = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
-          'x-api-key': apiKey,
+          'x-api-key': anthropicKey,
           'anthropic-version': '2023-06-01',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: 2800,
+          max_tokens: 8192,
           system: SYSTEM_PROMPT_EXTRACTION,
           messages: [
             {
               role: 'user',
               content: [
-                {
-                  type: 'image',
-                  source: { type: 'base64', media_type: mediaType, data: imageBase64 },
-                },
-                { type: 'text', text: pagePrompt },
+                ...imageContents,
+                { type: 'text', text: extractionPrompt },
               ],
             },
           ],
@@ -432,203 +317,33 @@ FORMAT (JSON STRICT):
 
       if (!claudeResp.ok) {
         const txt = await claudeResp.text();
-        console.error(`Claude page ${pageNumber} error: ${claudeResp.status}`, txt);
-        return null;
-      }
-
-      const data = await claudeResp.json();
-      return data.content?.[0]?.text || null;
-    }
-
-    let finalContent: string;
-
-    if (mode === 'plan' && imageUrls.length > 0) {
-      // Multi-pass: analyze each page separately
-      console.log(`Starting Claude multi-pass analysis for ${imageUrls.length} pages...`);
-      const pageExtractions: any[] = [];
-      const additionalContext = body.additionalNotes ? `NOTES CLIENT: ${body.additionalNotes}` : '';
-
-      for (let i = 0; i < imageUrls.length; i++) {
-        const url = imageUrls[i];
-        console.log(`Processing page ${i + 1}/${imageUrls.length}: ${url.substring(url.lastIndexOf('/') + 1)}`);
-
-        const imgData = await fetchImageAsBase64(url);
-        if (!imgData) {
-          console.log(`Skipping page ${i + 1} (fetch failed or too large)`);
-          continue;
+        console.error('Claude API error:', claudeResp.status, txt);
+        
+        // Check for specific errors
+        if (claudeResp.status === 413 || txt.includes('too large')) {
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              error: 'Les images sont trop volumineuses. Essayez avec moins de pages ou des images plus petites.' 
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
         }
-
-        const pageResult = await analyzeOnePage(
-          anthropicKey,
-          imgData.base64,
-          imgData.mediaType,
-          i + 1,
-          imageUrls.length,
-          additionalContext,
-        );
-
-        if (pageResult) {
-          const parsed = safeParseJsonFromModel(pageResult);
-          const extraction = parsed?.extraction;
-          if (extraction && Array.isArray(extraction.categories)) {
-            pageExtractions.push(extraction);
-            console.log(`Page ${i + 1} analyzed successfully (categories: ${extraction.categories.length})`);
-          } else {
-            console.log(`Page ${i + 1} returned non-parseable JSON`);
-          }
-        } else {
-          console.log(`Page ${i + 1} analysis returned empty`);
-        }
-      }
-
-      if (pageExtractions.length === 0) {
+        
         return new Response(
-          JSON.stringify({
-            success: false,
-            error: "Impossible d'analyser les plans. Vérifie que les images sont accessibles et pas trop lourdes.",
-          }),
+          JSON.stringify({ success: false, error: `Erreur API: ${claudeResp.status}` }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      // Merge in code (more reliable, avoids timeouts / huge prompts)
-      console.log(`Merging ${pageExtractions.length} page extractions in code...`);
-
-      const catMap = new Map<string, { nom: string; items: any[]; heures_main_oeuvre: number; sous_total_main_oeuvre: number; sous_total_materiaux: number; taux_horaire_CCQ: number }>();
-      const missing = new Set<string>();
-      const ambiguites = new Set<string>();
-      const incoherences = new Set<string>();
-
-      let typeProjet: string | undefined;
-      let superficie: number | undefined;
-      let etages: number | undefined;
-
-      const normalizeKey = (s: unknown) => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ');
-
-      for (const ex of pageExtractions) {
-        typeProjet = typeProjet || ex.type_projet;
-        if (!superficie && Number(ex.superficie_nouvelle_pi2)) superficie = Number(ex.superficie_nouvelle_pi2);
-        if (!etages && Number(ex.nombre_etages)) etages = Number(ex.nombre_etages);
-
-        for (const e of ex.elements_manquants || []) missing.add(String(e));
-        for (const e of ex.ambiguites || []) ambiguites.add(String(e));
-        for (const e of ex.incoherences || []) incoherences.add(String(e));
-
-        for (const cat of ex.categories || []) {
-          const nom = cat.nom || cat.name || 'Autre';
-          const key = normalizeKey(nom);
-          const existing = catMap.get(key) || {
-            nom,
-            items: [],
-            heures_main_oeuvre: 0,
-            sous_total_main_oeuvre: 0,
-            sous_total_materiaux: 0,
-            taux_horaire_CCQ: Number(cat.taux_horaire_CCQ) || 0,
-          };
-
-          existing.heures_main_oeuvre += Number(cat.heures_main_oeuvre) || 0;
-          existing.sous_total_main_oeuvre += Number(cat.sous_total_main_oeuvre) || 0;
-          existing.sous_total_materiaux += Number(cat.sous_total_materiaux) || 0;
-          existing.taux_horaire_CCQ = existing.taux_horaire_CCQ || Number(cat.taux_horaire_CCQ) || 0;
-
-          // Merge items by description+unit+dimension
-          const itemMap = new Map<string, any>();
-          for (const it of existing.items) {
-            const k = `${normalizeKey(it.description)}|${normalizeKey(it.unite)}|${normalizeKey(it.dimension)}`;
-            itemMap.set(k, it);
-          }
-          for (const it of cat.items || []) {
-            const desc = it.description;
-            const unite = it.unite || it.unit;
-            const dimension = it.dimension || '';
-            const k = `${normalizeKey(desc)}|${normalizeKey(unite)}|${normalizeKey(dimension)}`;
-
-            const quantite = Number(it.quantite) || 0;
-            const prix = Number(it.prix_unitaire) || 0;
-            const total = Number(it.total) || (quantite && prix ? quantite * prix : 0);
-
-            const prev = itemMap.get(k);
-            if (prev) {
-              prev.quantite = (Number(prev.quantite) || 0) + quantite;
-              prev.total = (Number(prev.total) || 0) + total;
-              // Keep max unit price if differs
-              prev.prix_unitaire = Math.max(Number(prev.prix_unitaire) || 0, prix);
-              // Keep any source
-              prev.source = prev.source || it.source;
-              itemMap.set(k, prev);
-            } else {
-              itemMap.set(k, {
-                description: desc,
-                quantite,
-                unite,
-                dimension,
-                prix_unitaire: prix,
-                total,
-                source: it.source,
-                confiance: it.confiance || 'moyenne',
-              });
-            }
-          }
-          existing.items = Array.from(itemMap.values());
-
-          catMap.set(key, existing);
-        }
-      }
-
-      const mergedCategories = Array.from(catMap.values()).map((c) => {
-        const itemsTotal = c.items.reduce((sum, it) => sum + (Number(it.total) || 0), 0);
-        return {
-          nom: c.nom,
-          items: c.items,
-          sous_total_materiaux: c.sous_total_materiaux || itemsTotal,
-          heures_main_oeuvre: c.heures_main_oeuvre || 0,
-          taux_horaire_CCQ: c.taux_horaire_CCQ || 0,
-          sous_total_main_oeuvre: c.sous_total_main_oeuvre || 0,
-          sous_total_categorie: itemsTotal,
-        };
-      });
-
-      const sousTotalAvantTaxes = mergedCategories.reduce((sum, c) => sum + (Number(c.sous_total_categorie) || 0), 0);
-      const contingence = sousTotalAvantTaxes * 0.05;
-      const sousTotalAvecContingence = sousTotalAvantTaxes + contingence;
-      const tps = sousTotalAvecContingence * 0.05;
-      const tvq = sousTotalAvecContingence * 0.09975;
-      const totalTtc = sousTotalAvecContingence + tps + tvq;
-
-      const mergedBudget = {
-        extraction: {
-          type_projet: typeProjet || 'GARAGE',
-          superficie_nouvelle_pi2: superficie || 0,
-          nombre_etages: etages || 1,
-          plans_analyses: imageUrls.length,
-          categories: mergedCategories,
-          elements_manquants: Array.from(missing),
-          ambiguites: Array.from(ambiguites),
-          incoherences: Array.from(incoherences),
-        },
-        totaux: {
-          sous_total_avant_taxes: sousTotalAvantTaxes,
-          contingence_5_pourcent: contingence,
-          sous_total_avec_contingence: sousTotalAvecContingence,
-          tps_5_pourcent: tps,
-          tvq_9_975_pourcent: tvq,
-          total_ttc: totalTtc,
-        },
-        validation: {
-          surfaces_completes: false,
-          ratio_main_oeuvre_materiaux: null,
-          ratio_acceptable: null,
-          alertes: [],
-        },
-        recommandations: ["Estimation fusionnée automatiquement à partir de toutes les pages analysées."],
-        resume_projet: body.additionalNotes || 'Analyse de plans',
-      };
-
-      finalContent = JSON.stringify(mergedBudget);
-      console.log('Multi-pass merge complete (code)');
+      const claudeData = await claudeResp.json();
+      finalContent = claudeData.content?.[0]?.text || '';
+      console.log('Claude analysis complete');
+      
     } else {
-      // Manual mode or no images: single call to Claude (text only)
+      // Manual mode or no images: text-only call
       console.log('Analyzing with Claude (text mode)...');
+      
       const textResp = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -660,34 +375,29 @@ FORMAT (JSON STRICT):
 
     if (!finalContent) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Empty response from AI' }),
+        JSON.stringify({ success: false, error: 'Réponse vide de l\'IA' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Parse the final JSON - handle text before/after JSON and truncation
+    // Parse the final JSON
     let budgetData;
     try {
-      // Remove markdown code blocks
       let cleanContent = finalContent
         .replace(/```json\n?/g, '')
         .replace(/```\n?/g, '')
         .trim();
       
-      // Find JSON start - look for opening brace
       const jsonStart = cleanContent.indexOf('{');
       if (jsonStart > 0) {
         cleanContent = cleanContent.substring(jsonStart);
       }
       
-      // Try to parse, if truncated try to fix
       try {
         budgetData = JSON.parse(cleanContent);
       } catch (firstTry) {
-        // Response might be truncated - try to close JSON properly
         console.log('JSON appears truncated, attempting to repair...');
         
-        // Count open braces and brackets
         let braceCount = 0;
         let bracketCount = 0;
         for (const char of cleanContent) {
@@ -697,7 +407,6 @@ FORMAT (JSON STRICT):
           if (char === ']') bracketCount--;
         }
         
-        // Add missing closures
         let repairedContent = cleanContent;
         while (bracketCount > 0) {
           repairedContent += ']';
@@ -712,7 +421,6 @@ FORMAT (JSON STRICT):
           budgetData = JSON.parse(repairedContent);
           console.log('JSON repair successful');
         } catch (secondTry) {
-          // Last resort: create a minimal valid response
           console.error('JSON repair failed, creating fallback response');
           budgetData = {
             extraction: {
@@ -731,7 +439,7 @@ FORMAT (JSON STRICT):
     } catch (parseError) {
       console.error('Failed to parse AI response:', finalContent?.substring(0, 500));
       return new Response(
-        JSON.stringify({ success: false, error: 'Failed to parse budget data - please try again' }),
+        JSON.stringify({ success: false, error: 'Échec de l\'analyse - veuillez réessayer' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -739,7 +447,7 @@ FORMAT (JSON STRICT):
     // Transform to expected format for frontend compatibility
     const transformedData = transformToLegacyFormat(budgetData, finishQuality);
 
-    console.log('Analysis complete');
+    console.log('Analysis complete - categories:', transformedData.categories?.length || 0);
 
     return new Response(
       JSON.stringify({ success: true, data: transformedData, rawAnalysis: budgetData }),
@@ -758,12 +466,10 @@ FORMAT (JSON STRICT):
 
 // Transform the new detailed format to legacy format for frontend compatibility
 function transformToLegacyFormat(data: any, finishQuality: string): any {
-  // Handle case where data is already in legacy format
   if (data.categories && Array.isArray(data.categories) && data.categories[0]?.budget !== undefined) {
     return data;
   }
 
-  // Handle new extraction format
   const extraction = data.extraction || data;
   const totaux = data.totaux || {};
   const validation = data.validation || {};
@@ -811,7 +517,6 @@ function transformToLegacyFormat(data: any, finishQuality: string): any {
     ...(validation.alertes || [])
   ];
 
-  // Ajouter avertissements automatiques pour travaux de préparation
   const projectType = (extraction.type_projet || "").toUpperCase();
   const isAttachedOrExtension = projectType.includes("AGRANDISSEMENT") || 
                                  projectType.includes("GARAGE") || 
@@ -819,12 +524,10 @@ function transformToLegacyFormat(data: any, finishQuality: string): any {
                                  projectType.includes("JUMELE") ||
                                  projectType.includes("ANNEXE");
 
-  // Avertissements travaux de préparation (toujours affichés)
   warnings.push("🏗️ PRÉPARATION DU SITE: Vérifier les coûts d'excavation, nivellement, et accès chantier");
   warnings.push("🚧 PERMIS ET INSPECTIONS: Frais de permis de construction et inspections municipales à prévoir");
   warnings.push("📋 SERVICES PUBLICS: Confirmer les raccordements (eau, égout, électricité, gaz) et frais associés");
 
-  // Avertissements spécifiques au jumelage à l'existant
   if (isAttachedOrExtension) {
     warnings.push("🔗 JUMELAGE STRUCTUREL: Travaux de connexion à la structure existante (linteaux, ancrages, renfort fondation)");
     warnings.push("⚡ RACCORDEMENT ÉLECTRIQUE: Extension du panneau existant et mise aux normes possiblement requise");
