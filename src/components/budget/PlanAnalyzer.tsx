@@ -979,9 +979,9 @@ export function PlanAnalyzer({
               <div className="flex flex-col items-end">
                 <Badge variant="secondary" className="text-lg px-4 py-1">
                   <DollarSign className="h-4 w-4 mr-1" />
-                  {Math.round(analysis.estimatedTotal * 0.85).toLocaleString()} $ à {Math.round(analysis.estimatedTotal * 1.15).toLocaleString()} $
+                  {Math.round(analysis.estimatedTotal * 0.94).toLocaleString()} $ à {Math.round(analysis.estimatedTotal * 1.06).toLocaleString()} $
                 </Badge>
-                <span className="text-xs text-muted-foreground mt-1">Fourchette ±15%</span>
+                <span className="text-xs text-muted-foreground mt-1">Fourchette ±6%</span>
               </div>
             </div>
 
@@ -1001,13 +1001,13 @@ export function PlanAnalyzer({
                     <span className="font-medium">{cat.name}</span>
                   </div>
                   <span className="text-muted-foreground font-medium text-sm">
-                    {Math.round(cat.budget * 0.85).toLocaleString()} $ - {Math.round(cat.budget * 1.15).toLocaleString()} $
+                    {Math.round(cat.budget * 0.94).toLocaleString()} $ - {Math.round(cat.budget * 1.06).toLocaleString()} $
                   </span>
                 </div>
               ))}
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              {analysis.categories.length} catégorie(s) • Estimation préliminaire ±15%
+              {analysis.categories.length} catégorie(s) • Estimation préliminaire ±6%
             </p>
 
             {/* Warnings */}
