@@ -94,6 +94,7 @@ interface SupplierSelection {
 interface SupplierFormData {
   name: string;
   phone: string;
+  referencePhone: string;
   amount: string;
   selectedDocId: string | null;
   selectedOption: string | null;
@@ -152,6 +153,7 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
         inputs[tradeId] = {
           name: notes.supplierName || '',
           phone: notes.supplierPhone || '',
+          referencePhone: notes.referencePhone || '',
           amount: notes.amount || '',
           selectedDocId: notes.selectedDocId || null,
           selectedOption: notes.selectedOption || null,
@@ -163,8 +165,8 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
 
   // Mutation pour sauvegarder le statut avec montant et option
   const saveStatusMutation = useMutation({
-    mutationFn: async ({ tradeId, isCompleted, supplierName, supplierPhone, amount, selectedDocId, selectedOption }: SoumissionStatus & { amount?: string; selectedDocId?: string; selectedOption?: string }) => {
-      const notes = JSON.stringify({ supplierName, supplierPhone, isCompleted, amount, selectedDocId, selectedOption });
+    mutationFn: async ({ tradeId, isCompleted, supplierName, supplierPhone, referencePhone, amount, selectedDocId, selectedOption }: SoumissionStatus & { referencePhone?: string; amount?: string; selectedDocId?: string; selectedOption?: string }) => {
+      const notes = JSON.stringify({ supplierName, supplierPhone, referencePhone, isCompleted, amount, selectedDocId, selectedOption });
       
       const { data: existing } = await supabase
         .from('task_dates')
@@ -298,12 +300,13 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
 
   const handleToggleCompleted = (tradeId: string) => {
     const current = getTradeStatus(tradeId);
-    const inputs = supplierInputs[tradeId] || { name: '', phone: '', amount: '', selectedDocId: null };
+    const inputs = supplierInputs[tradeId] || { name: '', phone: '', referencePhone: '', amount: '', selectedDocId: null };
     saveStatusMutation.mutate({
       tradeId,
       isCompleted: !current.isCompleted,
       supplierName: inputs.name || current.supplierName,
       supplierPhone: inputs.phone || current.supplierPhone,
+      referencePhone: inputs.referencePhone,
       amount: inputs.amount,
       selectedDocId: inputs.selectedDocId || undefined,
     });
@@ -311,12 +314,13 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
 
   const handleSaveSupplier = (tradeId: string) => {
     const current = getTradeStatus(tradeId);
-    const inputs = supplierInputs[tradeId] || { name: '', phone: '', amount: '', selectedDocId: null };
+    const inputs = supplierInputs[tradeId] || { name: '', phone: '', referencePhone: '', amount: '', selectedDocId: null };
     saveStatusMutation.mutate({
       tradeId,
       isCompleted: current.isCompleted,
       supplierName: inputs.name,
       supplierPhone: inputs.phone,
+      referencePhone: inputs.referencePhone,
       amount: inputs.amount,
       selectedDocId: inputs.selectedDocId || undefined,
     });
@@ -556,7 +560,7 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
     if (!selectingSupplier) return;
     
     const { tradeId, tradeName } = selectingSupplier;
-    const inputs = supplierInputs[tradeId] || { name: '', phone: '', amount: '', selectedDocId: null, selectedOption: null };
+    const inputs = supplierInputs[tradeId] || { name: '', phone: '', referencePhone: '', amount: '', selectedDocId: null, selectedOption: null };
     
     if (!inputs.name.trim()) {
       toast({
@@ -576,6 +580,7 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
         isCompleted: true,
         supplierName: inputs.name,
         supplierPhone: inputs.phone,
+        referencePhone: inputs.referencePhone,
         amount: inputs.amount,
         selectedDocId: inputs.selectedDocId || undefined,
         selectedOption: inputs.selectedOption || undefined,
@@ -1193,6 +1198,25 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
                     [selectingSupplier.tradeId]: { 
                       ...prev[selectingSupplier.tradeId], 
                       phone: e.target.value 
+                    }
+                  }))}
+                />
+              </div>
+
+              {/* Contact de référence */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  Contact de référence
+                  <span className="text-xs text-muted-foreground">(client précédent à contacter)</span>
+                </label>
+                <Input
+                  placeholder="Ex: 514-555-9876"
+                  value={supplierInputs[selectingSupplier.tradeId]?.referencePhone || ''}
+                  onChange={(e) => setSupplierInputs(prev => ({
+                    ...prev,
+                    [selectingSupplier.tradeId]: { 
+                      ...prev[selectingSupplier.tradeId], 
+                      referencePhone: e.target.value 
                     }
                   }))}
                 />
