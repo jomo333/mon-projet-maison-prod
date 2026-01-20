@@ -654,6 +654,10 @@ export function StepDetail({
                       )}
                       
                       {/* Gestionnaire de soumissions par corps de métier */}
+                      {(() => {
+                        console.log('[StepDetail] Task ID:', task.id, '| ProjectId:', projectId, '| Match:', task.id === 'obtenir-soumissions');
+                        return null;
+                      })()}
                       {task.id === 'obtenir-soumissions' && (
                         projectId ? (
                           <SoumissionsManager projectId={projectId} />
