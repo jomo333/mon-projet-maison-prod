@@ -298,7 +298,8 @@ export const constructionSteps: Step[] = [
           "Installez les solins autour des cheminées et évents",
           "La membrane autocollante est requise dans les zones à risque",
           "Appliquez une membrane autocollante dans les premiers 4 pieds des rebords du toit pour une meilleure protection",
-          "Assurez-vous d'une bonne ventilation pour laisser évacuer la chaleur. Une mauvaise ventilation peut détériorer le revêtement prématurément"
+          "Assurez-vous d'une bonne ventilation pour laisser évacuer la chaleur. Une mauvaise ventilation peut détériorer le revêtement prématurément",
+          "Faites installer les moulures de départ pour le fascia sous la membrane autocollante pour un bon écoulement d'eau en cas de fuite au niveau du revêtement"
         ]
       },
       {
