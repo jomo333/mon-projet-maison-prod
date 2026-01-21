@@ -296,7 +296,9 @@ export const constructionSteps: Step[] = [
         description: "Pose de la membrane d'étanchéité et des bardeaux d'asphalte ou autre revêtement.",
         tips: [
           "Installez les solins autour des cheminées et évents",
-          "La membrane autocollante est requise dans les zones à risque"
+          "La membrane autocollante est requise dans les zones à risque",
+          "Appliquez une membrane autocollante dans les premiers 4 pieds des rebords du toit pour une meilleure protection",
+          "Assurez-vous d'une bonne ventilation pour laisser évacuer la chaleur. Une mauvaise ventilation peut détériorer le revêtement prématurément"
         ]
       },
       {
