@@ -417,7 +417,7 @@ export const constructionSteps: Step[] = [
         description: "Nivellement, compaction et installation de la membrane pare-vapeur sous la dalle.",
         tips: [
           "Assurez-vous que le drainage est bien en place avant de couler",
-          "Installez un isolant rigide sous la dalle pour réduire les pertes de chaleur"
+          "Installez un isolant rigide sous la dalle et un pare-vapeur scellé pour réduire les pertes de chaleur et l'humidité"
         ]
       },
       {
