@@ -355,7 +355,7 @@ export const constructionSteps: Step[] = [
         description: "Isolation du plafond du dernier étage ou de la toiture cathédrale.",
         tips: [
           "R-41 minimum pour les toits au Québec",
-          "Maintenez une ventilation adéquate du comble"
+          "Maintenez une ventilation adéquate du comble, utilisez un déflecteur dans le bas du pontage pour maximiser la ventilation"
         ]
       },
       {
