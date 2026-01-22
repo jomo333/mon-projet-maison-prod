@@ -85,7 +85,7 @@ export const constructionSteps: Step[] = [
         tips: [
           "Assurez-vous que les plans sont conformes au Code du bâtiment",
           "Incluez les plans de structure et mécanique",
-          "Dès l'obtention de vos plans préliminaires, commencez à solliciter des soumissions pour accélérer la préparation du projet"
+          "Dès l'obtention de vos plans, commencez à solliciter des soumissions pour accélérer la préparation du projet"
         ],
         documents: ["Plans d'architecture", "Plans de structure", "Plans mécaniques"]
       },
