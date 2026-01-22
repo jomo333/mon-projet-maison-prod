@@ -437,8 +437,10 @@ export function CategorySubmissionsDialog({
     if (supplier) {
       setSupplierName(supplier.supplierName);
       setSupplierPhone(supplier.phone);
-      setSelectedAmount(supplier.amount.replace(/[^\d]/g, ''));
-      setSpent(supplier.amount.replace(/[^\d]/g, ''));
+      // Parse amount: remove spaces, keep digits and decimal point, then parse as float and round
+      const cleanAmount = Math.round(parseFloat(supplier.amount.replace(/[\s,]/g, '').replace(/[^\d.]/g, '')) || 0).toString();
+      setSelectedAmount(cleanAmount);
+      setSpent(cleanAmount);
     }
   };
 
@@ -449,8 +451,10 @@ export function CategorySubmissionsDialog({
       const supplier = extractedSuppliers[selectedSupplierIndex];
       const option = supplier?.options?.[optionIndex];
       if (option) {
-        setSelectedAmount(option.amount.replace(/[^\d]/g, ''));
-        setSpent(option.amount.replace(/[^\d]/g, ''));
+        // Parse amount: remove spaces, keep digits and decimal point, then parse as float and round
+        const cleanAmount = Math.round(parseFloat(option.amount.replace(/[\s,]/g, '').replace(/[^\d.]/g, '')) || 0).toString();
+        setSelectedAmount(cleanAmount);
+        setSpent(cleanAmount);
       }
     }
   };
