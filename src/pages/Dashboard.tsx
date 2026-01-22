@@ -12,8 +12,16 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ArrowLeft, Home, Calendar, ChevronRight, AlertTriangle, X, Camera, FileText } from "lucide-react";
+import { ArrowLeft, Home, Calendar, ChevronRight, AlertTriangle, X, Camera, FileText, HelpCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useProjectSchedule } from "@/hooks/useProjectSchedule";
 import { useCompletedTasks } from "@/hooks/useCompletedTasks";
 import { useAuth } from "@/hooks/useAuth";
@@ -354,16 +362,58 @@ const Dashboard = () => {
               </div>
               
               {/* Quick access buttons */}
-              {projectFromUrl && (
-                <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <HelpCircle className="h-4 w-4" />
+                      Comment utiliser cette page
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Comment utiliser cette page</DialogTitle>
+                      <DialogDescription>
+                        Voici les fonctionnalités disponibles pour gérer vos étapes de construction.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 sm:grid-cols-2 py-4">
+                      <div className="space-y-1 p-3 rounded-lg bg-muted/50">
+                        <h3 className="font-medium text-sm text-primary">📋 Filtrer par phase</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Utilisez les badges pour afficher uniquement les étapes d'une phase spécifique (pré-construction, gros œuvre, second œuvre, finitions).
+                        </p>
+                      </div>
+                      <div className="space-y-1 p-3 rounded-lg bg-muted/50">
+                        <h3 className="font-medium text-sm text-primary">📖 Consulter une étape</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Cliquez sur une carte pour voir les tâches détaillées, conseils pratiques et documents requis pour chaque étape.
+                        </p>
+                      </div>
+                      <div className="space-y-1 p-3 rounded-lg bg-muted/50">
+                        <h3 className="font-medium text-sm text-primary">✅ Marquer comme terminé</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Cochez les étapes complétées directement sur les cartes pour suivre votre progression globale.
+                        </p>
+                      </div>
+                      <div className="space-y-1 p-3 rounded-lg bg-muted/50">
+                        <h3 className="font-medium text-sm text-primary">📷 Photos & Documents</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Accédez à vos dossiers pour gérer photos de chantier et documents importants liés au projet.
+                        </p>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+                {projectFromUrl && (
                   <Button variant="outline" size="sm" asChild className="gap-2">
                     <Link to={`/galerie?project=${projectFromUrl}`}>
                       <Camera className="h-4 w-4" />
                       Photos & Documents
                     </Link>
                   </Button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
 
