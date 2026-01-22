@@ -284,19 +284,7 @@ export function CategorySubmissionsDialog({
 
   // Delete supplier from database
   const handleDeleteSupplier = async () => {
-    // Reset local state
-    setSupplierName("");
-    setSupplierPhone("");
-    setContactPerson("");
-    setContactPersonPhone("");
-    setSelectedAmount("");
-    setSpent("0");
-    setSelectedSupplierIndex(null);
-    setSelectedOptionIndex(null);
-    setAnalysisResult(null);
-    setExtractedSuppliers([]);
-
-    // Delete from database
+    // Delete from database first
     const { error } = await supabase
       .from('task_dates')
       .delete()
@@ -313,8 +301,13 @@ export function CategorySubmissionsDialog({
     // Update budget spent to 0
     onSave(parseFloat(budget) || 0, 0);
     
+    // Invalidate queries to refresh data
     queryClient.invalidateQueries({ queryKey: ['supplier-status', projectId, tradeId] });
+    
     toast.success("Fournisseur supprimé");
+    
+    // Close the dialog to force a clean refresh
+    onOpenChange(false);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
