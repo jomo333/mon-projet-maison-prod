@@ -231,9 +231,16 @@ const Budget = () => {
     },
   });
 
+  // Check if budget has been analyzed (not just default categories)
+  const hasAnalyzedBudget = savedBudget && savedBudget.length > 0;
+  
   const totalBudget = budgetCategories.reduce((acc, cat) => acc + cat.budget, 0);
   const totalSpent = budgetCategories.reduce((acc, cat) => acc + cat.spent, 0);
   const percentUsed = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+  
+  // Display values - show 0 if no analysis done
+  const displayBudget = hasAnalyzedBudget ? totalBudget : 0;
+  const displayRemaining = hasAnalyzedBudget ? (totalBudget - totalSpent) : 0;
 
   const pieData = budgetCategories.map((cat) => ({
     name: cat.name,
@@ -397,10 +404,19 @@ const Budget = () => {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-xl font-bold font-display">
-                  {Math.round(totalBudget * 0.85).toLocaleString()} $ à {Math.round(totalBudget * 1.15).toLocaleString()} $
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">Fourchette ±15%</p>
+                {hasAnalyzedBudget ? (
+                  <>
+                    <div className="text-xl font-bold font-display">
+                      {Math.round(displayBudget * 0.85).toLocaleString()} $ à {Math.round(displayBudget * 1.15).toLocaleString()} $
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Fourchette ±15%</p>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-2xl font-bold font-display text-muted-foreground">0 $</div>
+                    <p className="text-xs text-muted-foreground mt-1">Aucune analyse effectuée</p>
+                  </>
+                )}
               </CardContent>
             </Card>
 
@@ -430,9 +446,13 @@ const Budget = () => {
                 <TrendingUp className="h-4 w-4 text-success" />
               </CardHeader>
               <CardContent>
-                <div className="text-xl font-bold font-display text-success">
-                  {Math.round((totalBudget - totalSpent) * 0.85).toLocaleString()} $ à {Math.round((totalBudget - totalSpent) * 1.15).toLocaleString()} $
-                </div>
+                {hasAnalyzedBudget ? (
+                  <div className="text-xl font-bold font-display text-success">
+                    {Math.round(displayRemaining * 0.85).toLocaleString()} $ à {Math.round(displayRemaining * 1.15).toLocaleString()} $
+                  </div>
+                ) : (
+                  <div className="text-2xl font-bold font-display text-muted-foreground">0 $</div>
+                )}
               </CardContent>
             </Card>
           </div>
