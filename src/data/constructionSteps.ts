@@ -372,42 +372,23 @@ export const constructionSteps: Step[] = [
     ]
   },
   {
-    id: "plomberie-roughin",
-    title: "Plomberie - Rough-in",
-    description: "Installation de la plomberie brute avant la fermeture des murs.",
+    id: "plomberie-sous-dalle",
+    title: "Plomberie sous dalle",
+    description: "Installation de la plomberie sous la dalle de béton avant le coulage.",
     phase: "second-oeuvre",
     phaseLabel: "Second œuvre",
     icon: "Droplets",
-    duration: "4 jours",
+    duration: "1 jour",
     tasks: [
       {
-        id: "plomberie-sous-dalle",
+        id: "plomberie-sous-dalle-visite",
         title: "Plomberie sous dalle - première visite",
-        description: "Installation de la plomberie sous la dalle de béton avant le coulage.",
+        description: "Installation des drains et tuyaux de plomberie sous la dalle de béton.",
         tips: [
           "Cette étape doit être complétée avant le coulage de la dalle",
-          "Vérifiez les pentes de drainage et les raccordements"
+          "Vérifiez les pentes de drainage et les raccordements",
+          "Assurez-vous que tous les branchements sont accessibles"
         ]
-      },
-      {
-        id: "plomberie-brute",
-        title: "Plomberie brute",
-        description: "Installation des tuyaux d'alimentation et de drainage dans les murs.",
-        tips: [
-          "Le PEX est plus facile à installer que le cuivre",
-          "Respectez les pentes de drainage"
-        ]
-      },
-      {
-        id: "chauffe-eau",
-        title: "Chauffe-eau",
-        description: "Installation du chauffe-eau (électrique, au gaz ou thermopompe).",
-      },
-      {
-        id: "branchements",
-        title: "Branchements municipaux",
-        description: "Raccordement à l'aqueduc et aux égouts (ou installation septique).",
-        documents: ["Permis de branchement", "Test d'étanchéité"]
       }
     ]
   },
@@ -469,6 +450,37 @@ export const constructionSteps: Step[] = [
           "Prévoyez l'espace pour les portes coulissantes si désiré",
           "Assurez-vous de la bonne hauteur des ouvertures de porte selon l'épaisseur des revêtements de sol"
         ]
+      }
+    ]
+  },
+  {
+    id: "plomberie-roughin",
+    title: "Plomberie - Rough-in",
+    description: "Installation de la plomberie brute avant la fermeture des murs.",
+    phase: "second-oeuvre",
+    phaseLabel: "Second œuvre",
+    icon: "Droplets",
+    duration: "4 jours",
+    tasks: [
+      {
+        id: "plomberie-brute",
+        title: "Plomberie brute",
+        description: "Installation des tuyaux d'alimentation et de drainage dans les murs.",
+        tips: [
+          "Le PEX est plus facile à installer que le cuivre",
+          "Respectez les pentes de drainage"
+        ]
+      },
+      {
+        id: "chauffe-eau",
+        title: "Chauffe-eau",
+        description: "Installation du chauffe-eau (électrique, au gaz ou thermopompe).",
+      },
+      {
+        id: "branchements",
+        title: "Branchements municipaux",
+        description: "Raccordement à l'aqueduc et aux égouts (ou installation septique).",
+        documents: ["Permis de branchement", "Test d'étanchéité"]
       }
     ]
   },
