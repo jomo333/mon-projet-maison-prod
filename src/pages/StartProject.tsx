@@ -47,6 +47,7 @@ interface UploadedPlan {
 const projectTypes = [
   { value: "maison-neuve", label: "Maison neuve", icon: Home },
   { value: "agrandissement", label: "Agrandissement", icon: Home },
+  { value: "garage-detache", label: "Garage détaché", icon: Home },
   { value: "renovation-majeure", label: "Rénovation majeure", icon: HardHat },
   { value: "chalet", label: "Chalet", icon: Home },
 ];
@@ -357,6 +358,18 @@ const StartProject = () => {
               "Cuisine et SDB": { min: 18000, max: 40000 },
               "Finitions": { min: 10000, max: 22000 },
               "Extérieur": { min: 10000, max: 20000 },
+            }
+          },
+          "garage-detache": {
+            min: 35000,
+            max: 80000,
+            categories: {
+              "Fondation": { min: 8000, max: 18000 },
+              "Structure et charpente": { min: 12000, max: 25000 },
+              "Toiture": { min: 5000, max: 12000 },
+              "Portes de garage": { min: 3000, max: 8000 },
+              "Électricité": { min: 2000, max: 6000 },
+              "Revêtement extérieur": { min: 5000, max: 12000 },
             }
           },
         };

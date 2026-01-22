@@ -53,6 +53,8 @@ const getProjectTypeLabel = (type: string | null) => {
       return "Maison neuve";
     case "agrandissement":
       return "Agrandissement";
+    case "garage-detache":
+      return "Garage détaché";
     case "renovation-majeure":
       return "Rénovation majeure";
     case "chalet":
