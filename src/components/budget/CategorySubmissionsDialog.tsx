@@ -114,6 +114,11 @@ export function CategorySubmissionsDialog({
   const [selectedAmount, setSelectedAmount] = useState("");
   const [showFullAnalysis, setShowFullAnalysis] = useState(false);
   
+  // DIY AI Analysis state
+  const [analyzingDIY, setAnalyzingDIY] = useState(false);
+  const [diyAnalysisResult, setDiyAnalysisResult] = useState<string | null>(null);
+  const [showDIYAnalysis, setShowDIYAnalysis] = useState(false);
+  
   // Sub-category state
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [activeSubCategoryId, setActiveSubCategoryId] = useState<string | null>(null);
@@ -144,6 +149,8 @@ export function CategorySubmissionsDialog({
       setSelectedOptionIndex(null);
       setActiveSubCategoryId(null);
       setViewingSubCategory(false);
+      setDiyAnalysisResult(null);
+      setShowDIYAnalysis(false);
     }
   }, [open, currentBudget, currentSpent]);
   
@@ -498,6 +505,8 @@ export function CategorySubmissionsDialog({
   const handleBackToMainCategory = () => {
     setActiveSubCategoryId(null);
     setViewingSubCategory(false);
+    setDiyAnalysisResult(null);
+    setShowDIYAnalysis(false);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -507,6 +516,172 @@ export function CategorySubmissionsDialog({
       uploadMutation.mutate(files[0]);
     }
     e.target.value = '';
+  };
+
+  // Fetch project plans for DIY analysis
+  const { data: projectPlans = [] } = useQuery({
+    queryKey: ['project-plans', projectId],
+    queryFn: async () => {
+      // Get plans from task_attachments (budget-plans folder)
+      const { data: attachments, error: attachmentsError } = await supabase
+        .from('task_attachments')
+        .select('*')
+        .eq('project_id', projectId)
+        .in('step_id', ['plans', 'budget-analysis']);
+      
+      if (attachmentsError) throw attachmentsError;
+      
+      // Also check for plans uploaded in budget-plans storage path
+      const { data: storagePlans, error: storageError } = await supabase.storage
+        .from('task-attachments')
+        .list(`budget-plans`, { limit: 20 });
+      
+      const budgetPlanUrls: string[] = [];
+      if (!storageError && storagePlans) {
+        for (const file of storagePlans) {
+          const { data: urlData } = supabase.storage
+            .from('task-attachments')
+            .getPublicUrl(`budget-plans/${file.name}`);
+          if (urlData?.publicUrl) {
+            budgetPlanUrls.push(urlData.publicUrl);
+          }
+        }
+      }
+      
+      // Combine all plan URLs
+      const allPlanUrls = [
+        ...(attachments || []).map(a => a.file_url),
+        ...budgetPlanUrls,
+      ].filter((url, index, self) => self.indexOf(url) === index); // dedupe
+      
+      return allPlanUrls;
+    },
+    enabled: !!projectId && open,
+  });
+
+  // Fetch project details for DIY analysis context
+  const { data: projectDetails } = useQuery({
+    queryKey: ['project-details', projectId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('id', projectId)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!projectId && open,
+  });
+
+  // DIY AI Material Analysis
+  const analyzeDIYMaterials = async () => {
+    const currentSubCat = subCategories.find(sc => sc.id === activeSubCategoryId);
+    if (!currentSubCat) {
+      toast.error("Veuillez sélectionner une sous-catégorie");
+      return;
+    }
+
+    setAnalyzingDIY(true);
+    setDiyAnalysisResult("");
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-diy-materials`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            categoryName,
+            subCategoryName: currentSubCat.name,
+            planUrls: projectPlans.slice(0, 3), // Max 3 plans
+            projectDetails: projectDetails ? {
+              squareFootage: projectDetails.square_footage,
+              numberOfFloors: projectDetails.number_of_floors,
+              projectType: projectDetails.project_type,
+              notes: projectDetails.description,
+            } : undefined,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 429) {
+          toast.error("Limite de requêtes atteinte, veuillez réessayer plus tard.");
+          return;
+        }
+        if (response.status === 402) {
+          toast.error("Crédits insuffisants. Veuillez recharger votre compte.");
+          return;
+        }
+        throw new Error(errorData.error || "Erreur lors de l'analyse");
+      }
+
+      if (!response.body) {
+        throw new Error("Pas de réponse du serveur");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+      let result = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              result += content;
+              setDiyAnalysisResult(result);
+            }
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
+
+      setDiyAnalysisResult(result);
+      setShowDIYAnalysis(true);
+      toast.success("Analyse des matériaux terminée");
+      
+      // Try to extract estimated cost from analysis
+      const costMatch = result.match(/\*\*TOTAL ESTIMÉ\*\*[^$]*\*?\*?([0-9\s,]+(?:\.[0-9]+)?)\s*\$/i);
+      if (costMatch) {
+        const estimatedCost = parseFloat(costMatch[1].replace(/[\s,]/g, '')) || 0;
+        if (estimatedCost > 0) {
+          toast.info(`Coût estimé des matériaux: ${Math.round(estimatedCost).toLocaleString('fr-CA')} $`, {
+            duration: 5000,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("DIY Analysis error:", error);
+      toast.error(error instanceof Error ? error.message : "Erreur d'analyse DIY");
+    } finally {
+      setAnalyzingDIY(false);
+    }
   };
 
   // AI Analysis
@@ -1038,25 +1213,110 @@ export function CategorySubmissionsDialog({
               if (!currentSubCat?.isDIY) return null;
               
               return (
-                <div className="rounded-xl border-2 border-amber-300 bg-amber-50/50 p-4 space-y-4">
+                <div className="rounded-xl border-2 border-amber-300 bg-amber-50/50 dark:bg-amber-950/20 p-4 space-y-4">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-semibold flex items-center gap-2 text-lg text-amber-700">
+                    <h4 className="font-semibold flex items-center gap-2 text-lg text-amber-700 dark:text-amber-400">
                       <Hammer className="h-5 w-5" />
                       Fait par moi-même
                     </h4>
-                    <Badge className="bg-amber-100 text-amber-700 border-amber-300">
+                    <Badge className="bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-700">
                       Matériaux seulement
                     </Badge>
                   </div>
                   
                   <p className="text-sm text-muted-foreground">
-                    Téléchargez vos factures de matériaux pour analyser les coûts (sans main-d'œuvre).
+                    Analysez automatiquement les coûts des matériaux basés sur vos plans ou entrez manuellement le montant.
                   </p>
+
+                  {/* AI Analysis Button for DIY */}
+                  <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-100/50 dark:bg-amber-900/30 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                          <Sparkles className="h-4 w-4" />
+                          Analyse IA des matériaux
+                        </p>
+                        <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">
+                          {projectPlans.length > 0 
+                            ? `Estimation basée sur ${projectPlans.length} plan(s) téléchargé(s)`
+                            : "Téléchargez des plans dans l'analyse de budget pour une estimation précise"
+                          }
+                        </p>
+                      </div>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={analyzeDIYMaterials}
+                        disabled={analyzingDIY}
+                        className="gap-2 bg-amber-600 hover:bg-amber-700 text-white"
+                      >
+                        {analyzingDIY ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-4 w-4" />
+                        )}
+                        {analyzingDIY ? "Analyse..." : "Analyser"}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* DIY Analysis Result */}
+                  {diyAnalysisResult && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h5 className="font-medium flex items-center gap-2 text-amber-800 dark:text-amber-300">
+                          <CheckCircle2 className="h-4 w-4" />
+                          Résumé des matériaux
+                        </h5>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowDIYAnalysis(!showDIYAnalysis)}
+                          className="gap-1 text-xs"
+                        >
+                          <Maximize2 className="h-3 w-3" />
+                          {showDIYAnalysis ? "Réduire" : "Voir détails"}
+                        </Button>
+                      </div>
+                      
+                      {showDIYAnalysis && (
+                        <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-white dark:bg-background p-4 max-h-[400px] overflow-y-auto">
+                          <div className="prose prose-sm dark:prose-invert max-w-none">
+                            {/* Simple markdown rendering */}
+                            {diyAnalysisResult.split('\n').map((line, i) => {
+                              if (line.startsWith('### ')) {
+                                return <h3 key={i} className="text-base font-semibold mt-4 mb-2 text-amber-800 dark:text-amber-300">{line.replace('### ', '')}</h3>;
+                              }
+                              if (line.startsWith('## ')) {
+                                return <h2 key={i} className="text-lg font-bold mt-4 mb-2 text-amber-900 dark:text-amber-200">{line.replace('## ', '')}</h2>;
+                              }
+                              if (line.startsWith('| ')) {
+                                return <p key={i} className="font-mono text-xs">{line}</p>;
+                              }
+                              if (line.startsWith('- ')) {
+                                return <li key={i} className="ml-4 list-disc">{line.replace('- ', '')}</li>;
+                              }
+                              if (line.startsWith('**') && line.endsWith('**')) {
+                                return <p key={i} className="font-bold">{line.replace(/\*\*/g, '')}</p>;
+                              }
+                              if (line.trim() === '---') {
+                                return <hr key={i} className="my-3 border-amber-200 dark:border-amber-800" />;
+                              }
+                              if (line.trim()) {
+                                return <p key={i} className="text-sm">{line}</p>;
+                              }
+                              return null;
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   {/* Material Cost Input */}
-                  <div className="space-y-2">
-                    <Label htmlFor="material-cost" className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-amber-600" />
+                  <div className="space-y-2 pt-2 border-t border-amber-200 dark:border-amber-800">
+                    <Label htmlFor="material-cost" className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
+                      <DollarSign className="h-4 w-4" />
                       Coût total des matériaux
                     </Label>
                     <div className="flex gap-2">
@@ -1093,6 +1353,7 @@ export function CategorySubmissionsDialog({
                             amount: materialCost.toString(),
                             materialCostOnly: materialCost,
                             isDIY: true,
+                            hasDIYAnalysis: !!diyAnalysisResult,
                           });
                           
                           await supabase
@@ -1130,9 +1391,9 @@ export function CategorySubmissionsDialog({
                   </div>
                   
                   {currentSubCat.materialCostOnly && currentSubCat.materialCostOnly > 0 && (
-                    <div className="flex items-center gap-2 pt-2 border-t border-amber-200">
-                      <CheckCircle2 className="h-4 w-4 text-amber-600" />
-                      <span className="text-sm font-medium text-amber-700">
+                    <div className="flex items-center gap-2 pt-2 border-t border-amber-200 dark:border-amber-800">
+                      <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                      <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
                         Économie estimée: main-d'œuvre non facturée
                       </span>
                     </div>
