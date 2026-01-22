@@ -1008,7 +1008,7 @@ export function CategorySubmissionsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-4xl h-[90vh] max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {viewingSubCategory && (
@@ -1047,7 +1047,7 @@ export function CategorySubmissionsDialog({
             viewportRef={(node) => {
               scrollViewportRef.current = node;
             }}
-            className="h-full max-h-[60vh] pr-10"
+            className="h-[60vh] pr-10"
           >
           <div className="space-y-6">
             {/* Budget Section - Only show on main view */}
@@ -1487,7 +1487,7 @@ export function CategorySubmissionsDialog({
           
           {/* Right-side scroll band */}
           <div
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-50 h-36 w-11 overflow-hidden rounded-full border bg-background/95 shadow-lg"
+            className="absolute right-1 top-1/2 -translate-y-1/2 z-50 h-44 w-11 overflow-hidden rounded-full border bg-background/95 shadow-lg"
             aria-label="Bande de navigation"
           >
             <button
@@ -1498,7 +1498,7 @@ export function CategorySubmissionsDialog({
                 scrollToTop();
               }}
               className={
-                "flex h-1/2 w-full items-center justify-center transition-opacity " +
+                "flex h-1/2 w-full items-center justify-center hover:bg-muted transition-opacity " +
                 (showScrollButtons.up ? "opacity-100" : "opacity-35")
               }
               aria-label="Remonter"
@@ -1514,7 +1514,7 @@ export function CategorySubmissionsDialog({
                 scrollToBottom();
               }}
               className={
-                "flex h-1/2 w-full items-center justify-center transition-opacity " +
+                "flex h-1/2 w-full items-center justify-center hover:bg-muted transition-opacity " +
                 (showScrollButtons.down ? "opacity-100" : "opacity-35")
               }
               aria-label="Descendre"
