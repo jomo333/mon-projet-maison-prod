@@ -29,9 +29,11 @@ import {
   Maximize2,
   ChevronUp,
   ChevronDown,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AnalysisFullView } from "./AnalysisFullView";
+import { SubCategoryManager, type SubCategory } from "./SubCategoryManager";
 
 interface CategorySubmissionsDialogProps {
   open: boolean;
@@ -113,6 +115,11 @@ export function CategorySubmissionsDialog({
   const [showFullAnalysis, setShowFullAnalysis] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [showScrollButtons, setShowScrollButtons] = useState({ up: false, down: false });
+  
+  // Sub-category state
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
+  const [activeSubCategoryId, setActiveSubCategoryId] = useState<string | null>(null);
+  const [viewingSubCategory, setViewingSubCategory] = useState(false);
 
   // Handle scroll inside dialog
   const handleDialogScroll = () => {
@@ -152,6 +159,16 @@ export function CategorySubmissionsDialog({
   }, [open, analysisResult, extractedSuppliers]);
 
   const tradeId = categoryToTradeId[categoryName] || categoryName.toLowerCase().replace(/\s+/g, '-');
+  
+  // Get the current task ID (main category or sub-category)
+  const getCurrentTaskId = () => {
+    if (activeSubCategoryId) {
+      return `soumission-${tradeId}-sub-${activeSubCategoryId}`;
+    }
+    return `soumission-${tradeId}`;
+  };
+  
+  const currentTaskId = getCurrentTaskId();
 
   // Reset state when dialog opens
   useEffect(() => {
@@ -162,19 +179,91 @@ export function CategorySubmissionsDialog({
       setExtractedSuppliers([]);
       setSelectedSupplierIndex(null);
       setSelectedOptionIndex(null);
+      setActiveSubCategoryId(null);
+      setViewingSubCategory(false);
     }
   }, [open, currentBudget, currentSpent]);
+  
+  // Fetch sub-categories for this category
+  const { data: savedSubCategories = [] } = useQuery({
+    queryKey: ['sub-categories', projectId, tradeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('task_dates')
+        .select('*')
+        .eq('project_id', projectId)
+        .eq('step_id', 'soumissions')
+        .like('task_id', `soumission-${tradeId}-sub-%`);
+      
+      if (error) throw error;
+      
+      return (data || []).map((item) => {
+        const notes = item.notes ? JSON.parse(item.notes) : {};
+        return {
+          id: item.task_id.replace(`soumission-${tradeId}-sub-`, ''),
+          name: notes.subCategoryName || 'Sans nom',
+          amount: notes.amount ? parseFloat(notes.amount) : 0,
+          supplierName: notes.supplierName,
+          supplierPhone: notes.supplierPhone,
+          hasDocuments: false,
+          hasAnalysis: notes.hasAnalysis || false,
+        } as SubCategory;
+      });
+    },
+    enabled: !!projectId && open,
+  });
+  
+  // Sync saved sub-categories to state
+  useEffect(() => {
+    if (savedSubCategories.length > 0) {
+      setSubCategories(savedSubCategories);
+    }
+  }, [savedSubCategories]);
+  
+  // Check documents count for sub-categories
+  const { data: subCategoryDocs = [] } = useQuery({
+    queryKey: ['sub-category-docs-count', projectId, tradeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('task_attachments')
+        .select('task_id')
+        .eq('project_id', projectId)
+        .eq('step_id', 'soumissions')
+        .like('task_id', `soumission-${tradeId}-sub-%`)
+        .neq('category', 'analyse');
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!projectId && open && subCategories.length > 0,
+  });
+  
+  // Update sub-categories with document info
+  useEffect(() => {
+    if (subCategoryDocs.length > 0 && subCategories.length > 0) {
+      const docsMap = subCategoryDocs.reduce((acc, doc) => {
+        const subId = doc.task_id.replace(`soumission-${tradeId}-sub-`, '');
+        acc[subId] = (acc[subId] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      setSubCategories(prev => prev.map(sc => ({
+        ...sc,
+        hasDocuments: (docsMap[sc.id] || 0) > 0,
+      })));
+    }
+  }, [subCategoryDocs, tradeId]);
 
-  // Fetch existing documents for this category (excluding analysis summaries)
+  // Fetch existing documents for this category or sub-category (excluding analysis summaries)
   const { data: documents = [], isLoading: loadingDocs } = useQuery({
-    queryKey: ['category-docs', projectId, tradeId],
+    queryKey: ['category-docs', projectId, currentTaskId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('task_attachments')
         .select('*')
         .eq('project_id', projectId)
         .eq('step_id', 'soumissions')
-        .eq('task_id', `soumission-${tradeId}`)
+        .eq('task_id', currentTaskId)
         .neq('category', 'analyse'); // Exclude analysis summaries
       
       if (error) throw error;
@@ -183,16 +272,16 @@ export function CategorySubmissionsDialog({
     enabled: !!projectId && open,
   });
 
-  // Fetch existing supplier status
+  // Fetch existing supplier status for current category/sub-category
   const { data: supplierStatus } = useQuery({
-    queryKey: ['supplier-status', projectId, tradeId],
+    queryKey: ['supplier-status', projectId, currentTaskId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('task_dates')
         .select('*')
         .eq('project_id', projectId)
         .eq('step_id', 'soumissions')
-        .eq('task_id', `soumission-${tradeId}`)
+        .eq('task_id', currentTaskId)
         .maybeSingle();
       
       if (error) throw error;
@@ -208,7 +297,7 @@ export function CategorySubmissionsDialog({
     enabled: !!projectId && open,
   });
 
-  // Set supplier info from saved status
+  // Set supplier info from saved status when changing category/sub-category
   useEffect(() => {
     if (supplierStatus) {
       setSupplierName(supplierStatus.supplierName || "");
@@ -216,8 +305,20 @@ export function CategorySubmissionsDialog({
       setContactPerson(supplierStatus.contactPerson || "");
       setContactPersonPhone(supplierStatus.contactPersonPhone || "");
       setSelectedAmount(supplierStatus.amount || "");
+    } else {
+      // Reset if no supplier status
+      setSupplierName("");
+      setSupplierPhone("");
+      setContactPerson("");
+      setContactPersonPhone("");
+      setSelectedAmount("");
     }
-  }, [supplierStatus]);
+    // Reset analysis state when changing sub-category
+    setAnalysisResult(null);
+    setExtractedSuppliers([]);
+    setSelectedSupplierIndex(null);
+    setSelectedOptionIndex(null);
+  }, [supplierStatus, currentTaskId]);
 
   // Sanitize filename for storage (remove spaces and special characters)
   const sanitizeFileName = (name: string): string => {
@@ -228,11 +329,12 @@ export function CategorySubmissionsDialog({
       .replace(/_+/g, '_'); // Replace multiple underscores with single
   };
 
-  // Upload mutation
+  // Upload mutation - uses currentTaskId for sub-category support
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
       const sanitizedName = sanitizeFileName(file.name);
-      const fileName = `${projectId}/soumissions/${tradeId}/${Date.now()}_${sanitizedName}`;
+      const subPath = activeSubCategoryId ? `${tradeId}/sub-${activeSubCategoryId}` : tradeId;
+      const fileName = `${projectId}/soumissions/${subPath}/${Date.now()}_${sanitizedName}`;
       
       const { error: uploadError } = await supabase.storage
         .from('task-attachments')
@@ -249,7 +351,7 @@ export function CategorySubmissionsDialog({
         .insert({
           project_id: projectId,
           step_id: 'soumissions',
-          task_id: `soumission-${tradeId}`,
+          task_id: currentTaskId,
           file_name: file.name,
           file_url: urlData.publicUrl,
           file_type: file.type,
@@ -261,7 +363,8 @@ export function CategorySubmissionsDialog({
       return urlData.publicUrl;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['category-docs', projectId, tradeId] });
+      queryClient.invalidateQueries({ queryKey: ['category-docs', projectId, currentTaskId] });
+      queryClient.invalidateQueries({ queryKey: ['sub-category-docs-count', projectId, tradeId] });
       toast.success("Document téléchargé avec succès");
       setUploading(false);
     },
@@ -282,12 +385,13 @@ export function CategorySubmissionsDialog({
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['category-docs', projectId, tradeId] });
+      queryClient.invalidateQueries({ queryKey: ['category-docs', projectId, currentTaskId] });
+      queryClient.invalidateQueries({ queryKey: ['sub-category-docs-count', projectId, tradeId] });
       toast.success("Document supprimé");
     },
   });
 
-  // Delete supplier from database
+  // Delete supplier from database (for current category or sub-category)
   const handleDeleteSupplier = async () => {
     // Delete from database first
     const { error } = await supabase
@@ -295,7 +399,7 @@ export function CategorySubmissionsDialog({
       .delete()
       .eq('project_id', projectId)
       .eq('step_id', 'soumissions')
-      .eq('task_id', `soumission-${tradeId}`);
+      .eq('task_id', currentTaskId);
 
     if (error) {
       console.error("Error deleting supplier:", error);
@@ -309,21 +413,122 @@ export function CategorySubmissionsDialog({
     setContactPerson("");
     setContactPersonPhone("");
     setSelectedAmount("");
-    setSpent("0");
     setSelectedSupplierIndex(null);
     setSelectedOptionIndex(null);
     setAnalysisResult(null);
     setExtractedSuppliers([]);
 
-    // Update budget spent to 0
-    onSave(parseFloat(budget) || 0, 0, undefined, { closeDialog: false });
+    // If in sub-category, update the sub-category amount
+    if (activeSubCategoryId) {
+      setSubCategories(prev => prev.map(sc => 
+        sc.id === activeSubCategoryId 
+          ? { ...sc, amount: 0, supplierName: undefined, supplierPhone: undefined, hasAnalysis: false }
+          : sc
+      ));
+      // Recalculate total spent from remaining sub-categories
+      const newTotalSpent = subCategories
+        .filter(sc => sc.id !== activeSubCategoryId)
+        .reduce((sum, sc) => sum + (sc.amount || 0), 0);
+      setSpent(newTotalSpent.toString());
+    } else {
+      setSpent("0");
+      // Update budget spent to 0
+      onSave(parseFloat(budget) || 0, 0, undefined, { closeDialog: false });
+    }
     
     // Invalidate queries to refresh data
-    queryClient.invalidateQueries({ queryKey: ['supplier-status', projectId, tradeId] });
+    queryClient.invalidateQueries({ queryKey: ['supplier-status', projectId, currentTaskId] });
+    queryClient.invalidateQueries({ queryKey: ['sub-categories', projectId, tradeId] });
     
     toast.success("Fournisseur supprimé — vous pouvez relancer une analyse");
     
     // Stay on the dialog for new analysis (don't close)
+  };
+  
+  // Sub-category handlers
+  const handleAddSubCategory = async (name: string) => {
+    const id = Date.now().toString();
+    const newSubCategory: SubCategory = {
+      id,
+      name,
+      amount: 0,
+      hasDocuments: false,
+      hasAnalysis: false,
+    };
+    
+    // Save to database immediately
+    const notes = JSON.stringify({
+      subCategoryName: name,
+      amount: "0",
+    });
+    
+    await supabase
+      .from('task_dates')
+      .insert({
+        project_id: projectId,
+        step_id: 'soumissions',
+        task_id: `soumission-${tradeId}-sub-${id}`,
+        notes,
+      });
+    
+    setSubCategories(prev => [...prev, newSubCategory]);
+    queryClient.invalidateQueries({ queryKey: ['sub-categories', projectId, tradeId] });
+    
+    // Automatically select the new sub-category
+    setActiveSubCategoryId(id);
+    setViewingSubCategory(true);
+    
+    toast.success(`Sous-catégorie "${name}" ajoutée`);
+  };
+  
+  const handleRemoveSubCategory = async (id: string) => {
+    // Delete from database
+    await supabase
+      .from('task_dates')
+      .delete()
+      .eq('project_id', projectId)
+      .eq('step_id', 'soumissions')
+      .eq('task_id', `soumission-${tradeId}-sub-${id}`);
+    
+    // Delete associated documents
+    await supabase
+      .from('task_attachments')
+      .delete()
+      .eq('project_id', projectId)
+      .eq('step_id', 'soumissions')
+      .eq('task_id', `soumission-${tradeId}-sub-${id}`);
+    
+    const removedSubCat = subCategories.find(sc => sc.id === id);
+    setSubCategories(prev => prev.filter(sc => sc.id !== id));
+    
+    // Update total spent
+    if (removedSubCat) {
+      const newTotalSpent = subCategories
+        .filter(sc => sc.id !== id)
+        .reduce((sum, sc) => sum + (sc.amount || 0), 0);
+      setSpent(newTotalSpent.toString());
+    }
+    
+    // If we were viewing this sub-category, go back
+    if (activeSubCategoryId === id) {
+      setActiveSubCategoryId(null);
+      setViewingSubCategory(false);
+    }
+    
+    queryClient.invalidateQueries({ queryKey: ['sub-categories', projectId, tradeId] });
+    queryClient.invalidateQueries({ queryKey: ['sub-category-docs-count', projectId, tradeId] });
+    
+    toast.success("Sous-catégorie supprimée");
+  };
+  
+  const handleSelectSubCategory = (id: string) => {
+    setActiveSubCategoryId(id);
+    setViewingSubCategory(true);
+  };
+  
+  const handleBackToMainCategory = () => {
+    setActiveSubCategoryId(null);
+    setViewingSubCategory(false);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -582,9 +787,13 @@ export function CategorySubmissionsDialog({
     
     // Create a text file blob from the summary
     const blob = new Blob([summary], { type: 'text/markdown' });
-    const fileName = `Analyse_IA_${categoryName.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.md`;
+    const subCatName = activeSubCategoryId 
+      ? subCategories.find(sc => sc.id === activeSubCategoryId)?.name || ''
+      : '';
+    const fileName = `Analyse_IA_${categoryName.replace(/[^a-zA-Z0-9]/g, '_')}${subCatName ? `_${subCatName.replace(/[^a-zA-Z0-9]/g, '_')}` : ''}_${new Date().toISOString().split('T')[0]}.md`;
     const sanitizedFileName = sanitizeFileName(fileName);
-    const storagePath = `${projectId}/soumissions/${tradeId}/analyses/${Date.now()}_${sanitizedFileName}`;
+    const subPath = activeSubCategoryId ? `${tradeId}/sub-${activeSubCategoryId}` : tradeId;
+    const storagePath = `${projectId}/soumissions/${subPath}/analyses/${Date.now()}_${sanitizedFileName}`;
     
     // Upload to storage
     const { error: uploadError } = await supabase.storage
@@ -606,8 +815,8 @@ export function CategorySubmissionsDialog({
       .insert({
         project_id: projectId,
         step_id: 'soumissions',
-        task_id: `soumission-${tradeId}`,
-        file_name: `Résumé analyse IA - ${categoryName}`,
+        task_id: currentTaskId,
+        file_name: `Résumé analyse IA - ${categoryName}${subCatName ? ` (${subCatName})` : ''}`,
         file_url: urlData.publicUrl,
         file_type: 'text/markdown',
         file_size: blob.size,
@@ -625,18 +834,67 @@ export function CategorySubmissionsDialog({
   // Save everything
   const handleSave = async (saveAnalysis = false, keepDialogOpen = false) => {
     const budgetValue = parseFloat(budget) || 0;
-    const spentValue = parseFloat(spent) || parseFloat(selectedAmount) || 0;
+    let finalSpentValue = parseFloat(spent) || parseFloat(selectedAmount) || 0;
     
-    // Save analysis summary if requested
-    if (saveAnalysis && analysisResult) {
-      await saveAnalysisSummary(analysisResult);
-      toast.success(`Le résumé a été enregistré dans vos dossiers sous "Soumissions > ${categoryName}"`, {
-        duration: 5000,
+    // If we're in a sub-category, update the sub-category data
+    if (activeSubCategoryId && supplierName) {
+      const subCatAmount = parseFloat(selectedAmount) || 0;
+      const subCatName = subCategories.find(sc => sc.id === activeSubCategoryId)?.name || '';
+      
+      // Save sub-category supplier info
+      const notes = JSON.stringify({
+        subCategoryName: subCatName,
+        supplierName,
+        supplierPhone,
+        contactPerson,
+        contactPersonPhone,
+        amount: selectedAmount,
+        hasAnalysis: !!analysisResult,
+        isCompleted: true,
       });
-    }
-    
-    // Save supplier info to task_dates
-    if (supplierName) {
+
+      const { data: existing } = await supabase
+        .from('task_dates')
+        .select('id')
+        .eq('project_id', projectId)
+        .eq('step_id', 'soumissions')
+        .eq('task_id', currentTaskId)
+        .maybeSingle();
+
+      if (existing) {
+        await supabase
+          .from('task_dates')
+          .update({ notes })
+          .eq('id', existing.id);
+      } else {
+        await supabase
+          .from('task_dates')
+          .insert({
+            project_id: projectId,
+            step_id: 'soumissions',
+            task_id: currentTaskId,
+            notes,
+          });
+      }
+      
+      // Update local sub-category state
+      setSubCategories(prev => prev.map(sc => 
+        sc.id === activeSubCategoryId 
+          ? { ...sc, amount: subCatAmount, supplierName, supplierPhone, hasAnalysis: !!analysisResult }
+          : sc
+      ));
+      
+      // Calculate total spent from all sub-categories
+      finalSpentValue = subCategories.reduce((sum, sc) => {
+        if (sc.id === activeSubCategoryId) {
+          return sum + subCatAmount;
+        }
+        return sum + (sc.amount || 0);
+      }, 0);
+      
+      setSpent(finalSpentValue.toString());
+    } else if (!activeSubCategoryId && supplierName) {
+      // Main category - save supplier info
       const notes = JSON.stringify({
         supplierName,
         supplierPhone,
@@ -651,7 +909,7 @@ export function CategorySubmissionsDialog({
         .select('id')
         .eq('project_id', projectId)
         .eq('step_id', 'soumissions')
-        .eq('task_id', `soumission-${tradeId}`)
+        .eq('task_id', currentTaskId)
         .maybeSingle();
 
       if (existing) {
@@ -665,30 +923,42 @@ export function CategorySubmissionsDialog({
           .insert({
             project_id: projectId,
             step_id: 'soumissions',
-            task_id: `soumission-${tradeId}`,
+            task_id: currentTaskId,
             notes,
           });
       }
     }
+    
+    // Save analysis summary if requested
+    if (saveAnalysis && analysisResult) {
+      await saveAnalysisSummary(analysisResult);
+      const subCatName = activeSubCategoryId 
+        ? subCategories.find(sc => sc.id === activeSubCategoryId)?.name 
+        : null;
+      toast.success(`Le résumé a été enregistré dans vos dossiers sous "Soumissions > ${categoryName}${subCatName ? ` > ${subCatName}` : ''}"`, {
+        duration: 5000,
+      });
+    }
 
     onSave(
       budgetValue,
-      spentValue,
+      finalSpentValue,
       supplierName
         ? {
             name: supplierName,
             phone: supplierPhone,
-            amount: spentValue,
+            amount: finalSpentValue,
           }
         : undefined,
       { closeDialog: !keepDialogOpen }
     );
     
-    queryClient.invalidateQueries({ queryKey: ['supplier-status', projectId, tradeId] });
-    queryClient.invalidateQueries({ queryKey: ['category-docs', projectId, tradeId] });
+    queryClient.invalidateQueries({ queryKey: ['supplier-status', projectId, currentTaskId] });
+    queryClient.invalidateQueries({ queryKey: ['category-docs', projectId, currentTaskId] });
+    queryClient.invalidateQueries({ queryKey: ['sub-categories', projectId, tradeId] });
     
     if (!saveAnalysis) {
-      toast.success("Catégorie mise à jour");
+      toast.success(activeSubCategoryId ? "Sous-catégorie mise à jour" : "Catégorie mise à jour");
     }
     
     // Only close dialog if not keeping it open
@@ -696,55 +966,102 @@ export function CategorySubmissionsDialog({
       onOpenChange(false);
     }
   };
+  
+  // Get current sub-category name for display
+  const currentSubCategoryName = activeSubCategoryId 
+    ? subCategories.find(sc => sc.id === activeSubCategoryId)?.name 
+    : null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
+            {viewingSubCategory && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 mr-1"
+                onClick={handleBackToMainCategory}
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            )}
             <div 
               className="w-4 h-4 rounded" 
               style={{ backgroundColor: categoryColor }}
             />
             {categoryName}
+            {currentSubCategoryName && (
+              <>
+                <span className="text-muted-foreground">/</span>
+                <span className="text-primary">{currentSubCategoryName}</span>
+              </>
+            )}
           </DialogTitle>
           <DialogDescription>
-            Gérez le budget, les soumissions et le fournisseur retenu
+            {viewingSubCategory 
+              ? `Gérez les soumissions pour "${currentSubCategoryName}"`
+              : "Gérez le budget, les soumissions et les sous-catégories"
+            }
           </DialogDescription>
         </DialogHeader>
 
         <div className="relative flex-1">
           <ScrollArea ref={scrollAreaRef} className="h-full max-h-[60vh] pr-4">
           <div className="space-y-6">
-            {/* Budget Section */}
-            <div className="space-y-3">
-              <h4 className="font-medium flex items-center gap-2">
-                <DollarSign className="h-4 w-4" />
-                Budget
-              </h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="budget">Budget estimé ($)</Label>
-                  <Input
-                    id="budget"
-                    type="number"
-                    value={budget}
-                    onChange={(e) => setBudget(e.target.value)}
-                    placeholder="0"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="spent">Coût réel ($)</Label>
-                  <Input
-                    id="spent"
-                    type="number"
-                    value={spent}
-                    onChange={(e) => setSpent(e.target.value)}
-                    placeholder="0"
-                  />
+            {/* Budget Section - Only show on main view */}
+            {!viewingSubCategory && (
+              <div className="space-y-3">
+                <h4 className="font-medium flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Budget
+                </h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="budget">Budget estimé ($)</Label>
+                    <Input
+                      id="budget"
+                      type="number"
+                      value={budget}
+                      onChange={(e) => setBudget(e.target.value)}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="spent">
+                      Coût réel total ($)
+                      {subCategories.length > 0 && (
+                        <span className="text-xs text-muted-foreground ml-2">
+                          (somme des sous-catégories)
+                        </span>
+                      )}
+                    </Label>
+                    <Input
+                      id="spent"
+                      type="number"
+                      value={spent}
+                      onChange={(e) => setSpent(e.target.value)}
+                      placeholder="0"
+                      readOnly={subCategories.length > 0}
+                      className={subCategories.length > 0 ? "bg-muted" : ""}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+            
+            {/* Sub-Categories Section - Only show on main view */}
+            {!viewingSubCategory && (
+              <SubCategoryManager
+                subCategories={subCategories}
+                onAddSubCategory={handleAddSubCategory}
+                onRemoveSubCategory={handleRemoveSubCategory}
+                onSelectSubCategory={handleSelectSubCategory}
+                activeSubCategoryId={activeSubCategoryId}
+                categoryName={categoryName}
+              />
+            )}
 
             {/* Documents Section */}
             <div className="space-y-3">
@@ -758,7 +1075,7 @@ export function CategorySubmissionsDialog({
                     variant="outline"
                     size="sm"
                     disabled={uploading}
-                    onClick={() => document.getElementById(`upload-${tradeId}`)?.click()}
+                    onClick={() => document.getElementById(`upload-${currentTaskId}`)?.click()}
                   >
                     {uploading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -768,7 +1085,7 @@ export function CategorySubmissionsDialog({
                     <span className="ml-2">Télécharger</span>
                   </Button>
                   <input
-                    id={`upload-${tradeId}`}
+                    id={`upload-${currentTaskId}`}
                     type="file"
                     accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
                     className="hidden"
