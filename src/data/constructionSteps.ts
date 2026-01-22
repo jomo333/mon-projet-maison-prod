@@ -381,6 +381,15 @@ export const constructionSteps: Step[] = [
     duration: "4 jours",
     tasks: [
       {
+        id: "plomberie-sous-dalle",
+        title: "Plomberie sous dalle - première visite",
+        description: "Installation de la plomberie sous la dalle de béton avant le coulage.",
+        tips: [
+          "Cette étape doit être complétée avant le coulage de la dalle",
+          "Vérifiez les pentes de drainage et les raccordements"
+        ]
+      },
+      {
         id: "plomberie-brute",
         title: "Plomberie brute",
         description: "Installation des tuyaux d'alimentation et de drainage dans les murs.",
