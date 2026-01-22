@@ -44,14 +44,19 @@ interface BudgetCategory {
 }
 
 const defaultCategories: BudgetCategory[] = [
-  { name: "Fondations", budget: 35000, spent: 0, color: "#3B82F6" },
-  { name: "Structure", budget: 45000, spent: 0, color: "#F97316" },
-  { name: "Toiture", budget: 18000, spent: 0, color: "#22C55E" },
-  { name: "Fenêtres/Portes", budget: 22000, spent: 0, color: "#EAB308" },
-  { name: "Électricité", budget: 15000, spent: 0, color: "#EC4899" },
-  { name: "Plomberie", budget: 12000, spent: 0, color: "#06B6D4" },
-  { name: "Isolation", budget: 8000, spent: 0, color: "#8B5CF6" },
-  { name: "Finitions", budget: 45000, spent: 0, color: "#EF4444" },
+  { name: "Excavation et fondation", budget: 0, spent: 0, color: "#3B82F6" },
+  { name: "Structure et charpente", budget: 0, spent: 0, color: "#F97316" },
+  { name: "Toiture", budget: 0, spent: 0, color: "#22C55E" },
+  { name: "Fenêtres et portes", budget: 0, spent: 0, color: "#EAB308" },
+  { name: "Isolation et pare-vapeur", budget: 0, spent: 0, color: "#8B5CF6" },
+  { name: "Plomberie", budget: 0, spent: 0, color: "#06B6D4" },
+  { name: "Électricité", budget: 0, spent: 0, color: "#EC4899" },
+  { name: "Chauffage et ventilation (HVAC)", budget: 0, spent: 0, color: "#14B8A6" },
+  { name: "Revêtement extérieur", budget: 0, spent: 0, color: "#A855F7" },
+  { name: "Gypse et peinture", budget: 0, spent: 0, color: "#475569" },
+  { name: "Revêtements de sol", budget: 0, spent: 0, color: "#F59E0B" },
+  { name: "Travaux ébénisterie (cuisine/SDB)", budget: 0, spent: 0, color: "#10B981" },
+  { name: "Finitions intérieures", budget: 0, spent: 0, color: "#EF4444" },
 ];
 
 // Couleurs vives et distinctes pour une meilleure lisibilité
