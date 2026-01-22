@@ -155,7 +155,7 @@ export const constructionSteps: Step[] = [
     phase: "pre-construction",
     phaseLabel: "Pré-construction",
     icon: "DollarSign",
-    duration: "2 semaines",
+    duration: "2-4 semaines",
     tasks: [
       {
         id: "pret-construction",
