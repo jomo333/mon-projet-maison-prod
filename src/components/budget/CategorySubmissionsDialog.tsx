@@ -1154,13 +1154,18 @@ export function CategorySubmissionsDialog({
               )}
             </div>
 
-            {/* Selected Supplier Summary - Show when supplier is chosen */}
+            {/* Selected Supplier Summary - Show when supplier is chosen - PRIORITY DISPLAY */}
             {supplierName && (
-              <div className="rounded-xl border-2 border-primary bg-primary/5 p-4 space-y-3">
+              <div className="rounded-xl border-2 border-primary bg-primary/5 p-4 space-y-3 sticky top-0 z-10 backdrop-blur-sm">
                 <div className="flex items-center justify-between">
                   <h4 className="font-semibold flex items-center gap-2 text-lg text-primary">
                     <CheckCircle2 className="h-5 w-5" />
                     Fournisseur retenu
+                    {currentSubCategoryName && (
+                      <Badge variant="outline" className="text-xs ml-2">
+                        {currentSubCategoryName}
+                      </Badge>
+                    )}
                   </h4>
                   <div className="flex items-center gap-2">
                     <Button
@@ -1170,32 +1175,46 @@ export function CategorySubmissionsDialog({
                       className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="h-4 w-4 mr-1" />
-                      Supprimer fournisseur
+                      Supprimer
                     </Button>
                     <Badge className="bg-primary text-primary-foreground">
-                      Sélectionné
+                      Confirmé
                     </Badge>
                   </div>
                 </div>
-                <div className="grid gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Entreprise:</span>
-                    <span className="font-semibold">🏢 {supplierName}</span>
-                  </div>
-                  {supplierPhone && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Téléphone:</span>
-                      <span className="font-medium flex items-center gap-1">
-                        <Phone className="h-3 w-3" />
-                        {supplierPhone}
-                      </span>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground text-sm">Entreprise:</span>
+                      <span className="font-semibold">🏢 {supplierName}</span>
                     </div>
-                  )}
-                  <div className="flex items-center justify-between pt-2 border-t">
-                    <span className="text-muted-foreground">Coût retenu:</span>
-                    <span className="font-bold text-xl text-primary">
-                      {parseInt(spent || selectedAmount || '0').toLocaleString('fr-CA')} $
-                    </span>
+                    {supplierPhone && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground text-sm">Téléphone:</span>
+                        <span className="font-medium flex items-center gap-1">
+                          <Phone className="h-3 w-3" />
+                          {supplierPhone}
+                        </span>
+                      </div>
+                    )}
+                    {contactPerson && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground text-sm">Contact:</span>
+                        <span className="font-medium flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          {contactPerson}
+                          {contactPersonPhone && ` - ${contactPersonPhone}`}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-end">
+                    <div className="text-right">
+                      <div className="text-sm text-muted-foreground">Coût retenu</div>
+                      <div className="font-bold text-2xl text-primary">
+                        {parseInt(spent || selectedAmount || '0').toLocaleString('fr-CA')} $
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1426,31 +1445,29 @@ export function CategorySubmissionsDialog({
           </div>
         </ScrollArea>
           
-          {/* Scroll buttons inside dialog */}
-          {(showScrollButtons.up || showScrollButtons.down) && (
-            <div className="absolute right-6 bottom-4 flex flex-col gap-2 z-10">
-              {showScrollButtons.up && (
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  onClick={scrollToTop}
-                  className="h-9 w-9 rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  <ChevronUp className="h-4 w-4" />
-                </Button>
-              )}
-              {showScrollButtons.down && (
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  onClick={scrollToBottom}
-                  className="h-9 w-9 rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          )}
+          {/* Scroll buttons inside dialog - always visible for better UX */}
+          <div className="absolute right-6 bottom-4 flex flex-col gap-2 z-50">
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={scrollToTop}
+              className={`h-9 w-9 rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-opacity ${
+                showScrollButtons.up ? 'opacity-100' : 'opacity-40 hover:opacity-100'
+              }`}
+            >
+              <ChevronUp className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={scrollToBottom}
+              className={`h-9 w-9 rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-opacity ${
+                showScrollButtons.down ? 'opacity-100' : 'opacity-40 hover:opacity-100'
+              }`}
+            >
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         <DialogFooter className="mt-4">
