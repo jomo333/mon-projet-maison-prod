@@ -50,7 +50,7 @@ const stepTradeMapping: Record<string, string> = {
 const defaultDurations: Record<string, number> = {
   planification: 5,
   "plans-permis": 40,
-  soumissions: 5,
+  soumissions: 15,
   financement: 15,
   "excavation-fondation": 10,
   structure: 8,
