@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { DollarSign, TrendingUp, TrendingDown, AlertTriangle, Plus, Edit2, ChevronDown, ChevronUp, Save, FolderOpen, FileText, CheckCircle2 } from "lucide-react";
 import { PlanAnalyzer } from "@/components/budget/PlanAnalyzer";
+import { ScrollToTopBottom } from "@/components/ui/scroll-to-top-bottom";
 import { CategorySubmissionsDialog } from "@/components/budget/CategorySubmissionsDialog";
 import { GenerateScheduleDialog } from "@/components/schedule/GenerateScheduleDialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -768,6 +769,7 @@ const Budget = () => {
           )}
         </div>
       </main>
+      <ScrollToTopBottom />
       <Footer />
     </div>
   );
