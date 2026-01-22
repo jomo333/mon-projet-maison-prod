@@ -213,10 +213,20 @@ export function CategorySubmissionsDialog({
     }
   }, [supplierStatus]);
 
+  // Sanitize filename for storage (remove spaces and special characters)
+  const sanitizeFileName = (name: string): string => {
+    return name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Remove accents
+      .replace(/[^a-zA-Z0-9._-]/g, '_') // Replace special chars with underscore
+      .replace(/_+/g, '_'); // Replace multiple underscores with single
+  };
+
   // Upload mutation
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
-      const fileName = `${projectId}/soumissions/${tradeId}/${Date.now()}_${file.name}`;
+      const sanitizedName = sanitizeFileName(file.name);
+      const fileName = `${projectId}/soumissions/${tradeId}/${Date.now()}_${sanitizedName}`;
       
       const { error: uploadError } = await supabase.storage
         .from('task-attachments')
