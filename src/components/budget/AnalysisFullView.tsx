@@ -18,6 +18,14 @@ import {
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+// Helper function to parse currency strings like "25 652 $", "25,652$", "25652"
+const parseAmount = (amount: string | undefined): number => {
+  if (!amount) return 0;
+  // Remove spaces, commas, dollar signs, and other non-numeric characters except decimal point
+  const cleaned = amount.replace(/[\s,$]/g, '').replace(/[^\d.]/g, '');
+  return Math.round(parseFloat(cleaned) || 0);
+};
+
 interface SupplierOption {
   name: string;
   amount: string;
@@ -166,7 +174,7 @@ export function AnalysisFullView({
                         </div>
                         <div className="text-right shrink-0">
                           <div className="font-bold text-xl text-primary">
-                            {parseInt(supplier.amount || '0').toLocaleString('fr-CA')} $
+                            {parseAmount(supplier.amount).toLocaleString('fr-CA')} $
                           </div>
                           <div className="text-xs text-muted-foreground">avant taxes</div>
                         </div>
@@ -193,7 +201,7 @@ export function AnalysisFullView({
                                 <div className="flex justify-between items-center">
                                   <span className="font-medium text-sm">{option.name}</span>
                                   <span className="font-bold text-primary">
-                                    {parseInt(option.amount || '0').toLocaleString('fr-CA')} $
+                                    {parseAmount(option.amount).toLocaleString('fr-CA')} $
                                   </span>
                                 </div>
                                 {option.description && (
@@ -216,15 +224,15 @@ export function AnalysisFullView({
                 <div className="rounded-lg bg-primary/5 border border-primary/20 p-4 mb-4">
                   <p className="text-sm font-medium text-muted-foreground mb-1">Fournisseur sélectionné:</p>
                   <p className="font-semibold text-lg">{selectedSupplier.supplierName}</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-sm text-muted-foreground">Montant retenu:</span>
-                    <span className="font-bold text-xl text-primary">
-                      {parseInt(
-                        selectedOptionIndex !== null && selectedSupplier.options?.[selectedOptionIndex]
-                          ? selectedSupplier.options[selectedOptionIndex].amount
-                          : selectedSupplier.amount || '0'
-                      ).toLocaleString('fr-CA')} $
-                    </span>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-sm text-muted-foreground">Montant retenu:</span>
+                      <span className="font-bold text-xl text-primary">
+                        {parseAmount(
+                          selectedOptionIndex !== null && selectedSupplier.options?.[selectedOptionIndex]
+                            ? selectedSupplier.options[selectedOptionIndex].amount
+                            : selectedSupplier.amount
+                        ).toLocaleString('fr-CA')} $
+                      </span>
                   </div>
                 </div>
                 <Button 
