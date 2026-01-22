@@ -167,6 +167,37 @@ const ConstructionGuide = () => {
             )}
           </div>
 
+          {/* Résumé des options de la page */}
+          <div className="mb-8 p-6 bg-muted/50 rounded-lg border">
+            <h2 className="font-semibold text-lg mb-4">Comment utiliser cette page</h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="space-y-1">
+                <h3 className="font-medium text-sm text-primary">📋 Filtrer par phase</h3>
+                <p className="text-sm text-muted-foreground">
+                  Utilisez les badges ci-dessous pour afficher uniquement les étapes d'une phase spécifique (pré-construction, gros œuvre, second œuvre, finitions).
+                </p>
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-medium text-sm text-primary">📖 Consulter une étape</h3>
+                <p className="text-sm text-muted-foreground">
+                  Cliquez sur une carte pour voir les tâches détaillées, conseils pratiques et documents requis pour chaque étape.
+                </p>
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-medium text-sm text-primary">🔄 Recalculer l'échéancier</h3>
+                <p className="text-sm text-muted-foreground">
+                  Le bouton « Recalculer » met à jour automatiquement les dates de votre projet selon les durées estimées.
+                </p>
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-medium text-sm text-primary">✅ Marquer comme terminé</h3>
+                <p className="text-sm text-muted-foreground">
+                  Dans chaque étape, marquez les tâches complétées pour suivre votre progression et ajuster l'échéancier.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Planification uncertainty alert */}
           {(showPlanificationAlert || dateWarning) && (
             <Alert className="mb-6 border-amber-500/50 bg-amber-50 dark:bg-amber-950/20">
