@@ -234,7 +234,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log(`Analyzing ${documents.length} documents for ${tradeName} with Gemini 2.5 Pro`);
+    console.log(`Analyzing ${documents.length} documents for ${tradeName} with Gemini 2.5 Flash`);
 
     // Build message parts with documents
     const messageParts: any[] = [];
@@ -312,7 +312,7 @@ Calcule l'écart en % et signale si le budget est dépassé.
 ` : ''}`
     });
 
-    console.log("Sending request to Gemini 2.5 Pro with", messageParts.length, "parts");
+    console.log("Sending request to Gemini 2.5 Flash with", messageParts.length, "parts");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -321,7 +321,7 @@ Calcule l'écart en % et signale si le budget est dépassé.
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: messageParts }
