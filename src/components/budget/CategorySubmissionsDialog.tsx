@@ -424,32 +424,33 @@ export function CategorySubmissionsDialog({
       const nameMatch = block.match(/🏢\s*\*?\*?([^*\n]+)/);
       const phoneMatch = block.match(/📞\s*(?:Téléphone\s*:?\s*)?([0-9\-\.\s\(\)]+)/);
       
-      // Multiple patterns for amounts - more flexible matching
+      // Multiple patterns for amounts - more flexible matching (supports decimals and spaces)
       let amount = '';
       
-      // Pattern 1: 💰 Montant avant taxes: X $
-      const amountMatch1 = block.match(/💰\s*(?:Montant(?:\s*avant\s*taxes)?\s*:?\s*)?([0-9\s,]+)\s*\$/);
+      // Pattern 1: Montant avant taxes: 30 833.04 $ or Montant avant taxes: 30 833 $
+      const amountMatch1 = block.match(/Montant\s*avant\s*taxes\s*:?\s*([0-9\s,]+(?:\.[0-9]+)?)\s*\$/i);
       // Pattern 2: Prix avant taxes: X $ 
-      const amountMatch2 = block.match(/Prix\s*(?:avant\s*taxes)?\s*:?\s*([0-9\s,]+)\s*\$/i);
-      // Pattern 3: Total avec taxes: X $ (fallback)
-      const amountMatch3 = block.match(/Total\s*(?:avec\s*taxes)?\s*:?\s*\*?\*?([0-9\s,]+)\s*\$/i);
-      // Pattern 4: Sous-total: X $
-      const amountMatch4 = block.match(/Sous-total\s*:?\s*([0-9\s,]+)\s*\$/i);
-      // Pattern 5: Just a large number with $ sign (X XXX $ or X,XXX $)
-      const amountMatch5 = block.match(/:\s*\*?\*?([0-9]{1,3}(?:[\s,][0-9]{3})*)\s*\$\*?\*?/);
+      const amountMatch2 = block.match(/Prix\s*avant\s*taxes\s*:?\s*([0-9\s,]+(?:\.[0-9]+)?)\s*\$/i);
+      // Pattern 3: Sous-total: X $
+      const amountMatch3 = block.match(/Sous-total\s*:?\s*([0-9\s,]+(?:\.[0-9]+)?)\s*\$/i);
+      // Pattern 4: Total avec taxes: X $ (fallback - will use net price if available)
+      const amountMatch4 = block.match(/Total\s*avec\s*taxes\s*:?\s*\*?\*?([0-9\s,]+(?:\.[0-9]+)?)\s*\$\*?\*?/i);
+      // Pattern 5: Any number followed by $ in the pricing section
+      const amountMatch5 = block.match(/💰[^$]*?([0-9]{1,3}(?:[\s,][0-9]{3})*(?:\.[0-9]+)?)\s*\$/);
       
+      // Priority: before taxes > subtotal > with taxes
       if (amountMatch1) amount = amountMatch1[1].replace(/[\s,]/g, '');
       else if (amountMatch2) amount = amountMatch2[1].replace(/[\s,]/g, '');
-      else if (amountMatch4) amount = amountMatch4[1].replace(/[\s,]/g, '');
-      else if (amountMatch5) amount = amountMatch5[1].replace(/[\s,]/g, '');
       else if (amountMatch3) amount = amountMatch3[1].replace(/[\s,]/g, '');
+      else if (amountMatch5) amount = amountMatch5[1].replace(/[\s,]/g, '');
+      else if (amountMatch4) amount = amountMatch4[1].replace(/[\s,]/g, '');
       
       if (nameMatch) {
         // Try to extract options from the block
         const options: SupplierOption[] = [];
         
         // Look for option patterns like "Option A: X $" or "Forfait Premium: X $"
-        const optionMatches = block.matchAll(/(?:Option|Forfait|Package)\s*([A-Za-zÀ-ÿ0-9\s]+)\s*:?\s*([0-9\s,]+)\s*\$/gi);
+        const optionMatches = block.matchAll(/(?:Option|Forfait|Package|OPTION)\s*(?:SÉPARÉE\s*:?\s*)?([A-Za-zÀ-ÿ0-9\s]+?)\s*:?\s*([0-9\s,]+(?:\.[0-9]+)?)\s*\$/gi);
         for (const match of optionMatches) {
           options.push({
             name: match[1].trim(),
