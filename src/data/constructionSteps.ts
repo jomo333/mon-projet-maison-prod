@@ -173,13 +173,13 @@ export const constructionSteps: Step[] = [
 
   // GROS ŒUVRE
   {
-    id: "excavation-fondation",
-    title: "Excavation et fondation",
-    description: "Préparation du terrain et construction des fondations.",
+    id: "excavation",
+    title: "Excavation",
+    description: "Préparation du terrain et creusage pour les fondations.",
     phase: "gros-oeuvre",
     phaseLabel: "Gros œuvre",
     icon: "Shovel",
-    duration: "2 semaines",
+    duration: "3-5 jours",
     tasks: [
       {
         id: "implantation",
@@ -192,16 +192,27 @@ export const constructionSteps: Step[] = [
         documents: ["Certificat d'implantation"]
       },
       {
-        id: "excavation",
-        title: "Excavation",
+        id: "excavation-creusage",
+        title: "Creusage et excavation",
         description: "Creusage pour le sous-sol et préparation du terrain.",
         tips: [
           "Prévoyez l'entreposage de la terre excavée ou prévoir un budget de transport",
           "Protégez l'excavation de la pluie et prévoyez une pompe pour évacuer l'eau en cas de forte pluie"
         ]
-      },
+      }
+    ]
+  },
+  {
+    id: "fondation",
+    title: "Fondation",
+    description: "Construction des fondations et imperméabilisation.",
+    phase: "gros-oeuvre",
+    phaseLabel: "Gros œuvre",
+    icon: "Layers",
+    duration: "1-2 semaines",
+    tasks: [
       {
-        id: "fondation",
+        id: "coulage-fondation",
         title: "Coulage des fondations",
         description: "Installation des coffrages et coulage du béton pour les semelles et murs.",
         tips: [
