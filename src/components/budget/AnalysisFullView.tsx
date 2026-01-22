@@ -63,7 +63,7 @@ export function AnalysisFullView({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-[90vw] lg:max-w-[80vw] p-0 flex flex-col">
+      <SheetContent side="right" className="w-full sm:max-w-[95vw] lg:max-w-[95vw] xl:max-w-[95vw] p-0 flex flex-col h-screen">
         <SheetHeader className="p-6 border-b bg-muted/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -95,9 +95,10 @@ export function AnalysisFullView({
             </div>
             <ScrollArea className="flex-1 p-6">
               <div className="prose prose-lg dark:prose-invert max-w-none
-                [&_table]:w-full [&_table]:border-collapse [&_table]:text-base
-                [&_th]:bg-muted [&_th]:border [&_th]:border-border [&_th]:px-5 [&_th]:py-4 [&_th]:text-left [&_th]:font-semibold [&_th]:text-foreground
-                [&_td]:border [&_td]:border-border [&_td]:px-5 [&_td]:py-4 [&_td]:text-foreground
+                [&_table]:w-full [&_table]:border-collapse [&_table]:text-sm
+                [&_table]:table-fixed
+                [&_th]:bg-muted [&_th]:border [&_th]:border-border [&_th]:px-3 [&_th]:py-3 [&_th]:text-left [&_th]:font-semibold [&_th]:text-foreground [&_th]:whitespace-normal [&_th]:break-words
+                [&_td]:border [&_td]:border-border [&_td]:px-3 [&_td]:py-3 [&_td]:text-foreground [&_td]:whitespace-normal [&_td]:break-words [&_td]:align-top
                 [&_tr:nth-child(even)]:bg-muted/50
                 [&_tr:hover]:bg-accent/50
                 [&_p]:text-base [&_p]:leading-relaxed [&_p]:my-3
@@ -108,6 +109,7 @@ export function AnalysisFullView({
                 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-3
                 [&_li]:text-base [&_li]:my-1
                 [&_hr]:my-6 [&_hr]:border-border
+                overflow-x-auto
               ">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {analysisResult}
@@ -117,7 +119,7 @@ export function AnalysisFullView({
           </div>
 
           {/* Right Panel - Supplier Selection */}
-          <div className="w-[400px] flex flex-col bg-muted/20">
+          <div className="w-[350px] min-w-[350px] flex flex-col bg-muted/20">
             <div className="p-4 border-b bg-background">
               <h3 className="font-semibold flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-primary" />
