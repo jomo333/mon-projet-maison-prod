@@ -393,7 +393,7 @@ const Dashboard = () => {
                       <div className="space-y-1 p-3 rounded-lg bg-muted/50">
                         <h3 className="font-medium text-sm text-primary">✅ Marquer comme terminé</h3>
                         <p className="text-sm text-muted-foreground">
-                          Cochez les étapes complétées directement sur les cartes pour suivre votre progression globale.
+                          Cochez les étapes complétées directement sur les cartes pour suivre votre progression globale et devancer votre échéancier.
                         </p>
                       </div>
                       <div className="space-y-1 p-3 rounded-lg bg-muted/50">
