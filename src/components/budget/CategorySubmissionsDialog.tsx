@@ -639,7 +639,7 @@ export function CategorySubmissionsDialog({
                     className="gap-2"
                   >
                     <Maximize2 className="h-4 w-4" />
-                    Voir en grand
+                    Voir le résumé de l'analyse
                   </Button>
                 </div>
                 <div className="rounded-lg border bg-primary/5 p-4">
