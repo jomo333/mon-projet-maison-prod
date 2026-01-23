@@ -1455,6 +1455,7 @@ async function analyzeOnePageWithClaude({
   totalPages,
   additionalNotes,
   projectType,
+  manualContext,
 }: {
   apiKey: string;
   imageBase64: string;
@@ -1464,9 +1465,18 @@ async function analyzeOnePageWithClaude({
   totalPages: number;
   additionalNotes?: string;
   projectType?: string;
+  manualContext?: {
+    projectType?: string;
+    squareFootage?: number;
+    numberOfFloors?: number;
+    hasGarage?: boolean;
+    foundationSqft?: number;
+    additionalNotes?: string;
+  };
 }): Promise<string | null> {
   // Build special instruction for "agrandissement" projects
-  const isAgrandissement = projectType?.toLowerCase().includes('agrandissement');
+  const effectiveProjectType = projectType || manualContext?.projectType || '';
+  const isAgrandissement = effectiveProjectType.toLowerCase().includes('agrandissement');
   const agrandissementInstruction = isAgrandissement 
     ? `
 INSTRUCTION CRITIQUE - AGRANDISSEMENT:
@@ -1478,14 +1488,32 @@ INSTRUCTION CRITIQUE - AGRANDISSEMENT:
 ` 
     : '';
 
+  // Build context section from manual data
+  const hasManualContext = manualContext && (manualContext.projectType || manualContext.squareFootage || manualContext.additionalNotes);
+  const contextSection = hasManualContext ? `
+## CONTEXTE CLIENT (pour affiner l'analyse)
+${manualContext?.projectType ? `- Type de projet: ${manualContext.projectType}` : ''}
+${manualContext?.squareFootage ? `- Superficie estimée: ${manualContext.squareFootage} pi²` : ''}
+${manualContext?.numberOfFloors ? `- Nombre d'étages: ${manualContext.numberOfFloors}` : ''}
+${manualContext?.hasGarage ? `- Garage inclus` : ''}
+${manualContext?.foundationSqft ? `- Fondation: ${manualContext.foundationSqft} pi²` : ''}
+${manualContext?.additionalNotes ? `
+SPÉCIFICATIONS DU CLIENT:
+${manualContext.additionalNotes}
+(Utilise ces détails pour personnaliser les estimations: matériaux, équipements, finitions)
+` : ''}
+` : '';
+
   const pagePrompt = `Tu analyses la PAGE ${pageNumber}/${totalPages} d'un ensemble de plans de construction au Québec.
 
 QUALITÉ DE FINITION: ${finishQualityLabel}
 ${additionalNotes ? `NOTES CLIENT: ${additionalNotes}` : ''}
+${contextSection}
 ${agrandissementInstruction}
 OBJECTIF:
 - Extraire UNIQUEMENT ce qui est visible sur cette page (dimensions, quantités, matériaux).
 ${isAgrandissement ? '- Pour un AGRANDISSEMENT, extrais SEULEMENT les éléments de la partie NOUVELLE (extension), pas le bâtiment existant.' : ''}
+${hasManualContext ? '- PERSONNALISE les estimations selon les spécifications client (ex: si mentionné "plancher chauffant", inclus-le).' : ''}
 - Si une catégorie n'est pas visible sur cette page, ne l\'invente pas.
 - Retourne du JSON STRICT (sans texte autour), au format suivant:
 
@@ -1860,20 +1888,41 @@ INSTRUCTION CRITIQUE - AGRANDISSEMENT:
       : '';
     
     if (mode === "plan") {
-      // Mode plan: AUCUNE donnée manuelle - seulement les plans
-      // Les données manuelles peuvent être obsolètes par rapport aux plans
+      // Mode plan ENRICHI: plans comme source principale + données manuelles comme contexte
+      // Les données manuelles aident à préciser le type de projet et les spécifications
+      const manualContext = body.manualContext || {};
+      const hasManualContext = manualContext.projectType || manualContext.squareFootage || manualContext.additionalNotes;
+      
+      const contextSection = hasManualContext ? `
+## CONTEXTE COMPLÉMENTAIRE FOURNI PAR LE CLIENT
+${manualContext.projectType ? `- TYPE DE PROJET INDIQUÉ: ${manualContext.projectType}` : ''}
+${manualContext.squareFootage ? `- SUPERFICIE ESTIMÉE: ${manualContext.squareFootage} pi² (à vérifier avec les plans)` : ''}
+${manualContext.numberOfFloors ? `- NOMBRE D'ÉTAGES: ${manualContext.numberOfFloors}` : ''}
+${manualContext.foundationSqft ? `- SUPERFICIE FONDATION: ${manualContext.foundationSqft} pi²` : ''}
+${manualContext.hasGarage ? `- GARAGE: Inclus dans le projet` : ''}
+${manualContext.additionalNotes ? `
+## NOTES ET SPÉCIFICATIONS DU CLIENT
+${manualContext.additionalNotes}
+
+IMPORTANT: Utilise ces notes pour affiner ton estimation (matériaux spécifiques, équipements, finitions demandées).
+` : ''}
+` : '';
+
       extractionPrompt = `Analyse ${imageUrls.length > 1 ? 'ces ' + imageUrls.length + ' plans' : 'ce plan'} de construction pour un projet AU QUÉBEC.
 
 QUALITÉ DE FINITION: ${qualityDescriptions[finishQuality] || qualityDescriptions["standard"]}
 ${agrandissementInstruction}
+${contextSection}
 INSTRUCTIONS CRITIQUES:
 1. Examine TOUTES les pages/images fournies ensemble
-2. EXTRAIS les dimensions, superficies et quantités DIRECTEMENT des plans
-3. DÉDUIS le type de projet et le nombre d'étages à partir des plans
-${isAgrandissement ? '4. Pour un AGRANDISSEMENT: analyse SEULEMENT la partie NOUVELLE, ignore le bâtiment existant' : ''}
-5. Pour chaque catégorie NON VISIBLE, ESTIME les coûts basés sur la superficie EXTRAITE des plans
-6. Tu DOIS retourner TOUTES les 12 catégories principales (Fondation, Structure, Toiture, Revêtement, Fenêtres, Isolation, Électricité, Plomberie, CVAC, Finition, Cuisine, Salle de bain)
-7. Applique les prix du marché Québec 2025
+2. EXTRAIS les dimensions, superficies et quantités DIRECTEMENT des plans (source de vérité)
+3. COMPARE avec le contexte client et SIGNALE toute incohérence
+4. ${hasManualContext ? 'Utilise les notes du client pour PRÉCISER les matériaux, équipements et finitions' : 'DÉDUIS le type de projet et le nombre d\'étages à partir des plans'}
+${isAgrandissement ? '5. Pour un AGRANDISSEMENT: analyse SEULEMENT la partie NOUVELLE, ignore le bâtiment existant' : ''}
+6. Pour chaque catégorie NON VISIBLE, ESTIME les coûts basés sur la superficie EXTRAITE + les spécifications client
+7. Tu DOIS retourner TOUTES les 12 catégories principales (Fondation, Structure, Toiture, Revêtement, Fenêtres, Isolation, Électricité, Plomberie, CVAC, Finition, Cuisine, Salle de bain)
+8. Applique les prix du marché Québec 2025
+9. ${hasManualContext ? 'PERSONNALISE l\'estimation selon les notes (ex: si le client mentionne "plancher chauffant", inclus-le dans Plomberie)' : ''}
 
 Retourne le JSON structuré COMPLET avec TOUTES les catégories.`;
     } else {
@@ -1890,7 +1939,12 @@ ${foundationSqft ? `- FONDATION: ${foundationSqft} pi²` : ''}
 ${floorSqftDetails?.length ? `- DÉTAIL ÉTAGES: ${floorSqftDetails.join(', ')} pi²` : ''}
 - GARAGE: ${hasGarage ? 'Oui (attaché)' : 'Non'}
 - QUALITÉ: ${qualityDescriptions[finishQuality] || qualityDescriptions["standard"]}
-${additionalNotes ? `- NOTES CLIENT: ${additionalNotes}` : ''}
+${additionalNotes ? `
+## NOTES ET SPÉCIFICATIONS DU CLIENT
+${additionalNotes}
+
+IMPORTANT: Personnalise l'estimation selon ces notes (matériaux, équipements spécifiques, etc.)
+` : ''}
 ${isAgrandissement ? `
 INSTRUCTION CRITIQUE - AGRANDISSEMENT:
 - Ce projet est un AGRANDISSEMENT. La superficie indiquée est celle de l'extension UNIQUEMENT.
@@ -1902,6 +1956,7 @@ INSTRUCTIONS CRITIQUES:
 2. Utilise les prix du MILIEU de la fourchette pour la qualité sélectionnée
 3. Inclus matériaux ET main-d'œuvre pour chaque catégorie
 4. Calcule contingence 5% + TPS 5% + TVQ 9.975%
+5. ${additionalNotes ? 'PERSONNALISE selon les notes client (ex: thermopompe, plancher chauffant, balcon, etc.)' : ''}
 
 Retourne le JSON structuré COMPLET.`;
     }
@@ -1929,6 +1984,7 @@ Retourne le JSON structuré COMPLET.`;
           continue;
         }
 
+        const manualContext = body.manualContext || {};
         const pageText = await analyzeOnePageWithClaude({
           apiKey: anthropicKey,
           imageBase64: img.base64,
@@ -1936,8 +1992,9 @@ Retourne le JSON structuré COMPLET.`;
           finishQualityLabel,
           pageNumber: i + 1,
           totalPages: imageUrls.length,
-          additionalNotes: body.additionalNotes,
-          projectType: body.projectType,
+          additionalNotes: manualContext.additionalNotes || body.additionalNotes,
+          projectType: manualContext.projectType || body.projectType,
+          manualContext: manualContext,
         });
 
         const parsed = pageText ? safeParseJsonFromModel(pageText) : null;
@@ -1961,8 +2018,12 @@ Retourne le JSON structuré COMPLET.`;
       }
 
       const merged = mergePageExtractions(pageExtractions);
-      const sqftFallback = Number(body.squareFootage) || 0;
+      // Use manual context as fallback for values not extracted from plans
+      const manualCtx = body.manualContext || {};
+      const sqftFallback = Number(manualCtx.squareFootage) || Number(body.squareFootage) || 0;
       const sqft = merged.superficie || sqftFallback;
+      const etagesFallback = Number(manualCtx.numberOfFloors) || 1;
+      const etages = merged.etages || etagesFallback;
 
       const completed = ensureAllMainCategoriesAndRecalc({
         mergedCategories: merged.categories,
@@ -1970,14 +2031,15 @@ Retourne le JSON structuré COMPLET.`;
         finishQuality,
       });
 
-      // Generate descriptive project summary based on analysis (not user notes)
-      const typeProjetDisplay = merged.typeProjet
+      // Generate descriptive project summary based on analysis + manual context
+      const typeProjetDisplay = (merged.typeProjet || manualCtx.projectType || 'Construction neuve')
         .replace('_', ' ')
         .toLowerCase()
         .replace(/^\w/, (c: string) => c.toUpperCase());
       
       const plansCount = imageUrls.length - skipped;
-      const resumeProjet = `Analyse de ${plansCount} plan(s) - ${typeProjetDisplay} de ${sqft} pi² sur ${merged.etages} étage(s)`;
+      const hasManualNotes = manualCtx.additionalNotes ? ' (avec spécifications client)' : '';
+      const resumeProjet = `Analyse de ${plansCount} plan(s) - ${typeProjetDisplay} de ${sqft} pi² sur ${etages} étage(s)${hasManualNotes}`;
 
       const budgetData = {
         extraction: {
