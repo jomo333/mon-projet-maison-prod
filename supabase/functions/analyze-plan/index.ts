@@ -98,6 +98,78 @@ const PRIX_QUEBEC_2025 = {
     "dynamitage_roc_forfait_max": 10000.00,
     "majoration_hiver_pourcent": 40, // 30-50% moyenne
   },
+  fenetres_portes: {
+    // === FENÊTRES PAR TYPE ET DIMENSION ===
+    // PVC Standard (blanc/blanc)
+    "fenetre_pvc_coulissante_petit_pi2": 25.00, // < 15 pi²
+    "fenetre_pvc_coulissante_moyen_pi2": 22.00, // 15-25 pi²
+    "fenetre_pvc_coulissante_grand_pi2": 20.00, // > 25 pi²
+    "fenetre_pvc_battant_petit_pi2": 35.00, // < 10 pi²
+    "fenetre_pvc_battant_moyen_pi2": 30.00, // 10-20 pi²
+    "fenetre_pvc_battant_grand_pi2": 28.00, // > 20 pi²
+    // Hybride (aluminium ext/PVC int) - Premium
+    "fenetre_hybride_battant_petit_pi2": 55.00, // < 10 pi²
+    "fenetre_hybride_battant_moyen_pi2": 50.00, // 10-20 pi²
+    "fenetre_hybride_battant_grand_pi2": 45.00, // > 20 pi²
+    "fenetre_hybride_auvent_pi2": 60.00,
+    // Aluminium pur (commercial/moderne)
+    "fenetre_aluminium_fixe_pi2": 40.00,
+    "fenetre_aluminium_coulissante_pi2": 45.00,
+    
+    // === OPTIONS DE VITRAGE ===
+    "vitrage_double_lowE_argon_base": 0.00, // Inclus dans prix de base
+    "vitrage_triple_lowE_argon_majoration_pourcent": 25, // +25%
+    "vitrage_triple_krypton_majoration_pourcent": 40, // +40%
+    
+    // === OPTIONS COULEUR ===
+    "couleur_blanc_blanc_base": 0.00, // Standard
+    "couleur_noir_blanc_majoration": 150.00, // Par fenêtre
+    "couleur_bronze_blanc_majoration": 175.00,
+    "couleur_custom_majoration": 250.00,
+    
+    // === CARRELAGE / GRILLES DÉCORATIVES ===
+    "carrelage_colonial_par_fenetre": 75.00,
+    "carrelage_rectangulaire_par_fenetre": 100.00,
+    "separateur_integre_par_fenetre": 125.00,
+    
+    // === CERTIFICATIONS ===
+    "certification_energy_star_inclus": true,
+    "sortie_urgence_egress_majoration": 50.00,
+    
+    // === PORTES EXTÉRIEURES ===
+    "porte_simple_acier_base": 800.00,
+    "porte_simple_fibre_verre": 1200.00,
+    "porte_simple_bois_massif": 2500.00,
+    "porte_double_acier": 1800.00,
+    "porte_double_fibre_verre": 2800.00,
+    "porte_patio_coulissante_6pi": 1500.00,
+    "porte_patio_coulissante_8pi": 2200.00,
+    "porte_patio_francaise": 3500.00,
+    "porte_garage_simple_9x7": 1200.00,
+    "porte_garage_double_16x7": 2000.00,
+    "porte_garage_isolee_majoration": 400.00,
+    
+    // === OPTIONS PORTES ===
+    "insertion_verre_demi_vitre": 350.00,
+    "insertion_verre_pleine_vitre": 600.00,
+    "cadrage_aluminium_contemporain": 200.00,
+    "seuil_ajustable_premium": 150.00,
+    "quincaillerie_nickel_satine": 100.00,
+    "quincaillerie_noir_mat": 125.00,
+    
+    // === PORTES INTÉRIEURES ===
+    "porte_interieure_creuse": 150.00,
+    "porte_interieure_ame_pleine": 250.00,
+    "porte_interieure_mdf_moulure": 300.00,
+    "porte_francaise_interieure": 450.00,
+    "porte_coulissante_grange": 600.00,
+    "cadrage_porte_interieure": 75.00,
+    
+    // === INSTALLATION ===
+    "installation_fenetre_par_unite": 150.00,
+    "installation_porte_exterieure": 300.00,
+    "installation_porte_interieure": 100.00,
+  },
   taux_CCQ_2025: {
     charpentier_menuisier: 48.50,
     electricien: 52.00,
@@ -107,7 +179,8 @@ const PRIX_QUEBEC_2025 = {
     briqueteur_macon: 49.00,
     platrier: 46.00,
     peintre: 42.00,
-    operateur_pelle: 55.00, // Ajouté pour excavation
+    operateur_pelle: 55.00,
+    vitrier_installateur: 45.00,
   }
 };
 
@@ -132,7 +205,14 @@ Tu DOIS produire des estimations pour CHAQUE catégorie suivante, même si les p
 3. **Structure** - Charpente, solives, colombages, poutres, poutrelles
 4. **Toiture** - Fermes de toit, couverture, bardeaux, soffites, fascias
 5. **Revêtement extérieur** - Parement, briques, pierre, vinyle
-6. **Fenêtres et portes** - Toutes fenêtres, portes extérieures, portes intérieures
+6. **Fenêtres et portes** - DÉTAILLER chaque élément avec:
+   - Dimensions exactes (largeur x hauteur en pouces)
+   - Type de cadre: PVC, Hybride (alu/PVC), Aluminium
+   - Type d'ouverture: Coulissante, Battant, Auvent, Fixe
+   - Couleur ext/int (ex: Noir/Blanc, Blanc/Blanc)
+   - Vitrage: Double/Triple, Low-E, Argon/Krypton
+   - Options: Carrelage, séparateurs, certifications EnergyStar
+   - Portes: Type, matériau, insertions verre, quincaillerie
 7. **Isolation et pare-air** - Isolation murs, plafonds, pare-vapeur, Tyvek
 8. **Électricité** - Panneau, filage, prises, interrupteurs, luminaires
 9. **Plomberie** - Tuyauterie, drains, robinetterie, chauffe-eau
@@ -262,7 +342,107 @@ Tu DOIS produire des estimations pour CHAQUE catégorie suivante, même si les p
 - Surface toiture ≈ Superficie au sol x 1.15 (pente standard) à x 1.4 (forte pente)
 - Coût = Surface toiture x prix/pi² selon type de revêtement
 
+## COÛTS FENÊTRES ET PORTES QUÉBEC 2025 (référence détaillée)
+
+### FENÊTRES - Prix par pi² selon type et dimensions
+
+| Type de fenêtre | Petite (<15pi²) | Moyenne (15-25pi²) | Grande (>25pi²) |
+|-----------------|-----------------|--------------------|-----------------| 
+| PVC Coulissante (blanc) | 25$/pi² | 22$/pi² | 20$/pi² |
+| PVC Battant (blanc) | 35$/pi² | 30$/pi² | 28$/pi² |
+| Hybride Battant (alu/PVC) | 55$/pi² | 50$/pi² | 45$/pi² |
+| Hybride Auvent | 60$/pi² | 55$/pi² | 50$/pi² |
+| Aluminium Fixe | 40$/pi² | 38$/pi² | 35$/pi² |
+
+### OPTIONS DE VITRAGE
+
+| Type de vitrage | Coût additionnel |
+|-----------------|------------------|
+| Double Low-E Argon | Inclus (standard) |
+| Triple Low-E Argon | +25% du prix fenêtre |
+| Triple Low-E Krypton | +40% du prix fenêtre |
+
+### OPTIONS COULEUR (majoration par fenêtre)
+
+| Couleur Ext/Int | Majoration |
+|-----------------|------------|
+| Blanc/Blanc | Inclus |
+| Noir/Blanc | +150$/fenêtre |
+| Bronze/Blanc | +175$/fenêtre |
+| Couleur custom | +250$/fenêtre |
+
+### CARRELAGE ET GRILLES DÉCORATIVES
+
+| Type | Prix par fenêtre |
+|------|------------------|
+| Carrelage colonial | +75$ |
+| Carrelage rectangulaire | +100$ |
+| Séparateur intégré (1") | +125$ |
+
+### PORTES EXTÉRIEURES
+
+| Type de porte | Prix unitaire |
+|---------------|---------------|
+| Simple acier isolée | 800$ - 1200$ |
+| Simple fibre de verre | 1200$ - 1800$ |
+| Simple bois massif | 2500$ - 4000$ |
+| Double (porte-fenêtre) acier | 1800$ - 2500$ |
+| Double fibre de verre | 2800$ - 4000$ |
+| Patio coulissante 6' | 1500$ - 2200$ |
+| Patio coulissante 8' | 2200$ - 3200$ |
+| Patio française | 3500$ - 5000$ |
+| Garage simple 9x7 | 1200$ - 1800$ |
+| Garage double 16x7 | 2000$ - 3000$ |
+
+### OPTIONS PORTES
+
+| Option | Prix |
+|--------|------|
+| Insertion verre demi-vitrée | +350$ |
+| Insertion verre pleine vitre | +600$ |
+| Cadrage aluminium contemporain | +200$ |
+| Quincaillerie nickel satiné | +100$ |
+| Quincaillerie noir mat | +125$ |
+
+### PORTES INTÉRIEURES
+
+| Type | Prix par porte (avec cadrage) |
+|------|-------------------------------|
+| Creuse standard | 150$ - 225$ |
+| Âme pleine | 250$ - 350$ |
+| MDF avec moulures | 300$ - 450$ |
+| Française vitrée | 450$ - 700$ |
+| Coulissante grange | 600$ - 1000$ |
+
+### INSTALLATION (main-d'œuvre)
+
+| Élément | Coût installation |
+|---------|-------------------|
+| Fenêtre standard | 150$/unité |
+| Grande fenêtre/baie | 250$/unité |
+| Porte extérieure | 300$/unité |
+| Porte intérieure | 100$/unité |
+
+### CALCUL DÉTAILLÉ FENÊTRES ET PORTES
+
+Pour chaque fenêtre identifiée sur les plans:
+1. Calculer la superficie: Largeur (po) x Hauteur (po) / 144 = pi²
+2. Identifier le type: PVC, Hybride, Aluminium
+3. Identifier l'ouverture: Coulissante, Battant, Auvent, Fixe
+4. Appliquer le prix/pi² correspondant
+5. Ajouter majorations: couleur, vitrage, carrelage
+6. Ajouter coût installation
+
+**Exemple**: Fenêtre hybride battant 60"x36" noir/blanc avec carrelage
+- Superficie: 60 x 36 / 144 = 15 pi²
+- Prix base: 15 pi² x 50$/pi² = 750$
+- Majoration noir/blanc: +150$
+- Carrelage: +100$
+- Installation: +150$
+- **Total: 1150$**
+
 ## PRIX DÉTAILLÉS PAR CATÉGORIE AUTOCONSTRUCTION QUÉBEC 2025 (par pi² de superficie habitable PAR ÉTAGE)
+
 
 
 | Catégorie | Économique | Standard | Haut de gamme |
