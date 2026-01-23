@@ -35,6 +35,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePdfToImage } from "@/hooks/use-pdf-to-image";
 import { mapAnalysisToStepCategories } from "@/lib/budgetCategories";
+import { compressImageFileToJpeg } from "@/lib/imageCompression";
 
 interface BudgetCategory {
   name: string;
@@ -378,7 +379,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
           type: blob.type || "application/pdf",
         });
 
-        const { images, pageCount } = await convertPdfToImages(pdfFile, { scale: 2, maxPages: 20 });
+        const { images, pageCount } = await convertPdfToImages(pdfFile, { scale: 1.6, maxPages: 20 });
 
         if (pageCount > 20) {
           toast.warning(`Le PDF contient ${pageCount} pages. Seules les 20 premières ont été converties.`);
@@ -386,8 +387,8 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
 
         for (let i = 0; i < images.length; i++) {
           const imageBlob = images[i];
-          const imageName = `${pdfFile.name.replace(/\.pdf$/i, "")}_page_${i + 1}.png`;
-          const imageFile = new File([imageBlob], imageName, { type: "image/png" });
+          const imageName = `${pdfFile.name.replace(/\.pdf$/i, "")}_page_${i + 1}.jpg`;
+          const imageFile = new File([imageBlob], imageName, { type: "image/jpeg" });
           await uploadMutation.mutateAsync(imageFile);
         }
 
@@ -468,7 +469,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
         // Check if it's a PDF and needs conversion
         if (isPdf(file)) {
           toast.info("Conversion du PDF en images...");
-          const { images, pageCount } = await convertPdfToImages(file, { scale: 2, maxPages: 20 });
+          const { images, pageCount } = await convertPdfToImages(file, { scale: 1.6, maxPages: 20 });
           
           if (pageCount > 20) {
             toast.warning(`Le PDF contient ${pageCount} pages. Seules les 20 premières ont été converties.`);
@@ -477,14 +478,16 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
           // Upload each converted image
           for (let i = 0; i < images.length; i++) {
             const imageBlob = images[i];
-            const imageName = `${file.name.replace('.pdf', '')}_page_${i + 1}.png`;
-            const imageFile = new File([imageBlob], imageName, { type: "image/png" });
+            const imageName = `${file.name.replace('.pdf', '')}_page_${i + 1}.jpg`;
+            const imageFile = new File([imageBlob], imageName, { type: "image/jpeg" });
             await uploadMutation.mutateAsync(imageFile);
           }
           
           toast.success(`PDF converti en ${images.length} image(s) avec succès!`);
         } else {
-          await uploadMutation.mutateAsync(file);
+          const shouldCompress = file.type.startsWith("image/") && file.type !== "image/svg+xml";
+          const toUpload = shouldCompress ? await compressImageFileToJpeg(file) : file;
+          await uploadMutation.mutateAsync(toUpload);
         }
       }
     } catch (error) {

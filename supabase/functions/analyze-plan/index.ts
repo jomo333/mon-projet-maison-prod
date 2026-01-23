@@ -2210,7 +2210,8 @@ Retourne le JSON structuré COMPLET.`;
       
       console.log(`Processing ${imagesToProcess.length} image...`);
 
-      const maxBytesPerImage = 1_500_000; // ~1.5MB to stay safe and reduce CPU usage
+      // Accept slightly larger images; frontend now compresses to JPEG, but older stored files can be bigger.
+      const maxBytesPerImage = 6_000_000; // ~6MB
       const pageExtractions: PageExtraction[] = [];
       let skipped = 0;
 
