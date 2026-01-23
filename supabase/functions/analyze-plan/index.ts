@@ -314,6 +314,36 @@ const PRIX_QUEBEC_2025 = {
     "gypse_1000pi2_total_min": 2730.00,
     "gypse_1000pi2_total_max": 3348.00,
   },
+  revetements_sol: {
+    // === BOIS FRANC ET INGÉNIERIE ===
+    "bois_ingenierie_pi2_min": 7.25,
+    "bois_ingenierie_pi2_max": 13.25,
+    "bois_massif_pi2_min": 9.00,
+    "bois_massif_pi2_max": 18.00,
+    // === VINYLE / LVP ===
+    "vinyle_standard_pi2_min": 3.00,
+    "vinyle_standard_pi2_max": 5.00,
+    // === PLANCHER FLOTTANT / STRATIFIÉ ===
+    "stratifie_flottant_pi2_min": 2.75,
+    "stratifie_flottant_pi2_max": 5.25,
+    // === CARRELAGE / CÉRAMIQUE ===
+    "ceramique_porcelaine_pi2_min": 4.00,
+    "ceramique_porcelaine_pi2_max": 20.00,
+    "pierre_naturelle_pi2_min": 20.00,
+    "pierre_naturelle_pi2_max": 50.00,
+    // === MOQUETTE / TAPIS ===
+    "moquette_pi2_min": 3.00,
+    "moquette_pi2_max": 6.00,
+    "moquette_installation_pi2": 1.00,
+    // === BÉTON INTÉRIEUR ===
+    "beton_poli_pi2_min": 3.75,
+    "beton_poli_pi2_max": 15.00,
+    "beton_estampe_pi2_min": 14.50,
+    "beton_estampe_pi2_max": 29.00,
+    // === ACCESSOIRES ===
+    "accessoires_plinthes_transitions_pi2_min": 0.50,
+    "accessoires_plinthes_transitions_pi2_max": 1.50,
+  },
   taux_CCQ_2025: {
     charpentier_menuisier: 48.50,
     electricien: 52.00,
@@ -325,6 +355,8 @@ const PRIX_QUEBEC_2025 = {
     peintre: 42.00,
     operateur_pelle: 55.00,
     vitrier_installateur: 45.00,
+    poseur_plancher: 44.00,
+    carreleur: 47.00,
   }
 };
 
@@ -919,6 +951,84 @@ Pour chaque fenêtre identifiée sur les plans:
 |--------|---------------|
 | Plâtrier | 46$/heure |
 | Peintre | 42$/heure |
+
+## COÛTS REVÊTEMENTS DE SOL QUÉBEC 2025 (référence détaillée)
+
+### TYPES DE REVÊTEMENTS (matériaux + installation)
+
+| Type de revêtement | Coût au pi² installé |
+|--------------------|---------------------|
+| **Plancher flottant / stratifié** | 2,75$ à 5,25$ |
+| **Vinyle standard (LVP)** | 3$ à 5$ |
+| **Moquette résidentielle** | 3$ à 6$ + 1$ pose |
+| **Carrelage céramique / porcelaine** | 4$ à 20$+ |
+| **Bois d'ingénierie** | 7,25$ à 13,25$ |
+| **Bois massif (hardwood)** | 9$ à 18$ |
+| **Béton poli** | 3,75$ à 15$ |
+| **Béton estampé** | 14,50$ à 29$ |
+| **Pierre naturelle** | 20$ à 50$+ |
+
+### DÉTAILS PAR TYPE
+
+**🪵 Bois franc / Bois d'ingénierie**
+- Bois d'ingénierie (engineered) : 7,25$ à 13,25$/pi²
+- Bois massif : 9$ à 18$/pi²
+- Charme élevé, idéal pour salons et chambres
+
+**💠 Vinyle (PVC / LVP)**
+- Standard : 3$ à 5$/pi²
+- Résistant à l'eau, facile d'entretien
+- Populaire pour cuisines et salons
+
+**🪵 Plancher flottant / Stratifié (laminé)**
+- Budget : 2,75$ à 5,25$/pi²
+- Option économique imitant bois ou pierre
+
+**🧱 Carrelage / Céramique**
+- Céramique / porcelaine : 4$ à 20$/pi²
+- Pierre naturelle : 20$ à 50$+/pi²
+- Idéal salles de bain, entrées, cuisines
+
+**🪶 Moquette (tapis)**
+- Matériaux : 3$ à 6$/pi²
+- Installation : 0,60$ à 1,50$/pi²
+- Confortable, isolante, idéale pour chambres
+
+**🧱 Béton intérieur**
+- Béton poli : 3,75$ à 15$/pi²
+- Béton estampé : 14,50$ à 29$/pi²
+- Moderne et durable, sous-sol ou rez-de-chaussée
+
+### ACCESSOIRES ET PRÉPARATION
+
+| Poste | Coût additionnel |
+|-------|-----------------|
+| Plinthes, transitions, sous-couche | 0,50$ à 1,50$/pi² |
+| Préparation sous-plancher (nivellement) | Variable |
+| Isolation, pare-vapeur | Selon besoins |
+
+### EXEMPLES PAR SUPERFICIE
+
+| Superficie | Vinyle (éco) | Bois ingénierie (standard) | Céramique (moyen) |
+|------------|--------------|----------------------------|-------------------|
+| 1 000 pi² | 3 000$ - 5 000$ | 7 250$ - 13 250$ | 8 000$ - 15 000$ |
+| 1 500 pi² | 4 500$ - 7 500$ | 10 875$ - 19 875$ | 12 000$ - 22 500$ |
+| 2 000 pi² | 6 000$ - 10 000$ | 14 500$ - 26 500$ | 16 000$ - 30 000$ |
+
+### FACTEURS INFLUENÇANT LES COÛTS DES PLANCHERS
+
+- **Surface à couvrir** : Inclure halls, escaliers, placards
+- **Préparation** : Nivellement, isolation, pare-vapeur
+- **Complexité** : Découpes, motifs, transitions entre pièces
+- **Accessibilité** : Étage, sous-sol, escaliers
+- **Qualité des matériaux** : Budget vs haut de gamme
+
+### MAIN-D'ŒUVRE PLANCHERS
+
+| Métier | Taux CCQ 2025 |
+|--------|---------------|
+| Poseur de plancher | 44$/heure |
+| Carreleur | 47$/heure |
 
 ## PRIX DÉTAILLÉS PAR CATÉGORIE AUTOCONSTRUCTION QUÉBEC 2025 (par pi² de superficie habitable PAR ÉTAGE)
 
