@@ -437,6 +437,18 @@ const SYSTEM_PROMPT_EXTRACTION = `Tu es un ESTIMATEUR PROFESSIONNEL QUÉBÉCOIS 
 
 MISSION: Analyser TOUS les plans de construction fournis simultanément pour produire une estimation COMPLÈTE pour un projet d'AUTOCONSTRUCTION (owner-builder, sans entrepreneur général).
 
+## ⚠️ LECTURE CRITIQUE DES PLANS - TRÈS IMPORTANT
+
+Tu DOIS lire ATTENTIVEMENT:
+1. **TOUTES LES NOTES ÉCRITES** sur chaque plan - annotations, dimensions, spécifications techniques, légendes
+2. **Les tableaux de fenêtres/portes** avec dimensions exactes, types et quantités
+3. **Les coupes et élévations** pour comprendre les hauteurs et détails de construction
+4. **Les notes de construction** indiquant les matériaux, épaisseurs, types d'isolation
+5. **Les cotes et dimensions** pour calculer les périmètres et superficies EXACTES
+6. **Les indications "nouveau"/"existant"** ou lignes pointillées montrant ce qui est à construire vs. ce qui existe déjà
+
+NE TE FIE PAS SEULEMENT À L'IMAGE - LIS CHAQUE MOT, CHAQUE NOTE, CHAQUE DIMENSION INSCRITE SUR LES PLANS.
+
 ## CONTEXTE AUTOCONSTRUCTION
 
 Cette estimation est pour un autoconstructeur qui:
@@ -445,15 +457,24 @@ Cette estimation est pour un autoconstructeur qui:
 - Peut réaliser certaines tâches lui-même (finitions, peinture, etc.)
 - Économise les marges de profit d'un entrepreneur général
 
+## CALCULS BASÉS SUR LE PÉRIMÈTRE (PIED LINÉAIRE)
+
+Pour les fondations et structures, calcule en utilisant le PÉRIMÈTRE du projet:
+- **Semelles**: Périmètre x profondeur x prix/pi linéaire (10$-15$/pi lin)
+- **Murs de fondation**: Périmètre x hauteur x épaisseur = volume béton
+- **Structure murale**: Périmètre x hauteur = superficie murs extérieurs
+
+Formule clé: Périmètre (pi lin) = 2 x (longueur + largeur) du bâtiment
+
 ## EXTRACTION REQUISE - TOUTES LES CATÉGORIES
 
 Tu DOIS produire des estimations pour CHAQUE catégorie suivante, même si les plans ne montrent pas tous les détails:
 
-1. **Excavation** - Creusage, excavation du sol, nivellement, disposition de la terre, gestion des eaux souterraines
-2. **Fondation** - Semelles, murs de fondation, dalle de béton, imperméabilisation
-3. **Structure** - Charpente, solives, colombages, poutres, poutrelles
+1. **Excavation** - Creusage selon PÉRIMÈTRE + profondeur, nivellement, disposition terre
+2. **Fondation** - Semelles (périmètre x prix/pi lin), murs (périmètre x hauteur), dalle
+3. **Structure** - Charpente basée sur périmètre des murs + solives pour superficie
 4. **Toiture** - Fermes de toit, couverture, bardeaux, soffites, fascias
-5. **Revêtement extérieur** - Parement, briques, pierre, vinyle
+5. **Revêtement extérieur** - Parement calculé selon périmètre x hauteur des murs
 6. **Fenêtres et portes** - DÉTAILLER chaque élément avec:
    - Dimensions exactes (largeur x hauteur en pouces)
    - Type de cadre: PVC, Hybride (alu/PVC), Aluminium
@@ -462,7 +483,7 @@ Tu DOIS produire des estimations pour CHAQUE catégorie suivante, même si les p
    - Vitrage: Double/Triple, Low-E, Argon/Krypton
    - Options: Carrelage, séparateurs, certifications EnergyStar
    - Portes: Type, matériau, insertions verre, quincaillerie
-7. **Isolation et pare-air** - Isolation murs, plafonds, pare-vapeur, Tyvek
+7. **Isolation et pare-air** - Isolation murs (périmètre x hauteur), plafonds, pare-vapeur
 8. **Électricité** - Panneau, filage, prises, interrupteurs, luminaires
 9. **Plomberie** - Tuyauterie, drains, robinetterie, chauffe-eau
 10. **Chauffage/CVAC** - Système de chauffage, ventilation, climatisation
@@ -473,6 +494,8 @@ Tu DOIS produire des estimations pour CHAQUE catégorie suivante, même si les p
 ## RÈGLES CRITIQUES
 
 - Analyse TOUTES les pages/images fournies ENSEMBLE
+- **LIS TOUTES LES NOTES ET ANNOTATIONS** sur chaque plan - elles contiennent des informations cruciales
+- Calcule le PÉRIMÈTRE en pieds linéaires pour fondations, structure et murs
 - Pour les éléments non visibles sur les plans, ESTIME en fonction de la superficie et du type de projet
 - Utilise les prix du marché Québec 2025 pour AUTOCONSTRUCTION
 - Ratio main-d'œuvre/matériaux: 35-50% selon le type de travail
@@ -1479,12 +1502,39 @@ async function analyzeOnePageWithClaude({
   const isAgrandissement = effectiveProjectType.toLowerCase().includes('agrandissement');
   const agrandissementInstruction = isAgrandissement 
     ? `
-INSTRUCTION CRITIQUE - AGRANDISSEMENT:
-- Ce projet est un AGRANDISSEMENT (extension). 
-- IGNORE COMPLÈTEMENT le bâtiment existant sur les plans.
-- Analyse et estime UNIQUEMENT la partie NOUVELLE de la construction (l'extension).
-- Ne prends PAS en compte les dimensions, superficies ou éléments de la maison existante.
-- La "superficie_nouvelle_pi2" doit correspondre UNIQUEMENT à la superficie de l'agrandissement.
+## ⚠️ INSTRUCTION CRITIQUE - AGRANDISSEMENT (EXTENSION)
+
+Ce projet est un **AGRANDISSEMENT** (extension d'un bâtiment existant).
+
+### CE QUE TU DOIS FAIRE:
+1. **Identifier visuellement** sur les plans ce qui est NOUVEAU vs. EXISTANT:
+   - Lignes pointillées = généralement existant
+   - Lignes pleines avec annotations "nouveau" ou "proposé" = à construire
+   - Zones hachurées ou colorées différemment = souvent l'extension
+   - Notes indiquant "existant", "à démolir", "nouveau"
+
+2. **Calculer UNIQUEMENT pour la partie NOUVELLE**:
+   - Périmètre de l'agrandissement (pas de la maison complète)
+   - Superficie de l'extension seulement
+   - Fondations pour la nouvelle partie uniquement
+   - Nouveaux murs, fenêtres, portes ajoutés
+
+3. **IGNORER COMPLÈTEMENT**:
+   - Les dimensions du bâtiment existant
+   - Les pièces existantes qui ne sont pas modifiées
+   - Les éléments structuraux existants qui restent en place
+
+4. **Éléments spécifiques aux agrandissements**:
+   - Jonction entre l'existant et le nouveau (travaux de raccordement)
+   - Ouvertures dans les murs existants
+   - Raccordements électrique/plomberie à l'existant
+
+### EXEMPLE:
+Si le plan montre une maison de 1500 pi² avec un agrandissement de 400 pi²:
+- "superficie_nouvelle_pi2" = 400 (PAS 1900)
+- Le périmètre pour les fondations = périmètre de l'extension seulement (moins le mur mitoyen)
+
+LIS ATTENTIVEMENT TOUTES LES NOTES sur les plans qui indiquent ce qui est nouveau!
 ` 
     : '';
 
@@ -1506,21 +1556,36 @@ ${manualContext.additionalNotes}
 
   const pagePrompt = `Tu analyses la PAGE ${pageNumber}/${totalPages} d'un ensemble de plans de construction au Québec.
 
+## ⚠️ LECTURE OBLIGATOIRE - TRÈS IMPORTANT
+
+AVANT d'analyser les dimensions, tu DOIS:
+1. **LIRE TOUTES LES NOTES ÉCRITES** sur ce plan - chaque annotation, légende, spécification
+2. **Identifier les tableaux** de fenêtres/portes avec dimensions et types
+3. **Repérer les indications** "existant"/"nouveau"/"proposé" si c'est un agrandissement
+4. **Extraire les cotes** exactes pour calculer le périmètre (pied linéaire)
+5. **Chercher les dimensions** du bâtiment pour calculer: Périmètre = 2 x (longueur + largeur)
+
+Ne te fie PAS seulement à l'aspect visuel - LIS CHAQUE MOT inscrit sur le plan.
+
 QUALITÉ DE FINITION: ${finishQualityLabel}
 ${additionalNotes ? `NOTES CLIENT: ${additionalNotes}` : ''}
 ${contextSection}
 ${agrandissementInstruction}
-OBJECTIF:
-- Extraire UNIQUEMENT ce qui est visible sur cette page (dimensions, quantités, matériaux).
+
+## OBJECTIF
+
+- Extraire UNIQUEMENT ce qui est visible sur cette page (dimensions, quantités, matériaux)
+- **CALCULER LE PÉRIMÈTRE** en pieds linéaires pour les fondations et murs
 ${isAgrandissement ? '- Pour un AGRANDISSEMENT, extrais SEULEMENT les éléments de la partie NOUVELLE (extension), pas le bâtiment existant.' : ''}
-${hasManualContext ? '- PERSONNALISE les estimations selon les spécifications client (ex: si mentionné "plancher chauffant", inclus-le).' : ''}
-- Si une catégorie n'est pas visible sur cette page, ne l\'invente pas.
+${hasManualContext ? '- PERSONNALISE les estimations selon les spécifications client.' : ''}
+- Si une catégorie n'est pas visible sur cette page, ne l\'invente pas
 - Retourne du JSON STRICT (sans texte autour), au format suivant:
 
 {
   "extraction": {
     "type_projet": "CONSTRUCTION_NEUVE | AGRANDISSEMENT | RENOVATION | GARAGE | GARAGE_AVEC_ETAGE",
     "superficie_nouvelle_pi2": number,
+    "perimetre_pi_lineaire": number,
     "nombre_etages": number,
     "plans_analyses": 1,
     "categories": [
