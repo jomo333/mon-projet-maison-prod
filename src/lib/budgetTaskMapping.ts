@@ -327,3 +327,13 @@ export function groupItemsByTask(
 
   return grouped;
 }
+
+/**
+ * Get the list of task titles for a given category name.
+ * Returns an empty array if the category has no defined tasks.
+ */
+export function getTasksForCategory(categoryName: string): string[] {
+  const mappings = categoryTaskMappings[categoryName];
+  if (!mappings) return [];
+  return mappings.map((m) => m.taskTitle);
+}

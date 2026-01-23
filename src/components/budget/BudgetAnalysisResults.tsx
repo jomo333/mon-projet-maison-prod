@@ -37,7 +37,8 @@ import {
   PieChart,
   BarChart3,
   AlertCircle,
-  Info
+  Info,
+  Wrench
 } from "lucide-react";
 import {
   PieChart as RechartsPieChart,
@@ -52,6 +53,7 @@ import {
   Legend,
 } from "recharts";
 import { cn } from "@/lib/utils";
+import { groupItemsByTask, getTasksForCategory } from "@/lib/budgetTaskMapping";
 
 interface BudgetItem {
   name: string;
@@ -511,64 +513,90 @@ export function BudgetAnalysisResults({
                   </div>
                   
                   {isExpanded && cat.items.length > 0 && (
-                    <div className="border-t">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Item</TableHead>
-                            <TableHead className="text-right">Quantité</TableHead>
-                            <TableHead className="text-right">Unité</TableHead>
-                            <TableHead className="text-right">Coût</TableHead>
-                            {onAdjustPrice && <TableHead className="w-[60px]"></TableHead>}
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {cat.items.map((item, itemIndex) => (
-                            <TableRow key={itemIndex}>
-                              <TableCell className="max-w-[300px]">
-                                <span className="line-clamp-2">{item.name}</span>
-                              </TableCell>
-                              <TableCell className="text-right">{item.quantity}</TableCell>
-                              <TableCell className="text-right">{item.unit}</TableCell>
-                              <TableCell className="text-right">
-                                {editingItem?.catIndex === catIndex && editingItem?.itemIndex === itemIndex ? (
-                                  <div className="flex items-center gap-2 justify-end">
-                                    <Input
-                                      type="number"
-                                      value={editPrice}
-                                      onChange={(e) => setEditPrice(e.target.value)}
-                                      className="w-24 h-8"
-                                      autoFocus
-                                    />
-                                    <Button size="sm" variant="ghost" onClick={saveEdit}>
-                                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                                    </Button>
-                                    <Button size="sm" variant="ghost" onClick={cancelEdit}>
-                                      <X className="h-4 w-4 text-red-600" />
-                                    </Button>
+                    <div className="border-t p-4 space-y-4 bg-muted/30">
+                      {(() => {
+                        const groupedByTask = groupItemsByTask(cat.name, cat.items);
+                        const taskEntries = Array.from(groupedByTask.entries());
+
+                        if (taskEntries.length === 0) {
+                          return (
+                            <p className="text-sm text-muted-foreground italic">
+                              Aucun élément détaillé pour cette catégorie.
+                            </p>
+                          );
+                        }
+
+                        return taskEntries.map(([taskTitle, taskItems]) => (
+                          <div key={taskTitle} className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Wrench className="h-4 w-4 text-primary" />
+                              <span className="font-medium text-sm">{taskTitle}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {taskItems.length} élément{taskItems.length > 1 ? 's' : ''}
+                              </Badge>
+                            </div>
+                            <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
+                              <div className="col-span-5">Élément</div>
+                              <div className="col-span-3 text-center">Quantité</div>
+                              <div className="col-span-4 text-right">Coût</div>
+                            </div>
+                            {taskItems.map((item, itemIndex) => {
+                              const originalItemIndex = cat.items.findIndex(
+                                (i) => i.name === item.name && i.cost === item.cost
+                              );
+                              return (
+                                <div
+                                  key={itemIndex}
+                                  className="grid grid-cols-12 gap-2 text-sm py-1 items-center"
+                                >
+                                  <div className="col-span-5 truncate" title={item.name}>
+                                    {item.name}
                                   </div>
-                                ) : (
-                                  formatCurrency(item.cost)
-                                )}
-                              </TableCell>
-                              {onAdjustPrice && !editingItem && (
-                                <TableCell>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      startEditing(catIndex, itemIndex, item.cost);
-                                    }}
-                                  >
-                                    <Pencil className="h-4 w-4" />
-                                  </Button>
-                                </TableCell>
-                              )}
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                                  <div className="col-span-3 text-center text-muted-foreground">
+                                    {item.quantity} {item.unit}
+                                  </div>
+                                  <div className="col-span-4 text-right flex items-center justify-end gap-1">
+                                    {editingItem?.catIndex === catIndex && editingItem?.itemIndex === originalItemIndex ? (
+                                      <div className="flex items-center gap-1">
+                                        <Input
+                                          type="number"
+                                          value={editPrice}
+                                          onChange={(e) => setEditPrice(e.target.value)}
+                                          className="w-20 h-7 text-xs"
+                                          autoFocus
+                                        />
+                                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={saveEdit}>
+                                          <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                        </Button>
+                                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={cancelEdit}>
+                                          <X className="h-3 w-3 text-red-600" />
+                                        </Button>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <span className="font-medium">{formatCurrency(item.cost)}</span>
+                                        {onAdjustPrice && (
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            className="h-6 w-6 p-0"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              startEditing(catIndex, originalItemIndex, item.cost);
+                                            }}
+                                          >
+                                            <Pencil className="h-3 w-3" />
+                                          </Button>
+                                        )}
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ));
+                      })()}
                     </div>
                   )}
                 </Card>
