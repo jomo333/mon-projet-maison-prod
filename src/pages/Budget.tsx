@@ -47,6 +47,13 @@ interface BudgetCategory {
   items?: BudgetItem[];
 }
 
+type IncomingAnalysisCategory = {
+  name: string;
+  budget: number;
+  description: string;
+  items?: BudgetItem[];
+};
+
 const normalizeBudgetItemName = (name: string) => {
   // Remove plan-page suffixes that create artificial duplicates in the UI
   // e.g. "Murs de fondation (Page 2)" -> "Murs de fondation"
@@ -153,6 +160,95 @@ const buildStepTasksByCategory = (): Record<string, string[]> => {
 };
 
 const stepTasksByCategory = buildStepTasksByCategory();
+
+// Map legacy AI analysis categories (12-category model + taxes/contingence) into
+// the app's step-based budget categories so the table always updates.
+const normalizeKey = (s: unknown) =>
+  String(s || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ");
+
+const mapAnalysisToStepCategories = (
+  analysisCategories: IncomingAnalysisCategory[],
+  defaults: BudgetCategory[]
+): BudgetCategory[] => {
+  const mapped: BudgetCategory[] = defaults.map((d) => ({
+    ...d,
+    budget: 0,
+    spent: 0,
+    items: [],
+  }));
+
+  const byName = new Map(mapped.map((c) => [c.name, c] as const));
+
+  const analysisToStepMap: Record<string, string[]> = {
+    "fondation": ["Fondation"],
+    "structure": ["Structure et charpente"],
+    "toiture": ["Toiture"],
+    "revetement exterieur": ["Revêtement extérieur"],
+    "revêtement extérieur": ["Revêtement extérieur"],
+    "fenetres et portes": ["Fenêtres et portes extérieures"],
+    "fenêtres et portes": ["Fenêtres et portes extérieures"],
+    "isolation et pare-air": ["Isolation et pare-vapeur"],
+    "isolation et pare air": ["Isolation et pare-vapeur"],
+    "electricite": ["Électricité"],
+    "électricité": ["Électricité"],
+    "plomberie": ["Plomberie"],
+    "chauffage/cvac": ["Chauffage et ventilation (HVAC)"],
+    "chauffage et cvac": ["Chauffage et ventilation (HVAC)"],
+    "chauffage": ["Chauffage et ventilation (HVAC)"],
+    // Split finishes across the main finishing steps (approximation)
+    "finition interieure": ["Gypse et peinture", "Revêtements de sol", "Finitions intérieures"],
+    "finition intérieure": ["Gypse et peinture", "Revêtements de sol", "Finitions intérieures"],
+    "cuisine": ["Travaux ébénisterie (Cuisine/SDB)"],
+    "salle de bain": ["Travaux ébénisterie (Cuisine/SDB)"],
+    "salles de bain": ["Travaux ébénisterie (Cuisine/SDB)"],
+  };
+
+  let extraAmount = 0; // taxes + contingence
+
+  for (const cat of analysisCategories) {
+    const key = normalizeKey(cat.name);
+
+    if (key.includes("tax")) {
+      extraAmount += Number(cat.budget) || 0;
+      continue;
+    }
+    if (key.includes("contingence")) {
+      extraAmount += Number(cat.budget) || 0;
+      continue;
+    }
+
+    const targets = analysisToStepMap[key];
+    if (!targets || targets.length === 0) continue;
+
+    const totalBudget = Number(cat.budget) || 0;
+    const perTargetBudget = targets.length > 0 ? totalBudget / targets.length : totalBudget;
+
+    for (const targetName of targets) {
+      const target = byName.get(targetName);
+      if (!target) continue;
+      target.budget += perTargetBudget;
+      if (cat.items?.length) {
+        target.items = [...(target.items || []), ...cat.items];
+      }
+    }
+  }
+
+  // Distribute extra (taxes/contingence) proportionally so totals match without adding extra categories
+  const baseTotal = mapped.reduce((sum, c) => sum + (Number(c.budget) || 0), 0);
+  if (extraAmount > 0 && baseTotal > 0) {
+    for (const c of mapped) {
+      if ((c.budget || 0) <= 0) continue;
+      c.budget += (c.budget / baseTotal) * extraAmount;
+    }
+  }
+
+  return mapped;
+};
 
 // Build merged categories
 const buildDefaultCategories = (): BudgetCategory[] => {
@@ -349,7 +445,7 @@ const Budget = () => {
 
   // Save budget mutation
   const saveBudgetMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (categoriesToSave: BudgetCategory[]) => {
       if (!selectedProjectId || !user?.id) {
         throw new Error("Aucun projet sélectionné");
       }
@@ -361,7 +457,7 @@ const Budget = () => {
         .eq("project_id", selectedProjectId);
 
       // Insert new budget categories
-      const budgetData = budgetCategories.map(cat => ({
+      const budgetData = categoriesToSave.map(cat => ({
         project_id: selectedProjectId,
         category_name: cat.name,
         budget: cat.budget,
@@ -378,7 +474,7 @@ const Budget = () => {
       if (insertError) throw insertError;
 
       // Update project total budget
-      const totalBudget = budgetCategories.reduce((acc, cat) => acc + cat.budget, 0);
+      const totalBudget = categoriesToSave.reduce((acc, cat) => acc + cat.budget, 0);
       const { error: updateError } = await supabase
         .from("projects")
         .update({ total_budget: totalBudget, updated_at: new Date().toISOString() })
@@ -460,22 +556,14 @@ const Budget = () => {
     color: cat.color,
   }));
 
-  const handleBudgetGenerated = async (categories: { name: string; budget: number; description: string; items?: BudgetItem[] }[]) => {
-    const newCategories: BudgetCategory[] = categories.map((cat, index) => ({
-      name: cat.name,
-      budget: cat.budget,
-      spent: 0,
-      color: categoryColors[index % categoryColors.length],
-      description: cat.description,
-      items: cat.items || [],
-    }));
-    setBudgetCategories(newCategories);
+  const handleBudgetGenerated = async (categories: IncomingAnalysisCategory[]) => {
+    // Convert analysis (12 categories) -> step categories (our table)
+    const mapped = mapAnalysisToStepCategories(categories, defaultCategories);
+    setBudgetCategories(mapped);
 
     // Auto-save if a project is selected
     if (selectedProjectId) {
-      setTimeout(() => {
-        saveBudgetMutation.mutate();
-      }, 100);
+      saveBudgetMutation.mutate(mapped);
     }
   };
 
@@ -587,7 +675,7 @@ const Budget = () => {
               {selectedProjectId && (
                 <Button 
                   variant="default" 
-                  onClick={() => saveBudgetMutation.mutate()}
+                  onClick={() => saveBudgetMutation.mutate(budgetCategories)}
                   disabled={saveBudgetMutation.isPending}
                 >
                   <Save className="h-4 w-4 mr-2" />
