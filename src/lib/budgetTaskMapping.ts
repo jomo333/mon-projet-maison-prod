@@ -481,6 +481,15 @@ export const categoryTaskMappings: CategoryTaskMappings = {
 function shouldExcludeFromCategory(categoryName: string, itemName: string): boolean {
   const itemNameLower = itemName.toLowerCase();
   
+  // Global exclusions - items that should be excluded from ALL categories
+  const globalExclusions = [
+    "estimation basée sur repères", "repères québec", "estimé forfait"
+  ];
+  
+  if (globalExclusions.some((kw) => itemNameLower.includes(kw.toLowerCase()))) {
+    return true;
+  }
+  
   // Exclusion rules: items matching these keywords should NOT be in the specified category
   const exclusionRules: Record<string, string[]> = {
     "Excavation": [
