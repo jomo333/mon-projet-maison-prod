@@ -1,6 +1,6 @@
 /**
  * Mapping of keywords to task titles for grouping budget items under their corresponding guide tasks.
- * This is used to display analyzed items under the correct task heading in the budget category detail view.
+ * Task titles MUST match exactly the task.title values in src/data/constructionSteps.ts
  * 
  * The mapping is keyed by category name (or merged category name), and contains an array of
  * { taskTitle, keywords } objects. When displaying items, we check if the item name contains
@@ -15,24 +15,7 @@ export interface TaskKeywordMapping {
 export type CategoryTaskMappings = Record<string, TaskKeywordMapping[]>;
 
 export const categoryTaskMappings: CategoryTaskMappings = {
-  // FONDATION - two tasks: Coulage des fondations & Drain et remblai
-  "Fondation": [
-    {
-      taskTitle: "Coulage des fondations",
-      keywords: [
-        "semelle", "mur", "fondation", "béton", "coffrage", "coulage",
-        "imperméabilisation", "membrane", "delta", "goudron", "coffrage"
-      ],
-    },
-    {
-      taskTitle: "Drain et remblai",
-      keywords: [
-        "drain", "français", "remblai", "pierre", "gravier", "nette"
-      ],
-    },
-  ],
-
-  // EXCAVATION
+  // EXCAVATION - matches step "excavation"
   "Excavation": [
     {
       taskTitle: "Implantation de la maison",
@@ -44,7 +27,24 @@ export const categoryTaskMappings: CategoryTaskMappings = {
     },
   ],
 
-  // STRUCTURE
+  // FONDATION - matches step "fondation"
+  "Fondation": [
+    {
+      taskTitle: "Coulage des fondations",
+      keywords: [
+        "semelle", "mur", "fondation", "béton", "coffrage", "coulage",
+        "imperméabilisation", "membrane", "delta", "goudron"
+      ],
+    },
+    {
+      taskTitle: "Drain et remblai",
+      keywords: [
+        "drain", "français", "remblai", "pierre", "gravier", "nette"
+      ],
+    },
+  ],
+
+  // STRUCTURE ET CHARPENTE - matches step "structure"
   "Structure et charpente": [
     {
       taskTitle: "Plancher du rez-de-chaussée",
@@ -64,7 +64,7 @@ export const categoryTaskMappings: CategoryTaskMappings = {
     },
     {
       taskTitle: "Pontage de toit",
-      keywords: ["pontage", "contreplaqué", "osb", "toit"],
+      keywords: ["pontage", "contreplaqué", "osb"],
     },
     {
       taskTitle: "Étanchéité",
@@ -72,15 +72,15 @@ export const categoryTaskMappings: CategoryTaskMappings = {
     },
   ],
 
-  // TOITURE
+  // TOITURE - matches step "toiture"
   "Toiture": [
     {
       taskTitle: "Membrane et bardeaux",
-      keywords: ["membrane", "bardeau", "asphalte", "solin", "fascia", "ventilation", "toit"],
+      keywords: ["membrane", "bardeau", "asphalte", "solin", "fascia", "ventilation", "toit", "toiture"],
     },
   ],
 
-  // FENÊTRES ET PORTES
+  // FENÊTRES ET PORTES EXTÉRIEURES - matches step "fenetres-portes"
   "Fenêtres et portes extérieures": [
     {
       taskTitle: "Installation des fenêtres",
@@ -92,7 +92,7 @@ export const categoryTaskMappings: CategoryTaskMappings = {
     },
   ],
 
-  // ISOLATION
+  // ISOLATION ET PARE-VAPEUR - matches step "isolation"
   "Isolation et pare-vapeur": [
     {
       taskTitle: "Isolation des murs",
@@ -112,7 +112,7 @@ export const categoryTaskMappings: CategoryTaskMappings = {
     },
   ],
 
-  // PLOMBERIE SOUS DALLE
+  // PLOMBERIE SOUS DALLE - matches step "plomberie-sous-dalle"
   "Plomberie sous dalle": [
     {
       taskTitle: "Plomberie sous dalle - première visite",
@@ -120,7 +120,7 @@ export const categoryTaskMappings: CategoryTaskMappings = {
     },
   ],
 
-  // COULAGE DALLE SOUS-SOL
+  // COULAGE DE DALLE DU SOUS-SOL - matches step "dalle-sous-sol"
   "Coulage de dalle du sous-sol": [
     {
       taskTitle: "Préparation du sol",
@@ -132,7 +132,7 @@ export const categoryTaskMappings: CategoryTaskMappings = {
     },
   ],
 
-  // MURS DE DIVISION
+  // MURS DE DIVISION - matches step "murs-division"
   "Murs de division": [
     {
       taskTitle: "Construire escalier",
@@ -148,111 +148,139 @@ export const categoryTaskMappings: CategoryTaskMappings = {
     },
   ],
 
-  // PLOMBERIE (merged)
+  // PLOMBERIE (merged Rough-in + Finition) - matches steps "plomberie-roughin" + "plomberie-finition"
   "Plomberie": [
     {
       taskTitle: "Plomberie brute",
       keywords: ["tuyau", "drain", "alimentation", "cuivre", "pex", "abs", "égout", "rough"],
     },
     {
-      taskTitle: "Appareils sanitaires",
-      keywords: ["toilette", "lavabo", "bain", "douche", "robinet", "évier", "chauffe-eau"],
+      taskTitle: "Chauffe-eau",
+      keywords: ["chauffe-eau", "réservoir", "thermopompe"],
+    },
+    {
+      taskTitle: "Branchements municipaux",
+      keywords: ["branchement", "aqueduc", "municipal", "raccord"],
+    },
+    {
+      taskTitle: "Robinetterie",
+      keywords: ["robinet", "robinetterie"],
+    },
+    {
+      taskTitle: "Toilettes et lavabos",
+      keywords: ["toilette", "lavabo", "évier", "vanité"],
+    },
+    {
+      taskTitle: "Douche et baignoire",
+      keywords: ["douche", "bain", "baignoire"],
     },
   ],
 
-  // ÉLECTRICITÉ (merged)
+  // ÉLECTRICITÉ (merged Rough-in + Finition) - matches steps "electricite-roughin" + "electricite-finition"
   "Électricité": [
     {
-      taskTitle: "Filage électrique",
-      keywords: ["fil", "câble", "boîte", "électrique", "panneau", "disjoncteur", "rough"],
+      taskTitle: "Entrée électrique",
+      keywords: ["panneau", "disjoncteur", "ampérage", "200a", "hydro"],
     },
     {
-      taskTitle: "Luminaires et finition",
-      keywords: ["luminaire", "prise", "interrupteur", "plafonnier", "éclairage"],
+      taskTitle: "Filage brut",
+      keywords: ["fil", "câble", "boîte", "électrique", "filage", "rough"],
+    },
+    {
+      taskTitle: "Inspection électrique",
+      keywords: ["inspection", "certificat"],
+    },
+    {
+      taskTitle: "Prises et interrupteurs",
+      keywords: ["prise", "interrupteur", "plaque"],
+    },
+    {
+      taskTitle: "Luminaires",
+      keywords: ["luminaire", "plafonnier", "éclairage", "applique"],
+    },
+    {
+      taskTitle: "Raccordement des appareils",
+      keywords: ["électroménager", "cuisinière", "sécheuse", "branchement"],
     },
   ],
 
-  // VENTILATION
-  "Ventilation": [
+  // CHAUFFAGE ET VENTILATION - matches step "hvac"
+  "Chauffage et ventilation": [
     {
-      taskTitle: "Installation des conduits",
-      keywords: ["conduit", "ventilation", "hvac", "chauffage", "thermopompe", "air"],
+      taskTitle: "Système de chauffage",
+      keywords: ["chauffage", "plinthe", "thermopompe", "radiant", "plancher chauffant"],
     },
     {
-      taskTitle: "Échangeur d'air",
-      keywords: ["échangeur", "vrc", "récupérateur"],
+      taskTitle: "Ventilateur récupérateur de chaleur (VRC) (échangeur d'air)",
+      keywords: ["vrc", "échangeur", "récupérateur", "air"],
+    },
+    {
+      taskTitle: "Conduits de ventilation",
+      keywords: ["conduit", "ventilation", "hotte", "sécheuse", "salle de bain"],
     },
   ],
 
-  // REVÊTEMENT EXTÉRIEUR
+  // REVÊTEMENT EXTÉRIEUR - matches step "exterieur"
   "Revêtement extérieur": [
     {
-      taskTitle: "Revêtement mural",
-      keywords: ["revêtement", "vinyle", "brique", "pierre", "bois", "canexel", "crépi"],
+      taskTitle: "Revêtement extérieur",
+      keywords: ["revêtement", "vinyle", "brique", "pierre", "bois", "canexel", "crépi", "parement", "fibrociment"],
     },
     {
       taskTitle: "Fascia et soffite",
-      keywords: ["fascia", "soffite", "corniche"],
+      keywords: ["fascia", "soffite", "corniche", "bordure"],
+    },
+    {
+      taskTitle: "Balcons et terrasses",
+      keywords: ["balcon", "terrasse", "galerie"],
+    },
+    {
+      taskTitle: "Aménagement paysager",
+      keywords: ["aménagement", "paysager", "gazon", "entrée", "pavé", "plantation"],
     },
   ],
 
-  // GYPSE
-  "Gypse et joints": [
+  // GYPSE ET PEINTURE - matches step "gypse"
+  "Gypse et peinture": [
     {
       taskTitle: "Pose du gypse",
       keywords: ["gypse", "placo", "plâtre", "drywall", "panneau"],
     },
     {
       taskTitle: "Tirage de joints",
-      keywords: ["joint", "tirage", "ruban", "composé", "finition"],
+      keywords: ["joint", "tirage", "ruban", "composé"],
     },
-  ],
-
-  // PEINTURE
-  "Peinture": [
     {
-      taskTitle: "Peinture des plafonds et murs",
+      taskTitle: "Peinture",
       keywords: ["peinture", "peintre", "apprêt", "primer", "couche"],
     },
   ],
 
-  // TRAVAUX ÉBÉNISTERIE
-  "Travaux ébénisterie": [
+  // REVÊTEMENTS DE SOL - matches step "revetements-sol"
+  "Revêtements de sol": [
     {
-      taskTitle: "Armoires de cuisine",
-      keywords: ["armoire", "cuisine", "comptoir", "îlot", "cabinet"],
+      taskTitle: "Plancher de bois ou stratifié",
+      keywords: ["plancher", "bois franc", "flottant", "stratifié", "laminé"],
     },
-    {
-      taskTitle: "Vanités et rangements",
-      keywords: ["vanité", "rangement", "pharmacie", "salle de bain"],
-    },
-  ],
-
-  // CÉRAMIQUE
-  "Céramique et planchers": [
     {
       taskTitle: "Céramique",
       keywords: ["céramique", "tuile", "carrelage", "porcelaine", "mosaïque"],
     },
+  ],
+
+  // TRAVAUX ÉBÉNISTERIE - matches step "cuisine-sdb"
+  "Travaux ébénisterie": [
     {
-      taskTitle: "Planchers",
-      keywords: ["plancher", "bois franc", "flottant", "vinyle", "laminé"],
+      taskTitle: "Armoires de cuisine et vanités",
+      keywords: ["armoire", "cuisine", "vanité", "cabinet", "meuble-lavabo"],
+    },
+    {
+      taskTitle: "Comptoirs",
+      keywords: ["comptoir", "îlot", "quartz", "granit"],
     },
   ],
 
-  // BALCONS
-  "Balcons et terrasses": [
-    {
-      taskTitle: "Structure du balcon",
-      keywords: ["balcon", "terrasse", "structure", "poutre", "solive"],
-    },
-    {
-      taskTitle: "Membrane et revêtement",
-      keywords: ["membrane", "revêtement", "composite", "trex", "bois traité"],
-    },
-  ],
-
-  // FINITIONS INTÉRIEURES
+  // FINITIONS INTÉRIEURES - matches step "finitions-int"
   "Finitions intérieures": [
     {
       taskTitle: "Portes intérieures",
@@ -263,8 +291,12 @@ export const categoryTaskMappings: CategoryTaskMappings = {
       keywords: ["moulure", "plinthe", "cadrage", "couronne", "corniche"],
     },
     {
-      taskTitle: "Quincaillerie",
-      keywords: ["quincaillerie", "poignée", "penture", "charnière"],
+      taskTitle: "Escalier",
+      keywords: ["escalier", "marche", "contremarche", "rampe"],
+    },
+    {
+      taskTitle: "Peinture de finition",
+      keywords: ["peinture finition", "retouche", "couche finale"],
     },
   ],
 };
