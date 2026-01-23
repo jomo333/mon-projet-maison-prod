@@ -91,7 +91,6 @@ const analysisToStepMap: Record<string, MappingTarget[]> = {
   "excavation": [{ target: "Excavation", weight: 1 }],
 
   // Fondation: l'IA regroupe souvent sous un seul poste. On ventile vers les postes distincts.
-  // (Si l'analyse a déjà un poste Excavation, on ne lui ré-attribue pas ici.)
   "fondation": [
     { target: "Fondation", weight: 0.7 },
     { target: "Plomberie sous dalle", weight: 0.1 },
@@ -103,24 +102,52 @@ const analysisToStepMap: Record<string, MappingTarget[]> = {
     { target: "Structure et charpente", weight: 0.85 },
     { target: "Murs de division", weight: 0.15 },
   ],
+  "structure et charpente": [{ target: "Structure et charpente", weight: 1 }],
 
   "toiture": [{ target: "Toiture", weight: 1 }],
+  
+  // Fenêtres et portes - plusieurs variations possibles
   "fenetres et portes": [{ target: "Fenêtres et portes extérieures", weight: 1 }],
+  "fenetres et portes exterieures": [{ target: "Fenêtres et portes extérieures", weight: 1 }],
 
   // Second œuvre
+  "isolation": [{ target: "Isolation et pare-vapeur", weight: 1 }],
   "isolation et pare-air": [{ target: "Isolation et pare-vapeur", weight: 1 }],
   "isolation et pare air": [{ target: "Isolation et pare-vapeur", weight: 1 }],
+  "isolation et pare-vapeur": [{ target: "Isolation et pare-vapeur", weight: 1 }],
+  
   "electricite": [{ target: "Électricité", weight: 1 }],
   "plomberie": [{ target: "Plomberie", weight: 1 }],
+  "plomberie sous dalle": [{ target: "Plomberie sous dalle", weight: 1 }],
+  "coulage de dalle du sous-sol": [{ target: "Coulage de dalle du sous-sol", weight: 1 }],
+  "murs de division": [{ target: "Murs de division", weight: 1 }],
 
-  // Le titre de l'étape est "Chauffage et ventilation" (pas "(HVAC)")
+  // Chauffage - le titre de l'étape est "Chauffage et ventilation"
   "chauffage/cvac": [{ target: "Chauffage et ventilation", weight: 1 }],
   "chauffage et cvac": [{ target: "Chauffage et ventilation", weight: 1 }],
   "chauffage": [{ target: "Chauffage et ventilation", weight: 1 }],
+  "chauffage et ventilation": [{ target: "Chauffage et ventilation", weight: 1 }],
+  "chauffage et ventilation (hvac)": [{ target: "Chauffage et ventilation", weight: 1 }],
+  "hvac": [{ target: "Chauffage et ventilation", weight: 1 }],
 
   "revetement exterieur": [{ target: "Revêtement extérieur", weight: 1 }],
 
   // Finitions
+  "gypse": [{ target: "Gypse et peinture", weight: 1 }],
+  "gypse et peinture": [{ target: "Gypse et peinture", weight: 1 }],
+  "peinture": [{ target: "Gypse et peinture", weight: 1 }],
+  
+  "revetements de sol": [{ target: "Revêtements de sol", weight: 1 }],
+  "revetement de sol": [{ target: "Revêtements de sol", weight: 1 }],
+  "plancher": [{ target: "Revêtements de sol", weight: 1 }],
+  "planchers": [{ target: "Revêtements de sol", weight: 1 }],
+  
+  "travaux ebenisterie": [{ target: "Travaux ébénisterie", weight: 1 }],
+  "ebenisterie": [{ target: "Travaux ébénisterie", weight: 1 }],
+  
+  "finitions interieures": [{ target: "Finitions intérieures", weight: 1 }],
+  
+  // Catégories groupées de l'IA legacy
   "finition interieure": [
     { target: "Gypse et peinture", weight: 0.4 },
     { target: "Revêtements de sol", weight: 0.25 },
