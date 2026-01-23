@@ -206,13 +206,9 @@ export function BudgetAnalysisResults({
     }));
 
   // Calculate totals
-  const subTotalBeforeTaxes = analysis.totauxDetails?.sous_total_avant_taxes || 
-    analysis.categories.reduce((sum, cat) => {
-      if (cat.name.toLowerCase().includes("taxe") || cat.name.toLowerCase().includes("contingence")) {
-        return sum;
-      }
-      return sum + cat.budget;
-    }, 0);
+  const subTotalBeforeTaxes =
+    analysis.totauxDetails?.sous_total_avant_taxes ||
+    orderedCategories.reduce((sum, cat) => sum + (Number(cat.budget) || 0), 0);
 
   const hasWarnings = analysis.warnings && analysis.warnings.length > 0;
   const hasRecommendations = analysis.recommendations && analysis.recommendations.length > 0;
@@ -449,7 +445,7 @@ export function BudgetAnalysisResults({
 
           {/* Category Summary Cards */}
           <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
-            {orderedCategories.filter(cat => cat.budget > 0).slice(0, 8).map((cat, index) => {
+            {orderedCategories.map((cat, index) => {
               const percentage = (cat.budget / analysis.estimatedTotal) * 100;
               return (
                 <Card key={index} className="p-4">
@@ -521,90 +517,130 @@ export function BudgetAnalysisResults({
                     <Progress value={percentage} className="h-2 mt-3" />
                   </div>
                   
-                  {isExpanded && (cat.items || []).length > 0 && (
+                  {isExpanded && (
                     <div className="border-t p-4 space-y-4 bg-muted/30">
                       {(() => {
-                        const groupedByTask = groupItemsByTask(cat.name, cat.items || []);
-                        const taskEntries = Array.from(groupedByTask.entries());
+                        const items = cat.items || [];
+                        const groupedByTask = groupItemsByTask(cat.name, items);
 
-                        if (taskEntries.length === 0) {
+                        const tasksFromSteps = stepTasksByCategory[cat.name] ?? [];
+                        const tasksFromKeywords = getTasksForCategory(cat.name) ?? [];
+                        const orderedTasks = tasksFromSteps.length ? tasksFromSteps : tasksFromKeywords;
+
+                        const fallbackTasks = Array.from(groupedByTask.keys());
+                        const baseTasks = orderedTasks.length ? orderedTasks : fallbackTasks;
+
+                        const hasOther = groupedByTask.has("Autres éléments");
+                        const tasksToRender = [
+                          ...baseTasks.filter((t) => t !== "Autres éléments"),
+                          ...(hasOther ? ["Autres éléments"] : []),
+                        ];
+
+                        if (tasksToRender.length === 0) {
                           return (
                             <p className="text-sm text-muted-foreground italic">
-                              Aucun élément détaillé pour cette catégorie.
+                              Aucune tâche définie pour cette catégorie.
                             </p>
                           );
                         }
 
-                        return taskEntries.map(([taskTitle, taskItems]) => (
-                          <div key={taskTitle} className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <Wrench className="h-4 w-4 text-primary" />
-                              <span className="font-medium text-sm">{taskTitle}</span>
-                              <Badge variant="outline" className="text-xs">
-                                {taskItems.length} élément{taskItems.length > 1 ? 's' : ''}
-                              </Badge>
-                            </div>
-                            <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
-                              <div className="col-span-5">Élément</div>
-                              <div className="col-span-3 text-center">Quantité</div>
-                              <div className="col-span-4 text-right">Coût</div>
-                            </div>
-                            {taskItems.map((item, itemIndex) => {
-                              const originalItemIndex = cat.items.findIndex(
-                                (i) => i.name === item.name && i.cost === item.cost
-                              );
-                              return (
-                                <div
-                                  key={itemIndex}
-                                  className="grid grid-cols-12 gap-2 text-sm py-1 items-center"
-                                >
-                                  <div className="col-span-5 truncate" title={item.name}>
-                                    {item.name}
+                        return tasksToRender.map((taskTitle) => {
+                          const taskItems = groupedByTask.get(taskTitle) ?? [];
+
+                          return (
+                            <div key={taskTitle} className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Wrench className="h-4 w-4 text-primary" />
+                                <span className="font-medium text-sm">{taskTitle}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {taskItems.length} élément{taskItems.length > 1 ? "s" : ""}
+                                </Badge>
+                              </div>
+
+                              {taskItems.length === 0 ? (
+                                <p className="text-sm text-muted-foreground italic">
+                                  Aucun élément détecté pour cette tâche.
+                                </p>
+                              ) : (
+                                <>
+                                  <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
+                                    <div className="col-span-5">Élément</div>
+                                    <div className="col-span-3 text-center">Quantité</div>
+                                    <div className="col-span-4 text-right">Coût</div>
                                   </div>
-                                  <div className="col-span-3 text-center text-muted-foreground">
-                                    {item.quantity} {item.unit}
-                                  </div>
-                                  <div className="col-span-4 text-right flex items-center justify-end gap-1">
-                                    {editingItem?.catIndex === catIndex && editingItem?.itemIndex === originalItemIndex ? (
-                                      <div className="flex items-center gap-1">
-                                        <Input
-                                          type="number"
-                                          value={editPrice}
-                                          onChange={(e) => setEditPrice(e.target.value)}
-                                          className="w-20 h-7 text-xs"
-                                          autoFocus
-                                        />
-                                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={saveEdit}>
-                                          <CheckCircle2 className="h-3 w-3 text-green-600" />
-                                        </Button>
-                                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={cancelEdit}>
-                                          <X className="h-3 w-3 text-red-600" />
-                                        </Button>
+
+                                  {taskItems.map((item, itemIndex) => {
+                                    const originalItemIndex = items.findIndex(
+                                      (i) => i.name === item.name && i.cost === item.cost
+                                    );
+                                    const safeOriginalIndex = originalItemIndex >= 0 ? originalItemIndex : itemIndex;
+
+                                    return (
+                                      <div
+                                        key={itemIndex}
+                                        className="grid grid-cols-12 gap-2 text-sm py-1 items-center"
+                                      >
+                                        <div className="col-span-5 truncate" title={item.name}>
+                                          {item.name}
+                                        </div>
+                                        <div className="col-span-3 text-center text-muted-foreground">
+                                          {item.quantity} {item.unit}
+                                        </div>
+                                        <div className="col-span-4 text-right flex items-center justify-end gap-1">
+                                          {editingItem?.catIndex === catIndex &&
+                                          editingItem?.itemIndex === safeOriginalIndex ? (
+                                            <div className="flex items-center gap-1">
+                                              <Input
+                                                type="number"
+                                                value={editPrice}
+                                                onChange={(e) => setEditPrice(e.target.value)}
+                                                className="w-20 h-7 text-xs"
+                                                autoFocus
+                                              />
+                                              <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                className="h-7 w-7 p-0"
+                                                onClick={saveEdit}
+                                              >
+                                                <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                              </Button>
+                                              <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                className="h-7 w-7 p-0"
+                                                onClick={cancelEdit}
+                                              >
+                                                <X className="h-3 w-3 text-red-600" />
+                                              </Button>
+                                            </div>
+                                          ) : (
+                                            <>
+                                              <span className="font-medium">{formatCurrency(item.cost)}</span>
+                                              {onAdjustPrice && (
+                                                <Button
+                                                  size="sm"
+                                                  variant="ghost"
+                                                  className="h-6 w-6 p-0"
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    startEditing(catIndex, safeOriginalIndex, item.cost);
+                                                  }}
+                                                >
+                                                  <Pencil className="h-3 w-3" />
+                                                </Button>
+                                              )}
+                                            </>
+                                          )}
+                                        </div>
                                       </div>
-                                    ) : (
-                                      <>
-                                        <span className="font-medium">{formatCurrency(item.cost)}</span>
-                                        {onAdjustPrice && (
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            className="h-6 w-6 p-0"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              startEditing(catIndex, originalItemIndex, item.cost);
-                                            }}
-                                          >
-                                            <Pencil className="h-3 w-3" />
-                                          </Button>
-                                        )}
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        ));
+                                    );
+                                  })}
+                                </>
+                              )}
+                            </div>
+                          );
+                        });
                       })()}
                     </div>
                   )}
