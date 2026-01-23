@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { DollarSign, TrendingUp, TrendingDown, AlertTriangle, Plus, Edit2, ChevronDown, ChevronUp, Save, FolderOpen, FileText, CheckCircle2, RotateCcw } from "lucide-react";
-import { PlanAnalyzer } from "@/components/budget/PlanAnalyzer";
+import { PlanAnalyzer, PlanAnalyzerHandle } from "@/components/budget/PlanAnalyzer";
 
 import { CategorySubmissionsDialog } from "@/components/budget/CategorySubmissionsDialog";
 import { GenerateScheduleDialog } from "@/components/schedule/GenerateScheduleDialog";
@@ -129,6 +129,7 @@ const Budget = () => {
   
   // Ref for the PlanAnalyzer section to scroll into view
   const planAnalyzerRef = useRef<HTMLDivElement>(null);
+  const planAnalyzerComponentRef = useRef<PlanAnalyzerHandle>(null);
   const didScrollRef = useRef(false);
 
   // Schedule hook for generating schedule after budget analysis
@@ -332,7 +333,9 @@ const Budget = () => {
       return;
     }
     
-    if (window.confirm("Êtes-vous sûr de vouloir réinitialiser tout le budget ? Cette action supprimera toutes les catégories analysées.")) {
+    if (window.confirm("Êtes-vous sûr de vouloir réinitialiser tout le budget ? Cette action supprimera toutes les catégories analysées et les résultats d'analyse.")) {
+      // Reset the PlanAnalyzer analysis state
+      planAnalyzerComponentRef.current?.resetAnalysis();
       resetBudgetMutation.mutate();
     }
   };
@@ -553,6 +556,7 @@ const Budget = () => {
           {/* AI Plan Analyzer */}
           <div ref={planAnalyzerRef}>
             <PlanAnalyzer 
+              ref={planAnalyzerComponentRef}
               onBudgetGenerated={handleBudgetGenerated} 
               projectId={selectedProjectId}
               autoSelectPlanTab={autoAnalyze && !autoManual}

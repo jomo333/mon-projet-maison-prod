@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -70,7 +70,11 @@ interface PlanAnalyzerProps {
   prefillSquareFootage?: string;
 }
 
-export function PlanAnalyzer({ 
+export interface PlanAnalyzerHandle {
+  resetAnalysis: () => void;
+}
+
+export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(function PlanAnalyzer({ 
   onBudgetGenerated, 
   projectId, 
   autoSelectPlanTab = false, 
@@ -80,7 +84,7 @@ export function PlanAnalyzer({
   prefillProjectType,
   prefillFloors,
   prefillSquareFootage
-}: PlanAnalyzerProps) {
+}, ref) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<BudgetAnalysis | null>(null);
   const [analysisMode, setAnalysisMode] = useState<"manual" | "plan">(
@@ -141,6 +145,17 @@ export function PlanAnalyzer({
       }))
     );
   }, [analysis]);
+
+  // Expose reset function to parent via ref
+  useImperativeHandle(ref, () => ({
+    resetAnalysis: () => {
+      setAnalysis(null);
+      setSelectedPlanUrls([]);
+      setImportedPlanSourceUrls([]);
+      setManualReferenceImages([]);
+      autoImportedForProjectRef.current = null;
+    },
+  }));
   
   // Update additionalNotes when besoinsNote prop changes
   useEffect(() => {
@@ -1438,4 +1453,4 @@ export function PlanAnalyzer({
       </CardContent>
     </Card>
   );
-}
+});
