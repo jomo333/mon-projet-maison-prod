@@ -8,15 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Loader2, Mail, Lock, User, Chrome, Eye, EyeOff } from "lucide-react";
+import { Loader2, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { signIn, signUp, signInWithGoogle, user } = useAuth();
+  const { signIn, signUp, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showSignInPassword, setShowSignInPassword] = useState(false);
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
 
@@ -67,15 +65,6 @@ const Auth = () => {
     setIsLoading(false);
   };
 
-  const handleGoogleSignIn = async () => {
-    setIsGoogleLoading(true);
-    const { error } = await signInWithGoogle();
-    if (error) {
-      toast.error("Erreur Google: " + error.message);
-      setIsGoogleLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
@@ -95,29 +84,6 @@ const Auth = () => {
               </TabsList>
               
               <TabsContent value="signin" className="mt-4 space-y-4">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleGoogleSignIn}
-                  disabled={isGoogleLoading}
-                >
-                  {isGoogleLoading ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Chrome className="h-4 w-4 mr-2" />
-                  )}
-                  Continuer avec Google
-                </Button>
-                
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <Separator className="w-full" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">ou</span>
-                  </div>
-                </div>
-                
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signin-email">Email</Label>
@@ -166,29 +132,6 @@ const Auth = () => {
               </TabsContent>
               
               <TabsContent value="signup" className="mt-4 space-y-4">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleGoogleSignIn}
-                  disabled={isGoogleLoading}
-                >
-                  {isGoogleLoading ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Chrome className="h-4 w-4 mr-2" />
-                  )}
-                  S'inscrire avec Google
-                </Button>
-                
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <Separator className="w-full" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">ou</span>
-                  </div>
-                </div>
-                
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">Nom d'affichage</Label>
