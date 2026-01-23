@@ -156,15 +156,49 @@ const Budget = () => {
   // Load saved budget when project changes
   useEffect(() => {
     if (savedBudget && savedBudget.length > 0) {
-      const loadedCategories: BudgetCategory[] = savedBudget.map((cat, index) => ({
-        name: cat.category_name,
-        budget: Number(cat.budget) || 0,
-        spent: Number(cat.spent) || 0,
-        color: cat.color || categoryColors[index % categoryColors.length],
-        description: cat.description || undefined,
-        items: (cat.items as unknown as BudgetItem[]) || [],
-      }));
-      setBudgetCategories(loadedCategories);
+      // IMPORTANT: Always display categories in the construction-step order.
+      // For legacy projects, this also allows new steps (e.g. "Excavation")
+      // to appear automatically before "Fondation" without deleting existing data.
+      const savedByName = new Map(
+        savedBudget.map((row) => [row.category_name, row])
+      );
+
+      const defaultNames = new Set(defaultCategories.map((c) => c.name));
+
+      const ordered: BudgetCategory[] = defaultCategories.map((defCat) => {
+        const saved = savedByName.get(defCat.name);
+        if (!saved) {
+          return {
+            ...defCat,
+            budget: 0,
+            spent: 0,
+            items: [],
+          };
+        }
+
+        return {
+          name: saved.category_name,
+          budget: Number(saved.budget) || 0,
+          spent: Number(saved.spent) || 0,
+          color: saved.color || defCat.color,
+          description: saved.description || defCat.description,
+          items: (saved.items as unknown as BudgetItem[]) || [],
+        };
+      });
+
+      // Keep any legacy categories not present in the current step list (append at the end).
+      const extras: BudgetCategory[] = savedBudget
+        .filter((row) => !defaultNames.has(row.category_name))
+        .map((row, index) => ({
+          name: row.category_name,
+          budget: Number(row.budget) || 0,
+          spent: Number(row.spent) || 0,
+          color: row.color || categoryColors[index % categoryColors.length],
+          description: row.description || undefined,
+          items: (row.items as unknown as BudgetItem[]) || [],
+        }));
+
+      setBudgetCategories([...ordered, ...extras]);
     } else if (selectedProjectId) {
       // Reset to default if no budget saved
       setBudgetCategories(defaultCategories);
