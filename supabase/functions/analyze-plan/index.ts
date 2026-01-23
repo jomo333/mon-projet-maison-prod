@@ -61,7 +61,62 @@ const PRIX_QUEBEC_2025 = {
   },
   beton: {
     "ciment_portland_30kg": 12.50,
-    "beton_30MPa_m3": 165.00,
+    // === PRIX BÉTON PAR M³ (2025) ===
+    "beton_20MPA_sans_air_m3": 226.00,
+    "beton_20MPA_avec_air_m3": 233.00,
+    "beton_25MPA_sans_air_m3": 236.00,
+    "beton_25MPA_avec_air_m3": 243.00,
+    "beton_30MPA_sans_air_m3": 246.00,
+    "beton_30MPA_avec_air_m3": 253.00,
+    "beton_32MPA_sans_air_m3": 256.00,
+    "beton_32MPA_avec_air_m3": 263.00,
+    "beton_35MPA_sans_air_m3": 266.00,
+    "beton_35MPA_avec_air_m3": 273.00,
+    "beton_piscine_fond_m3": 246.00,
+    "beton_remblai_m3": 202.00,
+    "air_entraine_par_m3": 7.00,
+    // === FINITION ET MISE EN PLACE (par pi²) ===
+    "finition_truelle_pi2": 2.50,
+    "finition_truelle_min": 1500.00,
+    "finition_helicoptere_pi2": 3.25,
+    "finition_helicoptere_min": 1700.00,
+    "finition_estampage_pi2": 5.00,
+    "finition_estampage_min": 2500.00,
+    "scellant_mac_5gal": 305.00,
+    // === MANUTENTION ET POMPAGE ===
+    "manutention_4m_moins": 460.00,
+    "location_pompe_4h_min": 710.00,
+    "pompe_heure_supp": 150.00,
+    "sac_lavage": 110.00,
+    "lavage_usine": 110.00,
+    // === TEMPS ALLOUÉ PAR VOLUME ===
+    "temps_supp_minute": 3.00,
+    "taux_horaire_camion": 190.00,
+    // === ADDITIFS ===
+    "fibre_m3": 44.50,
+    "calcium_m3": 40.00,
+    "retardant_m3": 40.00,
+    "couleur_pale_m3": 110.00,
+    "couleur_fonce_m3": 160.00,
+    // === LIVRAISON SAMEDI ===
+    "extra_samedi_camion": 150.00,
+    // === FRAIS DE LIVRAISON PAR ZONE ===
+    // Zone Laval
+    "livraison_laval_base": 250.00,
+    "livraison_laval_vimont": 260.00,
+    "livraison_laval_fabreville": 275.00,
+    "livraison_laval_ouest": 300.00,
+    // Zone Montréal
+    "livraison_montreal_est": 250.00,
+    "livraison_montreal_nord": 275.00,
+    "livraison_montreal_ouest": 350.00,
+    "livraison_rive_sud": 360.00,
+    // Zone Lanaudière
+    "livraison_lanaudiere_proche": 220.00,
+    "livraison_lanaudiere_moyen": 250.00,
+    "livraison_lanaudiere_loin": 335.00,
+    // Achat minimum
+    "achat_minimum_base": 750.00,
   },
   fondation: {
     // Coûts par pi² selon le type de fondation
@@ -281,6 +336,107 @@ Tu DOIS produire des estimations pour CHAQUE catégorie suivante, même si les p
 **Calcul typique**: Pour une fondation standard de 8' de profondeur:
 - Volume = Superficie x 0.75m (profondeur moyenne creusée)
 - Coût excavation = Volume m³ x 200$/m³ (ajuster selon type de sol)
+
+## COÛTS DE BÉTON QUÉBEC 2025 (référence détaillée)
+
+### PRIX DU BÉTON PAR M³
+
+| Type de béton | Sans Air | Avec Air Entrainé |
+|---------------|----------|-------------------|
+| 20 MPA | 226$ | 233$ |
+| 25 MPA | 236$ | 243$ |
+| 30 MPA | 246$ | 253$ |
+| 32 MPA | 256$ | 263$ |
+| 35 MPA | 266$ | 273$ |
+| Mélange Piscine | 246$ | - |
+| Béton Remblai | 202$ | - |
+
+**Air entrainé**: +7$/m³ (recommandé pour dalles extérieures et climat québécois)
+
+### MISE EN PLACE ET FINITION (par pi²)
+
+| Type de finition | Prix au pi² | Minimum |
+|------------------|-------------|---------|
+| Finition à la truelle | 2,50$ | 1 500$ |
+| Finition à l'hélicoptère | 3,25$ | 1 700$ |
+| Finition estampage (couleurs incluses) | 5,00$ | 2 500$ |
+
+**Scellant Mac**: 305$/5 gallons (non inclus dans estampage)
+
+### MANUTENTION ET POMPAGE
+
+| Service | Prix |
+|---------|------|
+| Manutention 4m et moins | 460$ forfait |
+| Location pompe (4h minimum) | 710$ |
+| Pompe heure supplémentaire | 150$/heure |
+| Sac de lavage | 110$ |
+| Lavage à l'usine (extra) | 110$ |
+
+### TEMPS ALLOUÉ PAR VOLUME
+
+| Volume | Temps alloué |
+|--------|--------------|
+| Moins de 1m³ | 30 minutes |
+| 1 à 2m³ | 35 minutes |
+| 2 à 3m³ | 40 minutes |
+| 3 à 4m³ | 45 minutes |
+| 4 à 5m³ | 50 minutes |
+| 5 à 6m³ | 55 minutes |
+| 6m³ et + | 60 minutes |
+
+**Temps supplémentaire**: 3$/minute | **Taux horaire camion**: 190$/heure
+
+### ADDITIFS ET PRODUITS
+
+| Produit | Prix par m³ |
+|---------|-------------|
+| Fibre | 44,50$ |
+| Calcium (accélérateur) | 40$ |
+| Retardant | 40$ |
+| Couleur pâle intégrale | 110$ |
+| Couleur foncée intégrale | 160$ |
+
+### FRAIS DE LIVRAISON PAR ZONE
+
+**Zone Laval**:
+- St-François, St-Vincent Paul: 250$ ou min. 750$
+- Vimont, BDF, Auteuil: 260$ ou min. 760$
+- Fabreville, Chomedy, Ste-Rose: 275$ ou min. 775$
+- Laval-Ouest, Ste-Dorothée: 300$ ou min. 785$
+
+**Zone Montréal**:
+- Montréal-Est, PAT, Anjou: 250$ ou min. 750$
+- St-Léonard, MTL-Nord, Ahuntsic: 275$ ou min. 775$
+- Plateau, Ville St-Laurent: 275$ ou min. 775$
+- Pointe-Claire, Dorval, DDO: 350$ ou min. 850$
+- Rive-Sud (Longueuil, Boucherville): 360$ ou min. 860$
+
+**Zone Lanaudière/Rive-Nord**:
+- L'Assomption, Repentigny (20km et moins): 220$ ou min. 610$
+- St-Jacques, Mascouche, Terrebonne: 250$ ou min. 675$
+- Saint-Lin, La Plaine, Joliette: 265$ ou min. 695$
+- Boisbriand, Rosemère, Berthier: 285$ ou min. 735$
+- Blainville, Mirabel, St-Eustache: 310$ ou min. 785$
+- St-Jérôme, Ste-Béatrix, Chertsey: 335$ ou min. 835$
+
+**Extra livraison samedi**: 150$/camion
+
+### CALCUL TYPIQUE COULÉE DE DALLE
+
+1. Calculer volume: Superficie (pi²) x Épaisseur (po) / 324 = m³
+2. Choisir résistance: 25 MPA pour dalles intérieures, 32 MPA avec air pour extérieur
+3. Ajouter frais livraison selon zone
+4. Ajouter finition: Superficie x prix/pi² selon type
+5. Si pompe requise (>4m du camion): ajouter location pompe
+
+**Exemple**: Dalle 1000 pi² x 4" en zone Laval
+- Volume: 1000 x 4 / 324 = 12.35 m³ → arrondir à 13 m³
+- Béton 30 MPA: 13 x 253$ = 3 289$
+- Livraison Laval: 275$
+- Finition hélicoptère: 1000 x 3.25$ = 3 250$
+- Pompe (si requise): 710$
+- **Total estimé: 7 524$** (avant taxes)
 
 ## COÛTS DE FONDATION QUÉBEC 2025 (référence détaillée)
 
