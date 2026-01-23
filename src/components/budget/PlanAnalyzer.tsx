@@ -486,38 +486,48 @@ export function PlanAnalyzer({
       // Get style photo URLs to include in analysis
       const stylePhotoUrls = stylePhotos.map((p: any) => p.file_url);
       
-      // IMPORTANT: Quand des plans sont sélectionnés, TOUJOURS utiliser mode "plan"
-      // et IGNORER complètement les données manuelles - les plans sont la source de vérité
+      // NOUVELLE LOGIQUE: Combiner TOUTES les données disponibles pour une analyse plus précise
+      // Les plans sont la source principale, mais les données manuelles fournissent un contexte précieux
       const hasPlansSelected = selectedPlanUrls.length > 0;
       
-      const body = (analysisMode === "manual" && !hasPlansSelected)
+      // Données manuelles enrichies (toujours incluses pour contexte)
+      const manualData = {
+        projectType: projectType === "maison-unifamiliale" ? "Maison unifamiliale" :
+                     projectType === "jumelee" ? "Maison jumelée" :
+                     projectType === "cottage" ? "Cottage" :
+                     projectType === "bungalow" ? "Bungalow" :
+                     projectType === "agrandissement" ? "Agrandissement" :
+                     projectType === "garage" ? "Garage détaché" :
+                     projectType === "garage-etage" ? "Garage avec étage aménagé" :
+                     projectType === "renovation" ? "Rénovation majeure" : "Maison",
+        squareFootage: parseInt(squareFootage) || null,
+        numberOfFloors: parseInt(numberOfFloors) || null,
+        hasGarage,
+        foundationSqft: parseInt(foundationSqft) || null,
+        floorSqftDetails: floorSqftDetails.filter(s => s).map(s => parseInt(s)),
+        finishQuality,
+        additionalNotes: additionalNotes || undefined,
+      };
+      
+      const body = hasPlansSelected
         ? {
-            // Mode manuel: utiliser toutes les données entrées par l'utilisateur
-            mode: "manual",
-            projectType: projectType === "maison-unifamiliale" ? "Maison unifamiliale" :
-                         projectType === "jumelee" ? "Maison jumelée" :
-                         projectType === "cottage" ? "Cottage" :
-                         projectType === "bungalow" ? "Bungalow" : "Maison",
-            squareFootage: parseInt(squareFootage) || 1500,
-            numberOfFloors: parseInt(numberOfFloors) || 1,
-            hasGarage,
-            foundationSqft: parseInt(foundationSqft) || null,
-            floorSqftDetails: floorSqftDetails.filter(s => s).map(s => parseInt(s)),
-            finishQuality,
-            additionalNotes: additionalNotes || undefined,
-            stylePhotoUrls: stylePhotoUrls.length > 0 ? stylePhotoUrls : undefined,
-            // Include reference images from manual mode to help AI analysis
-            referenceImageUrls: manualReferenceImages.length > 0 ? manualReferenceImages : undefined,
-          }
-        : {
-            // Mode plan: SEULEMENT les plans - aucune donnée manuelle
-            // L'IA extraira toutes les informations directement des plans
+            // Mode plan ENRICHI: plans + données manuelles complémentaires
             mode: "plan",
             imageUrls: selectedPlanUrls,
             finishQuality,
-            // NE PAS envoyer squareFootage, numberOfFloors, additionalNotes
-            // Les plans sont la source de vérité, les données manuelles peuvent être obsolètes
+            // NOUVEAU: Inclure les données manuelles comme contexte complémentaire
+            // L'IA utilisera les plans comme source principale mais les données manuelles
+            // aident à préciser le contexte (type de projet, notes spécifiques, etc.)
+            manualContext: manualData,
             stylePhotoUrls: stylePhotoUrls.length > 0 ? stylePhotoUrls : undefined,
+            referenceImageUrls: manualReferenceImages.length > 0 ? manualReferenceImages : undefined,
+          }
+        : {
+            // Mode manuel pur: utiliser toutes les données entrées par l'utilisateur
+            mode: "manual",
+            ...manualData,
+            stylePhotoUrls: stylePhotoUrls.length > 0 ? stylePhotoUrls : undefined,
+            referenceImageUrls: manualReferenceImages.length > 0 ? manualReferenceImages : undefined,
           };
 
       const { data, error } = await supabase.functions.invoke('analyze-plan', {
@@ -836,42 +846,9 @@ export function PlanAnalyzer({
           
           {/* Plan Analysis Mode */}
           <TabsContent value="plan" className="mt-4 space-y-4">
-            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
-              <p className="text-sm text-blue-700 dark:text-blue-300">
-                <strong>Téléversez votre plan</strong> (image ou PDF). Les fichiers PDF seront automatiquement convertis en images pour l'analyse IA.
-              </p>
-            </div>
-            
-            {/* Quality Level Selector for Plan Mode */}
-            <div className="space-y-2">
-              <Label>Qualité des finitions intérieures</Label>
-              <Select value={finishQuality} onValueChange={(v) => setFinishQuality(v as "economique" | "standard" | "haut-de-gamme")}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="economique">
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">🏷️ Économique</span>
-                      <span className="text-xs text-muted-foreground">Plancher flottant, armoires mélamine, comptoirs stratifiés</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="standard">
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">⭐ Standard</span>
-                      <span className="text-xs text-muted-foreground">Bois franc ingénierie, armoires semi-custom, quartz</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="haut-de-gamme">
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">💎 Haut de gamme</span>
-                      <span className="text-xs text-muted-foreground">Bois franc massif, armoires sur mesure, granite/marbre</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Choisissez selon votre budget. Cela affecte les coûts des planchers, armoires, comptoirs et finitions.
+            <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+              <p className="text-sm text-foreground">
+                <strong>💡 Analyse enrichie</strong> : Téléversez vos plans ET ajoutez des informations complémentaires pour obtenir l'estimation la plus précise possible.
               </p>
             </div>
             
@@ -887,14 +864,15 @@ export function PlanAnalyzer({
               </div>
             )}
             
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Plans de construction (sélection multiple)</Label>
+            <div className="space-y-6">
+              {/* Section 1: Plans */}
+              <div className="space-y-3 p-4 rounded-lg border bg-card">
+                <div className="flex items-center gap-2">
+                  <Badge variant="default" className="text-xs">1</Badge>
+                  <Label className="text-base font-semibold">Plans de construction</Label>
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  Plans trouvés pour ce projet : <span className="font-medium">{plans.length}</span>
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Ajoutez tous les plans nécessaires (plans d'étages, élévations, coupes, etc.) pour une analyse complète.
+                  Plans trouvés : <span className="font-medium">{plans.length}</span> — Ajoutez tous les plans (étages, élévations, coupes) pour une analyse complète.
                 </p>
 
                 {plans.length > 0 && selectedPlanUrls.length === 0 && (
@@ -910,11 +888,8 @@ export function PlanAnalyzer({
                       className="gap-2"
                     >
                       <FileText className="h-4 w-4" />
-                      Importer le dernier plan trouvé
+                      Importer le dernier plan
                     </Button>
-                    <span className="text-xs text-muted-foreground">
-                      (convertit automatiquement les PDF en images)
-                    </span>
                   </div>
                 )}
 
@@ -980,7 +955,7 @@ export function PlanAnalyzer({
                     ) : (
                       <Upload className="h-4 w-4" />
                     )}
-                    {isConverting ? "Conversion..." : "Téléverser des plans"}
+                    {isConverting ? "Conversion..." : "Téléverser"}
                   </Button>
 
                   {selectedPlanUrls.length > 0 && (
@@ -991,82 +966,206 @@ export function PlanAnalyzer({
                       className="gap-2 text-destructive hover:text-destructive"
                     >
                       <X className="h-4 w-4" />
-                      Tout effacer
+                      Effacer
                     </Button>
                   )}
                 </div>
-              </div>
 
-              {/* Selected plans list */}
-              {selectedPlanUrls.length > 0 && (
-                <div className="space-y-2">
-                  <Label className="text-sm">Plans sélectionnés ({selectedPlanUrls.length})</Label>
-                  <div className="grid gap-2 max-h-[200px] overflow-y-auto">
-                    {selectedPlanUrls.map((url, index) => {
-                      const plan = plans.find(p => p.file_url === url);
-                      return (
-                        <div 
-                          key={url}
-                          className="flex items-center justify-between p-2 rounded-lg bg-muted/50 group"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="w-6 h-6 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center font-medium">
-                              {index + 1}
-                            </span>
-                            <span className="text-sm truncate max-w-[200px]">
-                              {plan?.file_name || `Plan ${index + 1}`}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1">
+                {/* Selected plans list */}
+                {selectedPlanUrls.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="grid gap-2 max-h-[150px] overflow-y-auto">
+                      {selectedPlanUrls.map((url, index) => {
+                        const plan = plans.find(p => p.file_url === url);
+                        return (
+                          <div 
+                            key={url}
+                            className="flex items-center justify-between p-2 rounded-lg bg-muted/50 group"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="w-5 h-5 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center font-medium">
+                                {index + 1}
+                              </span>
+                              <span className="text-sm truncate max-w-[180px]">
+                                {plan?.file_name || `Plan ${index + 1}`}
+                              </span>
+                            </div>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7"
-                              asChild
-                            >
-                              <a href={url} target="_blank" rel="noopener noreferrer">
-                                <Download className="h-3 w-3" />
-                              </a>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 text-destructive hover:text-destructive"
+                              className="h-6 w-6 text-destructive hover:text-destructive"
                               onClick={() => setSelectedPlanUrls(prev => prev.filter(u => u !== url))}
                             >
                               <X className="h-3 w-3" />
                             </Button>
                           </div>
+                        );
+                      })}
+                    </div>
+                    <p className="text-xs text-primary flex items-center gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      {selectedPlanUrls.length} plan(s) prêt(s) pour l'analyse
+                    </p>
+                  </div>
+                )}
+
+                {selectedPlanUrls.length === 0 && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    Aucun plan sélectionné
+                  </p>
+                )}
+              </div>
+
+              {/* Section 2: Informations complémentaires */}
+              <div className="space-y-3 p-4 rounded-lg border bg-card">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-xs">2</Badge>
+                  <Label className="text-base font-semibold">Informations complémentaires (recommandé)</Label>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Ces informations aident l'IA à affiner l'analyse des plans pour un budget plus précis.
+                </p>
+
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label>Type de projet</Label>
+                    <Select value={projectType} onValueChange={setProjectType}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="maison-unifamiliale">Maison unifamiliale</SelectItem>
+                        <SelectItem value="bungalow">Bungalow</SelectItem>
+                        <SelectItem value="cottage">Cottage</SelectItem>
+                        <SelectItem value="jumelee">Maison jumelée</SelectItem>
+                        <SelectItem value="agrandissement">Agrandissement</SelectItem>
+                        <SelectItem value="garage">Garage détaché</SelectItem>
+                        <SelectItem value="garage-etage">Garage avec étage</SelectItem>
+                        <SelectItem value="renovation">Rénovation majeure</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Superficie estimée (pi²)</Label>
+                    <Input
+                      type="number"
+                      value={squareFootage}
+                      onChange={(e) => setSquareFootage(e.target.value)}
+                      placeholder="Ex: 1500"
+                    />
+                    <p className="text-xs text-muted-foreground">L'IA vérifiera avec les plans</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Nombre d'étages</Label>
+                    <Select value={numberOfFloors} onValueChange={setNumberOfFloors}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 étage</SelectItem>
+                        <SelectItem value="2">2 étages</SelectItem>
+                        <SelectItem value="3">3 étages</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Qualité des finitions</Label>
+                    <Select value={finishQuality} onValueChange={(v) => setFinishQuality(v as "economique" | "standard" | "haut-de-gamme")}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="economique">🏷️ Économique</SelectItem>
+                        <SelectItem value="standard">⭐ Standard</SelectItem>
+                        <SelectItem value="haut-de-gamme">💎 Haut de gamme</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Superficie fondation (pi²)</Label>
+                    <Input
+                      type="number"
+                      value={foundationSqft}
+                      onChange={(e) => setFoundationSqft(e.target.value)}
+                      placeholder="Ex: 1200"
+                    />
+                  </div>
+
+                  <div className="space-y-2 flex items-end">
+                    <div className="flex items-center space-x-2 h-10">
+                      <Checkbox
+                        id="garage-plan"
+                        checked={hasGarage}
+                        onCheckedChange={(checked) => setHasGarage(checked === true)}
+                      />
+                      <label htmlFor="garage-plan" className="text-sm font-medium flex items-center gap-2">
+                        <Car className="h-4 w-4" />
+                        Inclure un garage
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes détaillées */}
+                <div className="space-y-2">
+                  <Label>Notes sur le projet (optionnel)</Label>
+                  <textarea
+                    value={additionalNotes}
+                    onChange={(e) => setAdditionalNotes(e.target.value)}
+                    placeholder="Ex: Cuisine ouverte avec îlot, 3 chambres, sous-sol fini, thermopompe murale, plancher chauffant salle de bain, balcon 12x10..."
+                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Plus vous donnez de détails, plus l'estimation sera précise (matériaux souhaités, équipements spéciaux, etc.)
+                  </p>
+                </div>
+
+                {/* Images de référence */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="flex items-center gap-2">
+                      <Image className="h-4 w-4" />
+                      Images d'inspiration (optionnel)
+                    </Label>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={isUploadingManualImage}
+                      onClick={() => manualImageInputRef.current?.click()}
+                    >
+                      {isUploadingManualImage ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-1" />
+                          Ajouter
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  {manualReferenceImages.length > 0 && (
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                      {manualReferenceImages.map((url, index) => (
+                        <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border bg-muted">
+                          <img src={url} alt={`Réf ${index + 1}`} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => setManualReferenceImages(prev => prev.filter((_, i) => i !== index))}
+                            className="absolute top-1 right-1 p-1 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
                         </div>
-                      );
-                    })}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-
-              {selectedPlanUrls.length > 0 && (
-                <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800">
-                  <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                    <CheckCircle2 className="h-5 w-5" />
-                    <span className="font-medium">{selectedPlanUrls.length} plan(s) sélectionné(s)</span>
-                  </div>
-                  <p className="text-sm text-green-600 dark:text-green-300 mt-1">
-                    L'IA va analyser tous les plans ensemble pour extraire les dimensions et générer un budget consolidé sans doublons.
-                  </p>
-                </div>
-              )}
-
-              {selectedPlanUrls.length === 0 && (
-                <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
-                  <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                    <AlertTriangle className="h-5 w-5" />
-                    <span className="font-medium">Aucun plan sélectionné</span>
-                  </div>
-                  <p className="text-sm text-amber-600 dark:text-amber-300 mt-1">
-                    Ajoutez un ou plusieurs plans (étages, élévations, coupes) pour une analyse complète.
-                  </p>
-                </div>
-              )}
+              </div>
             </div>
           </TabsContent>
         </Tabs>
