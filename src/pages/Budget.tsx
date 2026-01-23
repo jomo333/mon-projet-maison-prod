@@ -82,6 +82,19 @@ const mergeMap: Record<string, string> = {
   "electricite-finition": "Électricité",
 };
 
+// Build a stable mapping of category -> tasks (based on the guide steps),
+// so we can always display the tasks even if the budget analysis didn't produce items.
+const buildStepTasksByCategory = (): Record<string, string[]> => {
+  const map: Record<string, string[]> = {};
+  for (const step of physicalWorkSteps) {
+    const name = mergeMap[step.id] ?? step.title;
+    map[name] = [...(map[name] ?? []), ...step.tasks.map((t) => t.title)];
+  }
+  return map;
+};
+
+const stepTasksByCategory = buildStepTasksByCategory();
+
 // Build merged categories
 const buildDefaultCategories = (): BudgetCategory[] => {
   const result: BudgetCategory[] = [];
@@ -112,7 +125,7 @@ const buildDefaultCategories = (): BudgetCategory[] => {
       mergedCategories[mergedName].tasks.push(...step.tasks.map(t => t.title));
     } else {
       // Regular step
-      const taskTitles = step.tasks.map(t => t.title).join(", ");
+      const taskTitles = stepTasksByCategory[step.title]?.join(", ") ?? step.tasks.map(t => t.title).join(", ");
       result.push({
         name: step.title,
         budget: 0,
@@ -747,6 +760,12 @@ const Budget = () => {
                     const isNearLimit = percent > 80 && !isOverBudget;
                     const isExpanded = expandedCategories.includes(category.name);
                     const hasItems = category.items && category.items.length > 0;
+                    const stepTasks = stepTasksByCategory[category.name] ?? [];
+                    const stepTasksText = stepTasks.join(", ");
+                    const showAnalysisSummary =
+                      !!category.description &&
+                      category.description.trim().length > 0 &&
+                      category.description.trim() !== stepTasksText.trim();
 
                     return (
                       <Collapsible 
@@ -798,25 +817,42 @@ const Budget = () => {
                                 >
                                   <Edit2 className="h-4 w-4" />
                                 </Button>
-                                {hasItems && (
-                                  isExpanded ? (
-                                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                                  ) : (
-                                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                                  )
+                                {isExpanded ? (
+                                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                                ) : (
+                                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
                                 )}
                               </div>
                             </div>
                           </CollapsibleTrigger>
                           
                           <CollapsibleContent>
-                            {hasItems && (
-                              <div className="px-4 pb-3 pt-1 border-t bg-muted/30">
-                                {category.description && (
-                                  <p className="text-sm text-muted-foreground mb-3 italic">
-                                    {category.description}
-                                  </p>
-                                )}
+                            <div className="px-4 pb-3 pt-3 border-t bg-muted/30 space-y-4">
+                              {/* Tasks coming from the construction guide (always visible) */}
+                              {stepTasks.length > 0 && (
+                                <div>
+                                  <div className="text-xs font-medium text-muted-foreground mb-2">
+                                    Tâches incluses (étapes du guide)
+                                  </div>
+                                  <ul className="list-disc pl-5 space-y-1 text-sm">
+                                    {stepTasks.map((t) => (
+                                      <li key={t} className="text-muted-foreground">
+                                        {t}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+
+                              {/* Analysis summary (if present) */}
+                              {showAnalysisSummary && (
+                                <div className="text-sm text-muted-foreground">
+                                  <span className="font-medium">Analyse:</span> {category.description}
+                                </div>
+                              )}
+
+                              {/* Itemized analysis (if available) */}
+                              {hasItems ? (
                                 <div className="space-y-2">
                                   <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
                                     <div className="col-span-5">Élément</div>
@@ -835,8 +871,12 @@ const Budget = () => {
                                     </div>
                                   ))}
                                 </div>
-                              </div>
-                            )}
+                              ) : (
+                                <div className="text-sm text-muted-foreground italic">
+                                  Aucun élément analysé pour cette catégorie pour l’instant.
+                                </div>
+                              )}
+                            </div>
                           </CollapsibleContent>
                         </div>
                       </Collapsible>
