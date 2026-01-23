@@ -957,8 +957,16 @@ const Budget = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3 max-h-[500px] overflow-y-auto">
-                  {budgetCategories.map((category) => {
+                {(() => {
+                  const subTotal = budgetCategories.reduce((s, c) => s + (Number(c.budget) || 0), 0);
+                  const contingence = subTotal * 0.05;
+                  const tps = (subTotal + contingence) * 0.05;
+                  const tvq = (subTotal + contingence) * 0.09975;
+                  const taxes = tps + tvq;
+
+                  return (
+                    <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                      {budgetCategories.map((category) => {
                     const percent = category.budget > 0 ? (category.spent / category.budget) * 100 : 0;
                     const isOverBudget = category.spent > category.budget;
                     const isNearLimit = percent > 80 && !isOverBudget;
@@ -1107,8 +1115,40 @@ const Budget = () => {
                         </div>
                       </Collapsible>
                     );
-                  })}
-                </div>
+                      })}
+
+                      {/* Contingence 5% */}
+                      <div className="rounded-lg border bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 p-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded shrink-0 bg-amber-500" />
+                            <span className="font-medium text-amber-700 dark:text-amber-400">Contingence (5%)</span>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                              {Math.round(contingence * 0.90).toLocaleString()} $ - {Math.round(contingence * 1.10).toLocaleString()} $
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Taxes (TPS + TVQ) */}
+                      <div className="rounded-lg border bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800 p-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded shrink-0 bg-blue-500" />
+                            <span className="font-medium text-blue-700 dark:text-blue-400">Taxes (TPS 5% + TVQ 9,975%)</span>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="text-sm font-medium text-blue-700 dark:text-blue-400">
+                              {Math.round(taxes * 0.90).toLocaleString()} $ - {Math.round(taxes * 1.10).toLocaleString()} $
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </CardContent>
             </Card>
           </div>

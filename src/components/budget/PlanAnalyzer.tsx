@@ -1118,26 +1118,62 @@ export function PlanAnalyzer({
             <p className="text-muted-foreground">{analysis.projectSummary}</p>
 
             {/* Categories preview */}
-            <div className="grid gap-2 max-h-[400px] overflow-y-auto pr-2">
-              {orderedAnalysisCategories.map((cat, index) => (
-                <div 
-                  key={index}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center font-medium">
-                      {index + 1}
+            {(() => {
+              const subTotal = orderedAnalysisCategories.reduce((s, c) => s + (Number(c.budget) || 0), 0);
+              const contingence = subTotal * 0.05;
+              const tps = (subTotal + contingence) * 0.05;
+              const tvq = (subTotal + contingence) * 0.09975;
+              const taxes = tps + tvq;
+
+              return (
+                <div className="grid gap-2 max-h-[400px] overflow-y-auto pr-2">
+                  {orderedAnalysisCategories.map((cat, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center font-medium">
+                          {index + 1}
+                        </span>
+                        <span className="font-medium">{cat.name}</span>
+                      </div>
+                      <span className="text-muted-foreground font-medium text-sm">
+                        {Math.round(cat.budget * 0.90).toLocaleString()} $ - {Math.round(cat.budget * 1.10).toLocaleString()} $
+                      </span>
+                    </div>
+                  ))}
+
+                  {/* Contingence 5% */}
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs flex items-center justify-center font-medium">
+                        %
+                      </span>
+                      <span className="font-medium text-amber-700 dark:text-amber-400">Contingence (5%)</span>
+                    </div>
+                    <span className="text-amber-700 dark:text-amber-400 font-medium text-sm">
+                      {Math.round(contingence * 0.90).toLocaleString()} $ - {Math.round(contingence * 1.10).toLocaleString()} $
                     </span>
-                    <span className="font-medium">{cat.name}</span>
                   </div>
-                  <span className="text-muted-foreground font-medium text-sm">
-                    {Math.round(cat.budget * 0.90).toLocaleString()} $ - {Math.round(cat.budget * 1.10).toLocaleString()} $
-                  </span>
+
+                  {/* Taxes (TPS + TVQ) */}
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-blue-500/20 text-blue-700 dark:text-blue-400 text-xs flex items-center justify-center font-medium">
+                        $
+                      </span>
+                      <span className="font-medium text-blue-700 dark:text-blue-400">Taxes (TPS 5% + TVQ 9,975%)</span>
+                    </div>
+                    <span className="text-blue-700 dark:text-blue-400 font-medium text-sm">
+                      {Math.round(taxes * 0.90).toLocaleString()} $ - {Math.round(taxes * 1.10).toLocaleString()} $
+                    </span>
+                  </div>
                 </div>
-              ))}
-            </div>
+              );
+            })()}
             <p className="text-xs text-muted-foreground text-center">
-              {orderedAnalysisCategories.length} poste(s) • Fourchette ±10%
+              {orderedAnalysisCategories.length} poste(s) + Contingence + Taxes • Fourchette ±10%
             </p>
 
             {/* Warnings */}
