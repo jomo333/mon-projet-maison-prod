@@ -43,7 +43,8 @@ export function usePdfToImage() {
     file: File,
     options: { scale?: number; maxPages?: number } = {}
   ): Promise<ConversionResult> => {
-    const { scale = 2, maxPages = 10 } = options;
+    // PNG at scale 2 creates huge files; JPEG + slightly lower scale is faster and safer.
+    const { scale = 1.6, maxPages = 10 } = options;
     
     setIsConverting(true);
     setProgress(0);
@@ -80,8 +81,8 @@ export function usePdfToImage() {
               if (b) resolve(b);
               else reject(new Error("Failed to convert canvas to blob"));
             },
-            "image/png",
-            0.95
+            "image/jpeg",
+            0.82
           );
         });
 
