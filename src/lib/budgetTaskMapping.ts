@@ -16,6 +16,7 @@ export type CategoryTaskMappings = Record<string, TaskKeywordMapping[]>;
 
 export const categoryTaskMappings: CategoryTaskMappings = {
   // EXCAVATION - matches step "excavation"
+  // IMPORTANT: Do NOT include foundation-related keywords here (béton, fondation, semelle, dalle, mur, imperméabilisation, drain)
   "Excavation": [
     {
       taskTitle: "Implantation de la maison",
@@ -24,8 +25,20 @@ export const categoryTaskMappings: CategoryTaskMappings = {
     {
       taskTitle: "Creusage et excavation",
       keywords: [
-        "excavation", "creusage", "terre", "transport", "pelle", "nivellement",
-        "déblai", "remblayage", "terrassement", "excavatrice", "camion", "gravier"
+        "excavation", "creusage", "terre", "transport terre", "pelle mécanique", "nivellement terrain",
+        "déblai", "terrassement", "excavatrice", "camion terre", "excavation sous-sol"
+      ],
+    },
+  ],
+  
+  // Keywords that should NEVER match Excavation - they belong to Fondation or Dalle
+  // This is used as an exclusion list
+  "_excavation_exclusions": [
+    {
+      taskTitle: "_exclusion",
+      keywords: [
+        "fondation", "semelle", "béton", "dalle", "mur de fondation", "imperméabilisation",
+        "drain français", "coffrage", "coulage", "solage", "membrane", "goudron", "delta"
       ],
     },
   ],
@@ -35,16 +48,17 @@ export const categoryTaskMappings: CategoryTaskMappings = {
     {
       taskTitle: "Coulage des fondations",
       keywords: [
-        "semelle", "mur", "fondation", "béton", "coffrage", "coulage",
-        "imperméabilisation", "membrane", "delta", "goudron", "armature",
-        "acier", "fer", "forme", "fondations", "solage", "m3", "mètre cube"
+        "semelle", "mur de fondation", "mur fondation", "murs de fondation", "fondation", "béton coulé", 
+        "coffrage", "coulage fondation", "imperméabilisation", "membrane fondation", "delta", "goudron", 
+        "armature", "acier", "fer", "forme", "fondations", "solage", "m3", "mètre cube",
+        "8 pouces", "8\"", "10\"", "périmètre", "ml fondation"
       ],
     },
     {
       taskTitle: "Drain et remblai",
       keywords: [
-        "drain", "français", "remblai", "pierre", "gravier", "nette",
-        "drainage", "géotextile", "rigole", "pompe", "puisard"
+        "drain français", "drain", "remblai", "pierre nette", "gravier drainage",
+        "drainage", "géotextile", "rigole", "pompe puisard", "puisard"
       ],
     },
   ],
@@ -461,9 +475,33 @@ export const categoryTaskMappings: CategoryTaskMappings = {
 };
 
 /**
+ * Check if an item should be excluded from a category based on exclusion keywords
+ * For example, foundation items should not appear in Excavation
+ */
+function shouldExcludeFromCategory(categoryName: string, itemName: string): boolean {
+  const itemNameLower = itemName.toLowerCase();
+  
+  // Exclusion rules: items matching these keywords should NOT be in the specified category
+  const exclusionRules: Record<string, string[]> = {
+    "Excavation": [
+      "fondation", "semelle", "béton", "dalle", "mur de fondation", "murs de fondation",
+      "imperméabilisation", "drain français", "coffrage", "coulage", "solage",
+      "membrane", "goudron", "delta", "8 pouces", "8\"", "périmètre principal",
+      "mur fondation", "ml"
+    ],
+  };
+  
+  const exclusions = exclusionRules[categoryName];
+  if (!exclusions) return false;
+  
+  return exclusions.some((kw) => itemNameLower.includes(kw.toLowerCase()));
+}
+
+/**
  * Given a category name and an array of budget items, group the items under their corresponding tasks.
  * Returns a Map where keys are task titles and values are arrays of items for that task.
  * Items that don't match any task keywords are grouped under "Autres éléments".
+ * Items that should belong to another category (e.g., foundation items in excavation) are excluded.
  */
 export function groupItemsByTask(
   categoryName: string,
@@ -475,6 +513,8 @@ export function groupItemsByTask(
   // Initialize groups for each known task
   if (mappings) {
     for (const mapping of mappings) {
+      // Skip internal exclusion mappings
+      if (mapping.taskTitle.startsWith("_")) continue;
       grouped.set(mapping.taskTitle, []);
     }
   }
@@ -484,10 +524,19 @@ export function groupItemsByTask(
 
   for (const item of items) {
     const itemNameLower = item.name.toLowerCase();
+    
+    // Skip items that should be excluded from this category
+    if (shouldExcludeFromCategory(categoryName, item.name)) {
+      continue; // Don't add to this category at all
+    }
+    
     let matched = false;
 
     if (mappings) {
       for (const mapping of mappings) {
+        // Skip internal exclusion mappings
+        if (mapping.taskTitle.startsWith("_")) continue;
+        
         const matches = mapping.keywords.some((kw) =>
           itemNameLower.includes(kw.toLowerCase())
         );
