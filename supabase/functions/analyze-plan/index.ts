@@ -1917,7 +1917,7 @@ INSTRUCTION CRITIQUE - AGRANDISSEMENT:
           "pvc-standard": "Fenêtres PVC standard double vitrage",
           "pvc-triple": "Fenêtres PVC triple vitrage",
           "aluminium": "Fenêtres aluminium",
-          "hybride": "Fenêtres hybrides (bois/alu)",
+          "pvc-alu": "Fenêtres PVC/Aluminium (PVC int, alu ext)",
           "bois": "Fenêtres bois massif"
         },
         insulationType: {
