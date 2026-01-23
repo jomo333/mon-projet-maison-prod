@@ -42,8 +42,22 @@ const PRIX_QUEBEC_2025 = {
     "coffrage_isolant_R22_R32_pi2_max": 230.00,
   },
   toiture: {
-    "bardeau_asphalte_25ans_carre": 95.00,
+    // Toits en pente - Prix au pi² installation incluse
+    "bardeau_asphalte_pi2_min": 3.00,
+    "bardeau_asphalte_pi2_max": 12.00, // Durée de vie: 15-30 ans
+    "tole_metal_pi2_min": 10.00,
+    "tole_metal_pi2_max": 30.00, // Durée de vie: 50+ ans
+    // Toits plats - Prix au pi² installation incluse
+    "membrane_elastomere_pi2_min": 11.00,
+    "membrane_elastomere_pi2_max": 25.00, // Durée de vie: 25-35 ans
+    "membrane_TPO_pi2_min": 11.00,
+    "membrane_TPO_pi2_max": 22.00, // Durée de vie: 20-30 ans
+    "membrane_EPDM_pi2_min": 11.00,
+    "membrane_EPDM_pi2_max": 25.00, // Durée de vie: 20-25 ans
+    // Autres
     "membrane_Tyvek_pi2": 0.42,
+    "retrait_ancien_revetement_pi2_min": 2.00,
+    "retrait_ancien_revetement_pi2_max": 5.00,
   },
   beton: {
     "ciment_portland_30kg": 12.50,
@@ -228,7 +242,28 @@ Tu DOIS produire des estimations pour CHAQUE catégorie suivante, même si les p
 - Murs extérieurs: Superficie murs x prix/pi² selon type d'isolant
 - Grenier: Superficie plafond x prix/pi² cellulose R60
 
+## COÛTS DE TOITURE QUÉBEC 2025 (référence détaillée)
+
+| Type de revêtement | Prix au pi² (installation incluse) | Durée de vie | Application |
+|--------------------|-----------------------------------|--------------|-------------|
+| Bardeau d'asphalte | 3$ - 12$ | 15-30 ans | Toits en pente |
+| Tôle/Métal | 10$ - 30$ | 50+ ans | Toits en pente |
+| Membrane élastomère | 11$ - 25$ | 25-35 ans | Toits plats |
+| Membrane TPO | 11$ - 22$ | 20-30 ans | Toits plats |
+| Membrane EPDM | 11$ - 25$ | 20-25 ans | Toits plats |
+
+**Facteurs influençant les coûts**:
+- Pente du toit: Plus la pente est élevée, plus la surface est grande et le travail complexe
+- Complexité: Nombre de versants, noues, cheminées, puits de lumière
+- Retrait ancien revêtement: 2$ à 5$/pi² supplémentaire
+- Travaux hivernaux: Majoration possible
+
+**Calcul typique toiture**:
+- Surface toiture ≈ Superficie au sol x 1.15 (pente standard) à x 1.4 (forte pente)
+- Coût = Surface toiture x prix/pi² selon type de revêtement
+
 ## PRIX DÉTAILLÉS PAR CATÉGORIE AUTOCONSTRUCTION QUÉBEC 2025 (par pi² de superficie habitable PAR ÉTAGE)
+
 
 | Catégorie | Économique | Standard | Haut de gamme |
 |-----------|------------|----------|---------------|
