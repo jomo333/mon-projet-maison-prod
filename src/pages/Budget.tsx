@@ -845,10 +845,13 @@ const Budget = () => {
                               {/* Group items by task */}
                               {(() => {
                                 const groupedByTask = groupItemsByTask(category.name, displayItems);
-                                const taskEntries = Array.from(groupedByTask.entries());
+                                 const taskEntries = Array.from(groupedByTask.entries());
+                                 const otherItems = groupedByTask.get("Autres éléments") ?? [];
+                                 const guideTaskTitles = stepTasks;
+                                 const hasAnyItems = displayItems.length > 0;
 
-                                // If no items at all, show tasks from the guide without items
-                                if (taskEntries.length === 0) {
+                                 // If no items at all, show tasks from the guide without items
+                                 if (!hasAnyItems) {
                                   return (
                                     <>
                                       {stepTasks.length > 0 && (
@@ -872,37 +875,121 @@ const Budget = () => {
                                   );
                                 }
 
-                                // Display items grouped under their task headings
-                                return (
-                                  <div className="space-y-4">
-                                    {taskEntries.map(([taskTitle, items]) => (
-                                      <div key={taskTitle}>
-                                        <div className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
-                                          <CheckCircle2 className="h-4 w-4 text-primary" />
-                                          {taskTitle}
-                                        </div>
-                                        <div className="ml-6 space-y-1">
-                                          <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
-                                            <div className="col-span-5">Élément</div>
-                                            <div className="col-span-3 text-center">Quantité</div>
-                                            <div className="col-span-4 text-right">Coût</div>
-                                          </div>
-                                          {items.map((item, idx) => (
-                                            <div key={idx} className="grid grid-cols-12 gap-2 text-sm py-1">
-                                              <div className="col-span-5 truncate text-muted-foreground">{item.name}</div>
-                                              <div className="col-span-3 text-center text-muted-foreground">
-                                                {item.quantity} {item.unit}
-                                              </div>
-                                              <div className="col-span-4 text-right font-medium">
-                                                {item.cost.toLocaleString()} $
-                                              </div>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                );
+                                 // Prefer rendering the official guide task titles as headings
+                                 // so the UI is always identical to the step tasks.
+                                 if (guideTaskTitles.length > 0) {
+                                   return (
+                                     <div className="space-y-4">
+                                       {guideTaskTitles.map((taskTitle) => {
+                                         const items = groupedByTask.get(taskTitle) ?? [];
+                                         const hasItems = items.length > 0;
+
+                                         return (
+                                           <div key={taskTitle}>
+                                             <div
+                                               className={
+                                                 "text-sm font-medium mb-2 flex items-center gap-2 " +
+                                                 (hasItems ? "text-foreground" : "text-muted-foreground")
+                                               }
+                                             >
+                                               <CheckCircle2
+                                                 className={
+                                                   "h-4 w-4 " +
+                                                   (hasItems ? "text-primary" : "text-muted-foreground")
+                                                 }
+                                               />
+                                               {taskTitle}
+                                             </div>
+
+                                             {hasItems ? (
+                                               <div className="ml-6 space-y-1">
+                                                 <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
+                                                   <div className="col-span-5">Élément</div>
+                                                   <div className="col-span-3 text-center">Quantité</div>
+                                                   <div className="col-span-4 text-right">Coût</div>
+                                                 </div>
+                                                 {items.map((item, idx) => (
+                                                   <div key={idx} className="grid grid-cols-12 gap-2 text-sm py-1">
+                                                     <div className="col-span-5 truncate text-muted-foreground">{item.name}</div>
+                                                     <div className="col-span-3 text-center text-muted-foreground">
+                                                       {item.quantity} {item.unit}
+                                                     </div>
+                                                     <div className="col-span-4 text-right font-medium">
+                                                       {item.cost.toLocaleString()} $
+                                                     </div>
+                                                   </div>
+                                                 ))}
+                                               </div>
+                                             ) : (
+                                               <div className="ml-6 text-sm text-muted-foreground italic">
+                                                 Aucun élément associé.
+                                               </div>
+                                             )}
+                                           </div>
+                                         );
+                                       })}
+
+                                       {otherItems.length > 0 && (
+                                         <div>
+                                           <div className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                                             <CheckCircle2 className="h-4 w-4 text-primary" />
+                                             Autres éléments
+                                           </div>
+                                           <div className="ml-6 space-y-1">
+                                             <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
+                                               <div className="col-span-5">Élément</div>
+                                               <div className="col-span-3 text-center">Quantité</div>
+                                               <div className="col-span-4 text-right">Coût</div>
+                                             </div>
+                                             {otherItems.map((item, idx) => (
+                                               <div key={idx} className="grid grid-cols-12 gap-2 text-sm py-1">
+                                                 <div className="col-span-5 truncate text-muted-foreground">{item.name}</div>
+                                                 <div className="col-span-3 text-center text-muted-foreground">
+                                                   {item.quantity} {item.unit}
+                                                 </div>
+                                                 <div className="col-span-4 text-right font-medium">
+                                                   {item.cost.toLocaleString()} $
+                                                 </div>
+                                               </div>
+                                             ))}
+                                           </div>
+                                         </div>
+                                       )}
+                                     </div>
+                                   );
+                                 }
+
+                                 // Fallback: Display items grouped under their mapping task headings
+                                 return (
+                                   <div className="space-y-4">
+                                     {taskEntries.map(([taskTitle, items]) => (
+                                       <div key={taskTitle}>
+                                         <div className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                                           <CheckCircle2 className="h-4 w-4 text-primary" />
+                                           {taskTitle}
+                                         </div>
+                                         <div className="ml-6 space-y-1">
+                                           <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground pb-1 border-b">
+                                             <div className="col-span-5">Élément</div>
+                                             <div className="col-span-3 text-center">Quantité</div>
+                                             <div className="col-span-4 text-right">Coût</div>
+                                           </div>
+                                           {items.map((item, idx) => (
+                                             <div key={idx} className="grid grid-cols-12 gap-2 text-sm py-1">
+                                               <div className="col-span-5 truncate text-muted-foreground">{item.name}</div>
+                                               <div className="col-span-3 text-center text-muted-foreground">
+                                                 {item.quantity} {item.unit}
+                                               </div>
+                                               <div className="col-span-4 text-right font-medium">
+                                                 {item.cost.toLocaleString()} $
+                                               </div>
+                                             </div>
+                                           ))}
+                                         </div>
+                                       </div>
+                                     ))}
+                                   </div>
+                                 );
                               })()}
 
                               {/* Analysis summary (if present) */}
