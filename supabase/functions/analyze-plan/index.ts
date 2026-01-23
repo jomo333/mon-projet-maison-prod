@@ -225,6 +225,33 @@ const PRIX_QUEBEC_2025 = {
     "installation_porte_exterieure": 300.00,
     "installation_porte_interieure": 100.00,
   },
+  plomberie: {
+    // === COÛTS GLOBAUX CONSTRUCTION NEUVE ===
+    "rough_in_maison_1000_2000pi2_min": 5000.00,
+    "rough_in_maison_1000_2000pi2_max": 6000.00,
+    "finition_plomberie_min": 5500.00,
+    "total_maison_neuve_min": 10000.00,
+    "total_maison_neuve_max": 15000.00,
+    // === PAR APPAREIL (main-d'œuvre + tuyauterie) ===
+    "toilette_wc_min": 800.00,
+    "toilette_wc_max": 1300.00,
+    "lavabo_evier_sdb_min": 800.00,
+    "lavabo_evier_sdb_max": 1300.00,
+    "douche_bain_base_min": 1200.00,
+    "douche_bain_base_max": 2000.00,
+    "lave_vaisselle_laveuse_min": 600.00,
+    "lave_vaisselle_laveuse_max": 1000.00,
+    "chauffe_eau_installation_min": 750.00,
+    "chauffe_eau_installation_max": 1400.00,
+    "rough_in_par_appareil_min": 800.00,
+    "rough_in_par_appareil_max": 1800.00,
+    // === MAIN-D'ŒUVRE ===
+    "taux_horaire_plombier_min": 110.00,
+    "taux_horaire_plombier_max": 125.00,
+    // === TUYAUTERIE ===
+    "tuyauterie_installation_complexe_pi_min": 100.00,
+    "tuyauterie_installation_complexe_pi_max": 250.00,
+  },
   taux_CCQ_2025: {
     charpentier_menuisier: 48.50,
     electricien: 52.00,
@@ -596,6 +623,78 @@ Pour chaque fenêtre identifiée sur les plans:
 - Carrelage: +100$
 - Installation: +150$
 - **Total: 1150$**
+
+## COÛTS DE PLOMBERIE QUÉBEC 2025 (référence détaillée)
+
+### COÛTS GLOBAUX CONSTRUCTION NEUVE
+
+| Poste | Coût estimé |
+|-------|-------------|
+| Rough-in plomberie (maison 1000-2000 pi²) | 5 000$ - 6 000$ |
+| Finition de plomberie (connexion appareils) | 5 500$+ |
+| **Total plomberie maison neuve** | **10 000$ - 15 000$+** |
+
+*Le rough-in comprend l'installation des tuyaux d'alimentation et de drainage AVANT les appareils.*
+*La finition comprend la connexion des appareils (lavabo, toilette, douche, etc.).*
+
+### ESTIMATION PAR APPAREIL (main-d'œuvre + tuyauterie)
+
+| Appareil / Travaux | Coût estimé (2025-26) |
+|--------------------|-----------------------|
+| Toilette (WC) | 800$ - 1 300$ |
+| Lavabo / Évier salle de bain | 800$ - 1 300$ |
+| Douche / Bain (plomberie de base) | 1 200$ - 2 000$ |
+| Lave-vaisselle / Laveuse (raccordement) | 600$ - 1 000$ |
+| Chauffe-eau (installation complète) | 750$ - 1 400$ |
+| Rough-in par point d'eau (avant pose) | 800$ - 1 800$ |
+
+### MAIN-D'ŒUVRE PLOMBERIE
+
+| Tarif | Prix (région Montréal) |
+|-------|------------------------|
+| Taux horaire plombier résidentiel | 110$ - 125$/heure |
+| Taux CCQ officiel 2025 | 54$/heure (base) |
+
+*Les plombiers résidentiels facturent souvent entre 110$ et 125$/h (référence RBQ/CMMTQ).*
+
+### TUYAUTERIE ET MATÉRIAUX
+
+| Type d'installation | Coût par pied linéaire |
+|---------------------|------------------------|
+| Installation simple (PEX) | 50$ - 100$ |
+| Installation complexe (cuivre/murs) | 100$ - 250$+ |
+
+### CALCUL TYPIQUE PLOMBERIE MAISON NEUVE
+
+**Exemple: Maison 2 chambres, 1 salle de bain complète + 1 salle d'eau**
+
+1. **Salle de bain complète**: toilette + lavabo + douche/bain
+   - Rough-in 3 appareils: 3 x 1 000$ = 3 000$
+   - Finition: 3 000$
+   
+2. **Salle d'eau**: toilette + lavabo
+   - Rough-in 2 appareils: 2 x 1 000$ = 2 000$
+   - Finition: 2 000$
+   
+3. **Cuisine**: évier + lave-vaisselle
+   - Rough-in 2 appareils: 2 x 900$ = 1 800$
+   - Finition: 1 500$
+   
+4. **Buanderie**: laveuse
+   - Rough-in: 800$
+   - Finition: 600$
+   
+5. **Chauffe-eau**: 1 000$
+
+**Total estimé: ~12 700$** (avant taxes)
+
+### FACTEURS INFLUENÇANT LES COÛTS
+
+- **Nombre de salles de bain**: Chaque SDB complète ajoute 4 000$ - 6 000$
+- **Configuration**: Appareils empilés (2 étages) = économies sur la tuyauterie
+- **Type de tuyauterie**: PEX (économique) vs Cuivre (premium)
+- **Accès**: Sous-sol vs dalle sur sol (plus complexe)
+- **Appareils haut de gamme**: Peuvent augmenter les coûts de 20-50%
 
 ## PRIX DÉTAILLÉS PAR CATÉGORIE AUTOCONSTRUCTION QUÉBEC 2025 (par pi² de superficie habitable PAR ÉTAGE)
 
