@@ -252,6 +252,43 @@ const PRIX_QUEBEC_2025 = {
     "tuyauterie_installation_complexe_pi_min": 100.00,
     "tuyauterie_installation_complexe_pi_max": 250.00,
   },
+  electricite: {
+    // === COÛT PAR PI² (construction neuve complète) ===
+    "installation_complete_pi2_min": 4.00,
+    "installation_complete_pi2_max": 9.00,
+    // === ESTIMATIONS PAR SUPERFICIE ===
+    "maison_1000pi2_min": 4000.00,
+    "maison_1000pi2_max": 9000.00,
+    "maison_1500pi2_min": 6000.00,
+    "maison_1500pi2_max": 13500.00,
+    "maison_2000pi2_min": 8000.00,
+    "maison_2000pi2_max": 18000.00,
+    "maison_2500pi2_min": 10000.00,
+    "maison_2500pi2_max": 22500.00,
+    // === COMPOSANTES PRINCIPALES ===
+    "panneau_100A": 1500.00,
+    "panneau_200A": 2500.00,
+    "panneau_400A": 4500.00,
+    "circuit_standard_15A": 150.00,
+    "circuit_20A": 200.00,
+    "circuit_240V_30A": 350.00,
+    "circuit_240V_50A": 500.00,
+    "prise_standard": 25.00,
+    "prise_GFCI": 45.00,
+    "interrupteur_simple": 20.00,
+    "interrupteur_3voies": 35.00,
+    "interrupteur_dimmer": 50.00,
+    // === EXTRAS SPÉCIALISÉS ===
+    "borne_recharge_VE_niveau2": 1500.00,
+    "borne_recharge_VE_niveau2_max": 3000.00,
+    "domotique_base": 2000.00,
+    "domotique_avance": 8000.00,
+    "eclairage_encastre_unite": 75.00,
+    "eclairage_encastre_installation": 50.00,
+    // === MAIN-D'ŒUVRE ===
+    "taux_horaire_electricien_min": 112.00,
+    "taux_horaire_electricien_max": 185.00,
+  },
   taux_CCQ_2025: {
     charpentier_menuisier: 48.50,
     electricien: 52.00,
@@ -695,6 +732,98 @@ Pour chaque fenêtre identifiée sur les plans:
 - **Type de tuyauterie**: PEX (économique) vs Cuivre (premium)
 - **Accès**: Sous-sol vs dalle sur sol (plus complexe)
 - **Appareils haut de gamme**: Peuvent augmenter les coûts de 20-50%
+
+## COÛTS D'ÉLECTRICITÉ QUÉBEC 2025 (référence détaillée)
+
+### COÛT PAR PIED CARRÉ (construction neuve complète)
+
+| Élément | Coût estimé |
+|---------|-------------|
+| Installation électrique complète | **4$ à 9$ / pi² habitable** |
+
+*Ce coût comprend: câblage, panneau, prises, interrupteurs, luminaires de base, main-d'œuvre et matériaux.*
+
+### ESTIMATION PAR SUPERFICIE
+
+| Superficie habitable | Estimation électrique totale |
+|---------------------|------------------------------|
+| 1 000 pi² | 4 000$ à 9 000$ |
+| 1 500 pi² | 6 000$ à 13 500$ |
+| 2 000 pi² | 8 000$ à 18 000$ |
+| 2 500 pi² | 10 000$ à 22 500$ |
+
+*Ces montants incluent l'installation électrique complète mais PAS les extras spécialisés.*
+
+### CE QUI EST INCLUS
+
+✅ Installation des circuits, prises et interrupteurs
+✅ Mise en place du panneau électrique principal
+✅ Fourniture des fils, gaines, connecteurs et protections
+✅ Luminaires de base
+✅ Tests et conformité au Code de construction
+
+### COMPOSANTES ET CIRCUITS
+
+| Composante | Coût unitaire |
+|------------|---------------|
+| Panneau 100A | 1 500$ |
+| Panneau 200A | 2 500$ |
+| Panneau 400A | 4 500$ |
+| Circuit standard 15A | 150$ |
+| Circuit 20A | 200$ |
+| Circuit 240V 30A (sécheuse, cuisinière) | 350$ |
+| Circuit 240V 50A (spa, borne VE) | 500$ |
+
+### PRISES ET INTERRUPTEURS
+
+| Élément | Coût (matériel + installation) |
+|---------|-------------------------------|
+| Prise standard | 25$ |
+| Prise GFCI (salle de bain, cuisine) | 45$ |
+| Interrupteur simple | 20$ |
+| Interrupteur 3 voies | 35$ |
+| Interrupteur dimmer | 50$ |
+
+### EXTRAS SPÉCIALISÉS (non inclus dans coût de base)
+
+| Extra | Coût additionnel |
+|-------|------------------|
+| Borne de recharge VE niveau 2 | 1 500$ - 3 000$ |
+| Système domotique de base | 2 000$ |
+| Système domotique avancé | 8 000$+ |
+| Éclairage encastré (par unité) | 75$ + 50$ installation |
+| Circuit spa extérieur | 800$ - 1 200$ |
+| Panneau solaire (préparation) | 500$ - 1 000$ |
+
+### MAIN-D'ŒUVRE ÉLECTRICIEN
+
+| Tarif | Prix (Québec 2025) |
+|-------|-------------------|
+| Taux horaire résidentiel léger | 112$/heure |
+| Taux horaire résidentiel lourd/complexe | 185$/heure |
+| Taux CCQ officiel 2025 (base) | 52$/heure |
+
+### CALCUL TYPIQUE ÉLECTRICITÉ MAISON NEUVE
+
+**Exemple: Maison 1 500 pi² standard**
+
+1. **Installation de base** (6.50$/pi²)
+   - 1 500 pi² x 6.50$ = 9 750$
+   
+2. **Extras optionnels**:
+   - Borne de recharge VE: +2 000$
+   - 10 encastrés additionnels: 10 x 125$ = +1 250$
+   - Interrupteurs dimmer (5): 5 x 50$ = +250$
+
+**Total avec extras: ~13 250$** (avant taxes)
+
+### FACTEURS INFLUENÇANT LES COÛTS
+
+- **Complexité du plan électrique**: Domotique, circuits spéciaux, éclairage architectural
+- **Nombre de circuits spéciaux**: Spa, atelier, garage chauffé
+- **Calibre des fils et disjoncteurs**: Standard vs haute capacité
+- **Accessibilité**: Sous-sol ouvert vs construction sur dalle
+- **Permis et inspections**: Obligatoires au Québec (inclus dans estimation)
 
 ## PRIX DÉTAILLÉS PAR CATÉGORIE AUTOCONSTRUCTION QUÉBEC 2025 (par pi² de superficie habitable PAR ÉTAGE)
 
