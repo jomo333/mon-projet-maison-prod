@@ -398,6 +398,23 @@ const PRIX_QUEBEC_2025 = {
     "meubles_bain_haut_gamme_pl_min": 350.00,
     "meubles_bain_haut_gamme_pl_max": 800.00,
   },
+  balcons: {
+    // === FIBRE DE VERRE ===
+    "balcon_fibre_verre_pi2_min": 30.00,
+    "balcon_fibre_verre_pi2_max": 45.00,
+    // === BOIS TRAITÉ / STANDARD ===
+    "balcon_bois_traite_pi2_min": 48.00,
+    "balcon_bois_traite_pi2_max": 60.00,
+    // === CÈDRE / BOIS TORRÉFIÉ ===
+    "balcon_cedre_torrefix_pi2_min": 60.00,
+    "balcon_cedre_torrefix_pi2_max": 72.00,
+    // === COMPOSITE ===
+    "balcon_composite_pi2_min": 50.00,
+    "balcon_composite_pi2_max": 60.00,
+    // === BÉTON ===
+    "balcon_beton_pi2_min": 70.00,
+    "balcon_beton_pi2_max": 85.00,
+  },
   taux_CCQ_2025: {
     charpentier_menuisier: 48.50,
     electricien: 52.00,
@@ -1218,6 +1235,65 @@ Pour chaque fenêtre identifiée sur les plans:
 | Métier | Taux CCQ 2025 |
 |--------|---------------|
 | Ébéniste | 50$/heure |
+
+## COÛTS BALCONS QUÉBEC 2025 (référence détaillée)
+
+### CONSTRUCTION COMPLÈTE (structure + revêtement + installation)
+
+| Type de balcon / matériau | Coût par pi² installé |
+|---------------------------|----------------------|
+| Fibre de verre (entrée/moyenne gamme) | 30$ à 45$ |
+| Bois traité / bois standard | 48$ à 60$ |
+| Composite (installé) | 50$ à 60$ |
+| Cèdre rouge / bois torréfié | 60$ à 72$ |
+| Béton (solide, durable) | 70$ à 85$ |
+
+### DÉTAILS PAR MATÉRIAU
+
+**🪚 Bois traité / Cèdre**
+- Bois traité standard : 48$ à 60$/pi²
+- Cèdre rouge ou bois torréfié : 60$ à 72$/pi²
+- Option courante au Québec, demande entretien régulier
+
+**🪵 Composite / Synthétique**
+- Composite installé : 50$ à 60$/pi²
+- Matériaux seuls : ~9$/pi² (installation en sus)
+- Moins d'entretien que le bois
+
+**🧱 Béton et Fibre de verre**
+- Fibre de verre : 30$ à 45$/pi²
+- Béton armé : 70$ à 85$/pi²
+- Plus durable, structure solide
+
+### EXEMPLES PAR SUPERFICIE DE BALCON
+
+| Superficie | Fibre verre | Bois traité | Composite | Béton |
+|------------|-------------|-------------|-----------|-------|
+| 80 pi² (8x10) | 2 400$ - 3 600$ | 3 840$ - 4 800$ | 4 000$ - 4 800$ | 5 600$ - 6 800$ |
+| 120 pi² (10x12) | 3 600$ - 5 400$ | 5 760$ - 7 200$ | 6 000$ - 7 200$ | 8 400$ - 10 200$ |
+| 200 pi² (10x20) | 6 000$ - 9 000$ | 9 600$ - 12 000$ | 10 000$ - 12 000$ | 14 000$ - 17 000$ |
+
+### CE QUI EST INCLUS
+
+✔ Plate-forme du balcon
+✔ Sous-structure porteuse
+✔ Finition de surface
+✔ Installation professionnelle
+
+### CE QUI N'EST PAS INCLUS (coûts additionnels)
+
+- Garde-corps (rampe, balustrade)
+- Escaliers d'accès
+- Aménagements haut de gamme
+- Étanchéité avancée (membrane)
+- Permis municipaux (requis si >60 cm de hauteur)
+
+### FACTEURS DE MAJORATION
+
+- Grande portée / design sur mesure
+- Garde-corps en verre ou métal design
+- Matériaux haut de gamme
+- Accès difficile / étage élevé
 
 ## PRIX DÉTAILLÉS PAR CATÉGORIE AUTOCONSTRUCTION QUÉBEC 2025 (par pi² de superficie habitable PAR ÉTAGE)
 
