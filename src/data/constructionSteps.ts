@@ -441,7 +441,7 @@ export const constructionSteps: Step[] = [
   },
   {
     id: "dalle-sous-sol",
-    title: "Coulage de dalle du sous-sol",
+    title: "Coulée de dalle du sous-sol",
     description: "Coulage de la dalle de béton du sous-sol après l'installation de la plomberie brute.",
     phase: "second-oeuvre",
     phaseLabel: "Second œuvre",

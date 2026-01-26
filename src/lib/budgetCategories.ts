@@ -95,7 +95,7 @@ const analysisToStepMap: Record<string, MappingTarget[]> = {
   "fondation": [
     { target: "Fondation", weight: 0.7 },
     { target: "Plomberie sous dalle", weight: 0.1 },
-    { target: "Coulage de dalle du sous-sol", weight: 0.2 },
+    { target: "Coulée de dalle du sous-sol", weight: 0.2 },
   ],
 
   // Structure: on ventile une portion vers les murs de division (charpente intérieure)
@@ -120,7 +120,7 @@ const analysisToStepMap: Record<string, MappingTarget[]> = {
   "electricite": [{ target: "Électricité", weight: 1 }],
   "plomberie": [{ target: "Plomberie", weight: 1 }],
   "plomberie sous dalle": [{ target: "Plomberie sous dalle", weight: 1 }],
-  "coulage de dalle du sous-sol": [{ target: "Coulage de dalle du sous-sol", weight: 1 }],
+  "coulee de dalle du sous-sol": [{ target: "Coulée de dalle du sous-sol", weight: 1 }],
   "murs de division": [{ target: "Murs de division", weight: 1 }],
 
   // Chauffage - le titre de l'étape est "Chauffage et ventilation"

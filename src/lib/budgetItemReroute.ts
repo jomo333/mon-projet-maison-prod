@@ -154,7 +154,7 @@ const isNotPlumbing = (name: string) => {
   );
 };
 
-// Items that should be EXCLUDED from Coulage de dalle (foundation walls/footings, NOT slab items)
+// Items that should be EXCLUDED from Coulée de dalle (foundation walls/footings, NOT slab items)
 const isFoundationNotSlab = (name: string) => {
   const n = normalize(name);
   return (
@@ -185,7 +185,7 @@ const isFoundationNotSlab = (name: string) => {
 /**
  * Moves misclassified items OUT of "Fondation" into:
  * - "Excavation" for drain/remblai items
- * - "Coulage de dalle du sous-sol" for slab/dalle items
+ * - "Coulée de dalle du sous-sol" for slab/dalle items
  *
  * And OUT of "Toiture" into:
  * - "Structure et charpente" for OSB/contreplaqué items
@@ -200,7 +200,7 @@ export function rerouteFoundationItems<T extends ReroutableBudgetCategory>(categ
   // === FONDATION REROUTING ===
   const fondation = nextByName.get("Fondation");
   const excavation = nextByName.get("Excavation");
-  const dalle = nextByName.get("Coulage de dalle du sous-sol");
+  const dalle = nextByName.get("Coulée de dalle du sous-sol");
 
   if (fondation && Array.isArray(fondation.items) && fondation.items.length > 0 && excavation && dalle) {
     const toExcavation: ReroutableBudgetItem[] = [];
@@ -352,8 +352,8 @@ export function rerouteFoundationItems<T extends ReroutableBudgetCategory>(categ
     plomberieSousDalle.items = cleanedPlomberie as any;
   }
 
-  // === COULAGE DE DALLE CLEANUP - Remove foundation items that don't belong ===
-  const coulagesDalle = nextByName.get("Coulage de dalle du sous-sol");
+  // === COULÉE DE DALLE CLEANUP - Remove foundation items that don't belong ===
+  const coulagesDalle = nextByName.get("Coulée de dalle du sous-sol");
   const fondationFinal = nextByName.get("Fondation");
   if (coulagesDalle && Array.isArray(coulagesDalle.items) && coulagesDalle.items.length > 0) {
     const cleanedDalle: ReroutableBudgetItem[] = [];
