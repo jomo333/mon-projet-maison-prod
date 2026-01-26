@@ -1683,6 +1683,7 @@ ${hasManualContext ? '- PERSONNALISE les estimations selon les spécifications c
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 2800,
+        temperature: 0,
         system: SYSTEM_PROMPT_EXTRACTION,
         messages: [
           {
@@ -2689,6 +2690,7 @@ Retourne le JSON structuré COMPLET.`;
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 8192,
+          temperature: 0,
           system: SYSTEM_PROMPT_EXTRACTION,
           messages: [{ role: 'user', content: extractionPrompt }],
         }),
