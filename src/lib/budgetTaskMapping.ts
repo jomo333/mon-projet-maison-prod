@@ -45,26 +45,28 @@ export const categoryTaskMappings: CategoryTaskMappings = {
   ],
 
   // FONDATION - matches step "fondation"
-  // Simplified to 2 main categories: Semelle, Imperméabilisation
-  // Drain/remblai items are part of foundation work but don't need separate display
+  // ONLY foundation walls and footings - dalle items go to "Coulage de dalle du sous-sol"
   "Fondation": [
     {
       taskTitle: "Semelle",
       keywords: [
         "semelle", "footing", "semelles", "coffrage semelle", "béton semelle", 
-        "armature semelle", "acier semelle", "fer semelle"
+        "armature semelle", "acier semelle", "fer semelle", "semelles de fondation",
+        "semelles béton"
       ],
+      // Exclude dalle items
+      exclusions: ["dalle", "plancher béton", "4 pouces", "4\"", "garage dalle"]
     },
     {
       taskTitle: "Coulage des fondations",
       keywords: [
-        "mur de fondation", "mur fondation", "murs de fondation", "fondation", "béton coulé", 
-        "coffrage", "coulage fondation", "coffrage mur", "forme", "fondations", "solage", 
-        "m3", "mètre cube", "8 pouces", "8\"", "10\"", "périmètre", "ml fondation",
-        "armature", "acier", "fer"
+        "mur de fondation", "mur fondation", "murs de fondation", "murs fondation",
+        "fondation béton", "béton coulé", "coffrage mur", "coulage fondation",
+        "solage", "8 pouces", "8\"", "10\"", "8' hauteur", "hauteur 8",
+        "25 mpa", "béton 25", "ml fondation", "pi lin fondation"
       ],
-      // Exclude dalle-related items AND drain/remblai - they go elsewhere
-      exclusions: ["dalle", "sous-sol", "garage béton", "plancher béton", "drain", "remblai", "puisard", "drainage", "géotextile"]
+      // CRITICAL: Exclude ALL dalle-related items
+      exclusions: ["dalle", "plancher béton", "4 pouces", "4\"", "garage dalle", "sous-sol 4", "drain", "remblai", "puisard"]
     },
     {
       taskTitle: "Imperméabilisation",
@@ -76,20 +78,22 @@ export const categoryTaskMappings: CategoryTaskMappings = {
   ],
 
   // STRUCTURE ET CHARPENTE - matches step "structure"
+  // IMPORTANT: Includes ALL structural elements: solives, fermes, contreplaqué plancher, charpente murs extérieurs, Tyvek, fourrures
   "Structure et charpente": [
     {
       taskTitle: "Plancher du rez-de-chaussée",
       keywords: [
-        "solive", "plancher", "sous-plancher", "poutrelle", "rez-de-chaussée",
-        "poutre", "lvl", "i-joist", "tji", "lam", "contreplaqué", "osb plancher"
+        "solive", "solives", "plancher", "sous-plancher", "poutrelle", "rez-de-chaussée",
+        "poutre", "lvl", "i-joist", "tji", "lam", "contreplaqué plancher", "osb plancher",
+        "contreplaqué 5/8", "contreplaqué 3/4", "5/8''", "3/4''"
       ],
     },
     {
       taskTitle: "Érection des murs",
       keywords: [
-        "mur", "colombage", "ossature", "2x4", "2x6", "2x8", "linteau",
-        "extérieur", "montant", "lisse", "sablière", "clouage", "clou",
-        "murs extérieurs", "charpente mur"
+        "mur extérieur", "colombage", "ossature", "2x4", "2x6", "2x8", "linteau",
+        "montant", "lisse", "sablière", "clouage", "clou",
+        "murs extérieurs", "charpente mur", "charpente murale", "périmètre"
       ],
     },
     {
@@ -99,13 +103,13 @@ export const categoryTaskMappings: CategoryTaskMappings = {
     {
       taskTitle: "Installation des fermes de toit",
       keywords: [
-        "ferme", "toit", "chevron", "préfabriqué", "fermes", "truss",
-        "charpente toit", "toiture structure"
+        "ferme", "fermes", "chevron", "préfabriqué", "fermes de toit", "truss",
+        "charpente toit", "toiture structure", "fermes préfabriquées"
       ],
     },
     {
       taskTitle: "Pontage de toit",
-      keywords: ["pontage", "contreplaqué", "osb", "pontage toit", "decking"],
+      keywords: ["pontage", "contreplaqué toit", "osb toit", "pontage toit", "decking"],
     },
     {
       taskTitle: "Étanchéité",
@@ -201,7 +205,7 @@ export const categoryTaskMappings: CategoryTaskMappings = {
   ],
 
   // COULAGE DE DALLE DU SOUS-SOL - matches step "dalle-sous-sol"
-  // Only slab items - foundation items go to "Fondation"
+  // ONLY slab/dalle items - foundation walls and footings go to "Fondation"
   "Coulage de dalle du sous-sol": [
     {
       taskTitle: "Préparation du sol",
@@ -209,22 +213,22 @@ export const categoryTaskMappings: CategoryTaskMappings = {
         "préparation", "nivellement", "compaction", "membrane sol", "isolant rigide",
         "styrofoam", "polystyrène", "granulaire", "pierre concassée", "0-3/4"
       ],
-      // Exclude foundation items
-      exclusions: ["fondation", "semelle", "mur de fondation", "footing", "coffrage mur", "imperméabilisation"]
+      // CRITICAL: Exclude foundation items
+      exclusions: ["fondation", "semelle", "semelles", "mur de fondation", "murs fondation", "footing", "coffrage mur", "imperméabilisation", "8' hauteur", "ml fondation"]
     },
     {
       taskTitle: "Coulage du béton",
       keywords: [
-        "dalle", "coulage dalle", "joint", "cure", "sous-sol dalle", "garage dalle",
-        "plancher béton", "finition béton", "lissage"
+        "dalle", "dalle sous-sol", "dalle 4", "4 pouces", "4\"", "coulage dalle",
+        "joint", "cure", "plancher béton", "finition béton", "lissage", "garage dalle"
       ],
-      // Exclude foundation items
-      exclusions: ["fondation", "semelle", "mur de fondation", "footing", "coffrage mur", "imperméabilisation", "périmètre", "ml fondation"]
+      // CRITICAL: Exclude foundation items
+      exclusions: ["fondation", "semelle", "semelles", "mur de fondation", "murs fondation", "footing", "coffrage mur", "imperméabilisation", "8' hauteur", "ml fondation", "périmètre"]
     },
   ],
 
   // MURS DE DIVISION - matches step "murs-division"
-  // Only interior partition walls - structural elements go to "Structure et charpente"
+  // ONLY interior partition walls - ALL structural elements go to "Structure et charpente"
   "Murs de division": [
     {
       taskTitle: "Construire escalier",
@@ -236,20 +240,21 @@ export const categoryTaskMappings: CategoryTaskMappings = {
     {
       taskTitle: "Ossature des murs",
       keywords: [
-        "ossature", "mur", "division", "montant",
-        "murs intérieurs", "cloison", "partition", "séparation"
+        "cloison", "partition", "séparation", "mur intérieur", "murs intérieurs",
+        "cloisons intérieures"
       ],
-      // Exclude structural elements - they go to Structure
+      // CRITICAL: Exclude ALL structural elements - they go to Structure et charpente
       exclusions: [
         "solive", "solives", "plancher", "sous-plancher", "poutre", "poteau", "poteaux",
         "ferme", "fermes", "toit", "contreplaqué", "osb", "2x10", "2x12", "lvl", 
-        "i-joist", "tji", "garage", "sablière", "lisse haute", "plafond"
+        "i-joist", "tji", "sablière", "lisse haute", "plafond", "5/8", "3/4",
+        "charpente murale", "murs extérieurs", "mur extérieur", "périmètre", "2x6"
       ]
     },
     {
       taskTitle: "Cadrage des portes",
       keywords: [
-        "cadrage", "cadre", "porte", "ouverture", "encadrement",
+        "cadrage", "cadre", "porte intérieure", "ouverture", "encadrement",
         "jambage", "chambranle"
       ],
     },
