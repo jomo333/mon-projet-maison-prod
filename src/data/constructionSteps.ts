@@ -147,6 +147,19 @@ export const constructionSteps: Step[] = [
           "Comparez les garanties et délais proposés"
         ],
         documents: ["Soumissions signées", "Preuves d'assurance", "Licences RBQ"]
+      },
+      {
+        id: "assurance-chantier",
+        title: "Assurance chantier",
+        description: "Souscrivez une assurance chantier pour protéger votre projet.",
+        tips: [
+          "L'assurance chantier couvre les dommages pendant la construction",
+          "Vérifiez que la couverture inclut le vol, le vandalisme et les intempéries",
+          "Demandez une preuve d'assurance responsabilité civile à tous vos entrepreneurs",
+          "Comparez plusieurs courtiers pour obtenir le meilleur tarif",
+          "Assurez-vous que la couverture débute avant le premier coup de pelle"
+        ],
+        documents: ["Police d'assurance chantier", "Certificats d'assurance des entrepreneurs"]
       }
     ]
   },
