@@ -102,6 +102,8 @@ export const categoryTaskMappings: CategoryTaskMappings = {
         "montant", "lisse", "sablière", "clouage", "clou",
         "murs extérieurs", "charpente mur", "charpente murale", "périmètre"
       ],
+      // Exclude interior partition items - they go to "Murs de division"
+      exclusions: ["cloison", "cloisons", "intérieur", "intérieures", "partition", "division"]
     },
     {
       taskTitle: "Structure de l'étage",
