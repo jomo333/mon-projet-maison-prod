@@ -140,6 +140,34 @@ const isNotPlumbing = (name: string) => {
   );
 };
 
+// Items that should be EXCLUDED from Coulage de dalle (foundation walls/footings, NOT slab items)
+const isFoundationNotSlab = (name: string) => {
+  const n = normalize(name);
+  return (
+    // Foundation walls and footings - go to "Fondation"
+    n.includes("semelle") ||
+    n.includes("semelles de fondation") ||
+    n.includes("semelles beton perimetre") ||
+    n.includes("mur de fondation") ||
+    n.includes("murs de fondation") ||
+    n.includes("murs fondation") ||
+    n.includes("fondation beton") ||
+    n.includes("footing") ||
+    n.includes("solage") ||
+    n.includes("8' hauteur") ||
+    n.includes("8 pieds") ||
+    n.includes("hauteur 8") ||
+    n.includes("ml fondation") ||
+    n.includes("perimetre") ||
+    n.includes("coffrage et finition") ||
+    n.includes("coffrage mur") ||
+    n.includes("impermeabilisation") ||
+    n.includes("beton coule") ||
+    n.includes("25 mpa avec air") ||
+    n.includes("autres elements")
+  );
+};
+
 /**
  * Moves misclassified items OUT of "Fondation" into:
  * - "Excavation" for drain/remblai items
@@ -267,6 +295,30 @@ export function rerouteFoundationItems<T extends ReroutableBudgetCategory>(categ
     }
 
     plomberieSousDalle.items = cleanedPlomberie as any;
+  }
+
+  // === COULAGE DE DALLE CLEANUP - Remove foundation items that don't belong ===
+  const coulagesDalle = nextByName.get("Coulage de dalle du sous-sol");
+  const fondationFinal = nextByName.get("Fondation");
+  if (coulagesDalle && Array.isArray(coulagesDalle.items) && coulagesDalle.items.length > 0) {
+    const cleanedDalle: ReroutableBudgetItem[] = [];
+    const movedToFondation: ReroutableBudgetItem[] = [];
+
+    for (const item of coulagesDalle.items as ReroutableBudgetItem[]) {
+      if (isFoundationNotSlab(item.name)) {
+        // Move foundation items to Fondation
+        if (fondationFinal) {
+          movedToFondation.push(item);
+        }
+        continue;
+      }
+      cleanedDalle.push(item);
+    }
+
+    coulagesDalle.items = cleanedDalle as any;
+    if (fondationFinal && movedToFondation.length > 0) {
+      fondationFinal.items = ([...((fondationFinal.items as any) || []), ...movedToFondation] as any) as any;
+    }
   }
 
   return next;
