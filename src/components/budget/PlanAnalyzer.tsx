@@ -148,13 +148,22 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
   }, [analysis]);
 
   // Expose reset function to parent via ref
+  // Track if we just reset to prevent auto-import from immediately re-triggering
+  const justResetRef = useRef(false);
+  
   useImperativeHandle(ref, () => ({
     resetAnalysis: () => {
       setAnalysis(null);
       setSelectedPlanUrls([]);
       setImportedPlanSourceUrls([]);
       setManualReferenceImages([]);
-      autoImportedForProjectRef.current = null;
+      // Mark that we just reset - don't re-trigger auto-import
+      justResetRef.current = true;
+      // Keep the project marker so auto-import doesn't re-run for this project
+      // autoImportedForProjectRef stays as-is (or we set it to projectId to block)
+      if (projectId) {
+        autoImportedForProjectRef.current = projectId;
+      }
     },
   }));
   
