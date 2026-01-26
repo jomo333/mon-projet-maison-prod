@@ -183,13 +183,16 @@ export const categoryTaskMappings: CategoryTaskMappings = {
   ],
 
   // PLOMBERIE SOUS DALLE - matches step "plomberie-sous-dalle"
+  // Only plumbing items - concrete/dalle items go to "Coulage de dalle"
   "Plomberie sous dalle": [
     {
       taskTitle: "Plomberie sous dalle - première visite",
       keywords: [
-        "plomberie", "drain", "tuyau", "sous-dalle", "égout", "renvoi",
-        "sous dalle", "avant dalle", "rough-in sous-sol"
+        "plomberie", "drain", "tuyau", "égout", "renvoi",
+        "rough-in sous-sol", "abs", "pvc drain", "coude", "té"
       ],
+      // Exclude concrete/slab items - they go to "Coulage de dalle du sous-sol"
+      exclusions: ["béton", "dalle", "coulage", "m3", "mètre cube", "styrofoam", "polystyrène", "isolant rigide", "granulaire", "pierre concassée", "membrane sol"]
     },
   ],
 
