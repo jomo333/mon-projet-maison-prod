@@ -212,7 +212,7 @@ export const categoryTaskMappings: CategoryTaskMappings = {
         "plomberie", "drain", "tuyau", "égout", "renvoi",
         "rough-in sous-sol", "abs", "pvc drain", "coude", "té"
       ],
-      // CRITICAL: Exclude ALL concrete/foundation/slab items permanently
+      // CRITICAL: Exclude ALL concrete/foundation/slab/structural items permanently
       exclusions: [
         // Slab/concrete items - go to "Coulage de dalle du sous-sol"
         "béton", "beton", "dalle", "dalle de béton", "dalle sous-sol", "dalle sous sol",
@@ -226,6 +226,11 @@ export const categoryTaskMappings: CategoryTaskMappings = {
         "murs fondation béton", "footing", "solage", "8' hauteur", "8 pieds", "hauteur 8",
         "périmètre", "perimetre", "béton coulé", "beton coule", "imperméabilisation",
         "murs fondation béton 8' hauteur", "murs fondation béton 25 mpa", "avec air",
+        // Structural items - go to "Structure et charpente"
+        "charpente", "charpente murs", "charpente murs extérieurs", "murs extérieurs",
+        "solive", "solives", "solives de plancher", "ferme", "fermes", "fermes de toit",
+        "fermes préfabriquées", "préfabriquées", "contreplaqué", "5/8", "5/8\"", "osb",
+        "toiture", "plancher", "2x6", "2x4", "pontage",
         // Autres éléments catch-all
         "autres éléments"
       ]
