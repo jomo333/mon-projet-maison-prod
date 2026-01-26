@@ -151,6 +151,27 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
   // Track if we just reset to prevent auto-import from immediately re-triggering
   const justResetRef = useRef(false);
   
+  // Helper to get/set auto-import blocked state in sessionStorage (persists across refresh)
+  const getAutoImportBlockedForProject = (pid: string) => {
+    try {
+      return sessionStorage.getItem(`budget-auto-import-blocked-${pid}`) === "true";
+    } catch {
+      return false;
+    }
+  };
+  
+  const setAutoImportBlockedForProject = (pid: string, blocked: boolean) => {
+    try {
+      if (blocked) {
+        sessionStorage.setItem(`budget-auto-import-blocked-${pid}`, "true");
+      } else {
+        sessionStorage.removeItem(`budget-auto-import-blocked-${pid}`);
+      }
+    } catch {
+      // sessionStorage not available
+    }
+  };
+  
   useImperativeHandle(ref, () => ({
     resetAnalysis: () => {
       setAnalysis(null);
@@ -163,6 +184,15 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
       // autoImportedForProjectRef stays as-is (or we set it to projectId to block)
       if (projectId) {
         autoImportedForProjectRef.current = projectId;
+        // Also persist to sessionStorage so it survives page refresh
+        setAutoImportBlockedForProject(projectId, true);
+      }
+    },
+    // Allow parent to clear the auto-import block (e.g., when user uploads new plans)
+    clearAutoImportBlock: () => {
+      if (projectId) {
+        autoImportedForProjectRef.current = null;
+        setAutoImportBlockedForProject(projectId, false);
       }
     },
   }));
@@ -426,8 +456,12 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
     if (!plans || plans.length === 0) return;
     if (isUploading || isConverting) return;
 
-    // Avoid repeating auto-import for the same project.
+    // Avoid repeating auto-import for the same project (check both ref and sessionStorage)
     if (autoImportedForProjectRef.current === projectId) return;
+    if (getAutoImportBlockedForProject(projectId)) {
+      autoImportedForProjectRef.current = projectId;
+      return;
+    }
     autoImportedForProjectRef.current = projectId;
 
     const isPdfPlan = (p: any) => {
