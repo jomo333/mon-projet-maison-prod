@@ -205,10 +205,15 @@ export function BudgetAnalysisResults({
       budget: cat.budget,
     }));
 
-  // Calculate totals
-  const subTotalBeforeTaxes =
-    analysis.totauxDetails?.sous_total_avant_taxes ||
-    orderedCategories.reduce((sum, cat) => sum + (Number(cat.budget) || 0), 0);
+  // Calculate totals - toujours basé sur les catégories ordonnées pour cohérence
+  const categoriesSubTotal = orderedCategories.reduce((sum, cat) => sum + (Number(cat.budget) || 0), 0);
+  const subTotalBeforeTaxes = categoriesSubTotal;
+  
+  // Calculer le total avec taxes et contingence pour affichage cohérent
+  const calculatedContingence = subTotalBeforeTaxes * 0.05;
+  const calculatedTps = (subTotalBeforeTaxes + calculatedContingence) * 0.05;
+  const calculatedTvq = (subTotalBeforeTaxes + calculatedContingence) * 0.09975;
+  const calculatedGrandTotal = subTotalBeforeTaxes + calculatedContingence + calculatedTps + calculatedTvq;
 
   const hasWarnings = analysis.warnings && analysis.warnings.length > 0;
   const hasRecommendations = analysis.recommendations && analysis.recommendations.length > 0;
@@ -267,13 +272,13 @@ export function BudgetAnalysisResults({
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              {/* Afficher fourchette ±15% pour estimation préliminaire */}
+              {/* Afficher fourchette ±10% pour estimation préliminaire */}
               {analysis.plansAnalyzed === 1 && !analysis.totauxDetails?.total_materiaux ? (
                 <>
                   <CardTitle className="text-2xl flex items-baseline gap-2 flex-wrap">
-                    <span className="text-primary">{formatCurrency(Math.round(analysis.estimatedTotal * 0.90))}</span>
+                    <span className="text-primary">{formatCurrency(Math.round(calculatedGrandTotal * 0.90))}</span>
                     <span className="text-muted-foreground text-lg">à</span>
-                    <span className="text-primary">{formatCurrency(Math.round(analysis.estimatedTotal * 1.10))}</span>
+                    <span className="text-primary">{formatCurrency(Math.round(calculatedGrandTotal * 1.10))}</span>
                   </CardTitle>
                   <CardDescription className="flex items-center gap-2 mt-1">
                     <Badge variant="outline" className="text-xs">±10%</Badge>
@@ -283,7 +288,7 @@ export function BudgetAnalysisResults({
               ) : (
                 <>
                   <CardTitle className="text-2xl">
-                    {formatCurrency(analysis.estimatedTotal)}
+                    {formatCurrency(calculatedGrandTotal)}
                   </CardTitle>
                   <CardDescription>
                     {analysis.projectSummary}
