@@ -212,16 +212,22 @@ export const categoryTaskMappings: CategoryTaskMappings = {
         "plomberie", "drain", "tuyau", "égout", "renvoi",
         "rough-in sous-sol", "abs", "pvc drain", "coude", "té"
       ],
-      // CRITICAL: Exclude ALL concrete/foundation/slab items
+      // CRITICAL: Exclude ALL concrete/foundation/slab items permanently
       exclusions: [
         // Slab/concrete items - go to "Coulage de dalle du sous-sol"
-        "béton", "beton", "dalle", "coulage", "m3", "mètre cube", "styrofoam", "polystyrène", "isolant rigide", 
+        "béton", "beton", "dalle", "dalle de béton", "dalle sous-sol", "dalle sous sol",
+        "coulage", "m3", "mètre cube", "styrofoam", "polystyrène", "isolant rigide", 
         "granulaire", "pierre concassée", "membrane sol", "4 pouces", "4\"", "4 po", "4 in",
-        "coffrage", "finition", "25 mpa", "25mpa", "lissage",
+        "coffrage", "finition", "coffrage et finition", "25 mpa", "25mpa", "lissage",
+        "dalle 4", "sous-sol 4", "4 in béton",
         // Foundation items - go to "Fondation"
-        "semelle", "semelles", "fondation", "mur de fondation", "murs de fondation", "murs fondation",
-        "mur fondation", "footing", "solage", "8' hauteur", "8 pieds", "périmètre", "perimetre",
-        "béton coulé", "beton coule", "imperméabilisation"
+        "semelle", "semelles", "semelles de fondation", "semelles béton", "semelles béton périmètre",
+        "fondation", "mur de fondation", "murs de fondation", "murs fondation", "mur fondation",
+        "murs fondation béton", "footing", "solage", "8' hauteur", "8 pieds", "hauteur 8",
+        "périmètre", "perimetre", "béton coulé", "beton coule", "imperméabilisation",
+        "murs fondation béton 8' hauteur", "murs fondation béton 25 mpa", "avec air",
+        // Autres éléments catch-all
+        "autres éléments"
       ]
     },
   ],
