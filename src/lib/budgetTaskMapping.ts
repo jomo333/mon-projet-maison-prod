@@ -227,7 +227,8 @@ export const categoryTaskMappings: CategoryTaskMappings = {
       taskTitle: "Coulage du béton",
       keywords: [
         "dalle", "dalle sous-sol", "dalle 4", "4 pouces", "4\"", "coulage dalle",
-        "joint", "cure", "plancher béton", "finition béton", "lissage", "garage dalle"
+        "joint", "cure", "plancher béton", "finition béton", "lissage", "garage dalle",
+        "coffrage et finition"
       ],
       // CRITICAL: Exclude foundation items
       exclusions: ["fondation", "semelle", "semelles", "mur de fondation", "murs fondation", "footing", "coffrage mur", "imperméabilisation", "8' hauteur", "ml fondation", "périmètre"]

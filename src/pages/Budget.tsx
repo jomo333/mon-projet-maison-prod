@@ -22,6 +22,7 @@ import { useProjectSchedule } from "@/hooks/useProjectSchedule";
 import { toast } from "sonner";
 import type { Json } from "@/integrations/supabase/types";
 import { groupItemsByTask } from "@/lib/budgetTaskMapping";
+import { rerouteFoundationItems } from "@/lib/budgetItemReroute";
 import {
   mapAnalysisToStepCategories,
   defaultCategories as libDefaultCategories,
@@ -207,7 +208,7 @@ const Budget = () => {
 
       // Exclude legacy categories that no longer match the 18-step structure
       // These will be ignored (not displayed) - only current step categories are shown
-      setBudgetCategories(ordered);
+      setBudgetCategories(rerouteFoundationItems(ordered));
     } else if (selectedProjectId) {
       // Reset to default if no budget saved
       setBudgetCategories(defaultCategories);

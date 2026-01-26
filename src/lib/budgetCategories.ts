@@ -1,4 +1,5 @@
 import { constructionSteps } from "@/data/constructionSteps";
+import { rerouteFoundationItems } from "@/lib/budgetItemReroute";
 
 export interface BudgetItem {
   name: string;
@@ -314,11 +315,14 @@ export const mapAnalysisToStepCategoriesWithExtras = (
     });
   }
 
+  // Reroute common misclassifications (ex: dalle/drain listed under Fondation)
+  const rerouted = rerouteFoundationItems(mapped);
+
   // Calculate subtotal (before taxes and contingency)
-  const subTotal = mapped.reduce((sum, c) => sum + (Number(c.budget) || 0), 0);
+  const subTotal = rerouted.reduce((sum, c) => sum + (Number(c.budget) || 0), 0);
 
   return {
-    categories: mapped,
+    categories: rerouted,
     contingency: contingencyAmount,
     taxes: taxesAmount,
     subTotal,
