@@ -42,6 +42,7 @@ const Schedule = () => {
   const navigate = useNavigate();
   const selectedProjectId = searchParams.get("project");
   const [activeTab, setActiveTab] = useState("gantt");
+  const [isRegenerating, setIsRegenerating] = useState(false);
 
   // Fetch user projects
   const { data: projects, isLoading: projectsLoading } = useQuery({
@@ -337,8 +338,15 @@ const Schedule = () => {
                   <ScheduleGantt 
                     schedules={schedules} 
                     conflicts={conflicts}
-                    onRegenerateSchedule={regenerateSchedule}
-                    isUpdating={isLoading}
+                    onRegenerateSchedule={async () => {
+                      setIsRegenerating(true);
+                      try {
+                        await regenerateSchedule();
+                      } finally {
+                        setIsRegenerating(false);
+                      }
+                    }}
+                    isUpdating={isRegenerating}
                   />
                 )}
               </>

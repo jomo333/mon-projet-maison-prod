@@ -483,8 +483,11 @@ export const useProjectSchedule = (projectId: string | null) => {
         continue;
       }
 
-      // === AUTRES ÉTAPES APRÈS L'ÉTAPE FOCUS ===
-      if (focusIndex >= 0 && i > focusIndex) {
+      // === AUTRES ÉTAPES (après l'étape focus OU toutes si pas de focus) ===
+      // Quand focusIndex = -1, on recalcule toutes les étapes non-terminées
+      const shouldRecalculate = focusIndex < 0 || (focusIndex >= 0 && i > focusIndex);
+      
+      if (shouldRecalculate) {
         const isManualDate = manualDateStepIds.has(s.id);
         
         if (isManualDate && s.start_date) {
@@ -537,7 +540,7 @@ export const useProjectSchedule = (projectId: string | null) => {
           continue;
         } else {
           // Cette étape N'A PAS de date manuelle - la décaler automatiquement
-          let newStart = cursor || new Date();
+          let newStart = cursor || (s.start_date ? parseISO(s.start_date) : new Date());
           
           // Respecter les contraintes de délai (cure béton)
           if (requiredStartDate && newStart < requiredStartDate) {
