@@ -2488,6 +2488,26 @@ ${getMaterialLabel('countertopType', materialChoices.countertopType) ? `- COMPTO
 IMPORTANT: Utilise CES matériaux spécifiques pour l'estimation des coûts correspondants.
 ` : '';
       
+      // Garage-specific foundation instructions for plan mode
+      const isGarageProjectPlan = manualContext.projectType?.toLowerCase()?.includes('garage');
+      const isMonolithicSlabPlan = manualContext.garageFoundationType === 'dalle-monolithique';
+      
+      const garageFoundationContextPlan = isGarageProjectPlan ? (
+        isMonolithicSlabPlan 
+          ? `
+## TYPE DE FONDATION GARAGE - DALLE MONOLITHIQUE
+IMPORTANT: Ce garage utilise une DALLE MONOLITHIQUE.
+- La dalle et les bords épaissis sont coulés EN UNE SEULE OPÉRATION
+- PAS de murs de fondation séparés (pas de murs de 8 pieds)
+- PAS de sous-sol
+- Épaisseur dalle: 4" au centre, bords épaissis 12"-16" en périphérie
+- Coût typique: 8-15$/pi² (dalle + préparation)
+- NE PAS ESTIMER de murs de fondation coulés standard`
+          : `
+## TYPE DE FONDATION GARAGE - FONDATION STANDARD
+Ce garage utilise une fondation STANDARD avec murs de fondation séparés.`
+      ) : '';
+      
       const contextSection = hasManualContext || hasMaterialChoices ? `
 ## CONTEXTE COMPLÉMENTAIRE FOURNI PAR LE CLIENT
 ${manualContext.projectType ? `- TYPE DE PROJET INDIQUÉ: ${manualContext.projectType}` : ''}
@@ -2495,6 +2515,7 @@ ${manualContext.squareFootage ? `- SUPERFICIE ESTIMÉE: ${manualContext.squareFo
 ${manualContext.numberOfFloors ? `- NOMBRE D'ÉTAGES: ${manualContext.numberOfFloors}` : ''}
 ${manualContext.foundationSqft ? `- SUPERFICIE FONDATION: ${manualContext.foundationSqft} pi²` : ''}
 ${manualContext.hasGarage ? `- GARAGE: Inclus dans le projet` : ''}
+${garageFoundationContextPlan}
 ${materialChoicesSection}
 ${manualContext.additionalNotes ? `
 ## NOTES ET SPÉCIFICATIONS ADDITIONNELLES
@@ -2519,11 +2540,36 @@ ${isAgrandissement ? '5. Pour un AGRANDISSEMENT: analyse SEULEMENT la partie NOU
 7. Tu DOIS retourner TOUTES les 12 catégories principales (Fondation, Structure, Toiture, Revêtement, Fenêtres, Isolation, Électricité, Plomberie, CVAC, Finition, Cuisine, Salle de bain)
 8. Applique les prix du marché Québec 2025
 9. ${hasMaterialChoices ? 'Les matériaux du client REMPLACENT les valeurs par défaut - utilise les prix correspondants' : (hasManualContext ? 'PERSONNALISE l\'estimation selon les notes' : '')}
+${isGarageProjectPlan && isMonolithicSlabPlan ? '10. FONDATION GARAGE: Estime UNIQUEMENT une dalle monolithique, PAS de murs de fondation séparés de 8 pieds' : ''}
 
 Retourne le JSON structuré COMPLET avec TOUTES les catégories.`;
     } else {
       // Manual mode
-      const { projectType, squareFootage, numberOfFloors, hasGarage, foundationSqft, floorSqftDetails, additionalNotes } = body;
+      const { projectType, squareFootage, numberOfFloors, hasGarage, foundationSqft, floorSqftDetails, additionalNotes, garageFoundationType } = body;
+      
+      // Garage-specific foundation instructions
+      const isGarageProject = projectType?.toLowerCase()?.includes('garage');
+      const isMonolithicSlab = garageFoundationType === 'dalle-monolithique';
+      
+      const garageFoundationInstruction = isGarageProject ? (
+        isMonolithicSlab 
+          ? `
+## TYPE DE FONDATION - DALLE MONOLITHIQUE
+Ce garage utilise une DALLE MONOLITHIQUE (frost-protected shallow foundation / slab-on-grade avec bords épaissis).
+- La dalle et les murs périphériques sont coulés EN UNE SEULE OPÉRATION
+- PAS de murs de fondation séparés de 8 pieds
+- PAS de sous-sol
+- Épaisseur dalle: 4" au centre, bords épaissis 12"-16" en périphérie
+- Isolation rigide sous la dalle et en périphérie
+- Coût typique: 8-15$/pi² (dalle + préparation)
+- NE PAS inclure de murs de fondation coulés standard`
+          : `
+## TYPE DE FONDATION - FONDATION STANDARD
+Ce garage utilise une fondation STANDARD avec murs de fondation.
+- Murs de fondation coulés (hauteur selon le gel, typiquement 4-6 pieds)
+- Dalle coulée séparément après les murs
+- Semelles de fondation sous les murs`
+      ) : '';
       
       extractionPrompt = `Génère une estimation budgétaire COMPLÈTE pour ce projet au QUÉBEC en 2025.
 
@@ -2535,6 +2581,7 @@ ${foundationSqft ? `- FONDATION: ${foundationSqft} pi²` : ''}
 ${floorSqftDetails?.length ? `- DÉTAIL ÉTAGES: ${floorSqftDetails.join(', ')} pi²` : ''}
 - GARAGE: ${hasGarage ? 'Oui (attaché)' : 'Non'}
 - QUALITÉ: ${qualityDescriptions[finishQuality] || qualityDescriptions["standard"]}
+${garageFoundationInstruction}
 ${additionalNotes ? `
 ## NOTES ET SPÉCIFICATIONS DU CLIENT
 ${additionalNotes}
@@ -2553,6 +2600,7 @@ INSTRUCTIONS CRITIQUES:
 3. Inclus matériaux ET main-d'œuvre pour chaque catégorie
 4. Calcule contingence 5% + TPS 5% + TVQ 9.975%
 5. ${additionalNotes ? 'PERSONNALISE selon les notes client (ex: thermopompe, plancher chauffant, balcon, etc.)' : ''}
+${isGarageProject && isMonolithicSlab ? '6. Pour la fondation: estime UNIQUEMENT une dalle monolithique, PAS de murs de fondation séparés' : ''}
 
 Retourne le JSON structuré COMPLET.`;
     }

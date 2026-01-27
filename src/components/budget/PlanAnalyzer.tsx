@@ -563,6 +563,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
       const stylePhotoUrls = stylePhotos.map((p: any) => p.file_url);
       
       // Données manuelles enrichies (toujours incluses pour contexte)
+      const isGarageProject = projectType === "garage" || projectType === "garage-etage";
       const manualData = {
         projectType: projectType === "maison-unifamiliale" ? "Maison unifamiliale" :
                      projectType === "jumelee" ? "Maison jumelée" :
@@ -579,6 +580,8 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
         floorSqftDetails: floorSqftDetails.filter(s => s).map(s => parseInt(s)),
         finishQuality,
         additionalNotes: additionalNotes || undefined,
+        // Garage-specific: foundation type (monolithic slab vs standard foundation)
+        garageFoundationType: isGarageProject ? garageFoundationType : undefined,
         materialChoices: {
           exteriorSiding: exteriorSiding || undefined,
           roofingType: roofingType || undefined,
