@@ -386,11 +386,11 @@ export const ScheduleGantt = ({ schedules, conflicts, onRegenerateSchedule, isUp
                     )}
 
                     {/* Barre de la tâche */}
-                    <Tooltip>
+                    <Tooltip delayDuration={100}>
                       <TooltipTrigger asChild>
                         <div
                           className={cn(
-                            "absolute top-2 h-6 rounded cursor-pointer transition-opacity hover:opacity-80",
+                            "absolute top-2 h-6 rounded cursor-pointer transition-opacity hover:opacity-80 z-20",
                             hasConflict(schedule) && "ring-2 ring-destructive"
                           )}
                           style={{
@@ -399,7 +399,7 @@ export const ScheduleGantt = ({ schedules, conflicts, onRegenerateSchedule, isUp
                             backgroundColor: getTradeColor(schedule.trade_type),
                           }}
                         >
-                          <span className="text-xs text-white px-1 truncate block leading-6">
+                          <span className="text-xs text-white px-1 truncate block leading-6 pointer-events-none">
                             {schedule.actual_days || schedule.estimated_days}j
                           </span>
                         </div>
