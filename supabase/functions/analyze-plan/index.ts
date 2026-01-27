@@ -2509,11 +2509,18 @@ IMPORTANT: Utilise CES matériaux spécifiques pour l'estimation des coûts corr
       const isGarageProjectPlan = manualContext.projectType?.toLowerCase()?.includes('garage');
       const isMonolithicSlabPlan = manualContext.garageFoundationType === 'dalle-monolithique';
       
+      // Calculate dynamic cost estimates based on actual project square footage
+      const garageSqft = manualContext.foundationSqft || manualContext.squareFootage || 576;
+      const minCostEstimate = Math.round(garageSqft * 25);
+      const maxCostEstimate = Math.round(garageSqft * 30);
+      
       const garageFoundationContextPlan = isGarageProjectPlan ? (
         isMonolithicSlabPlan 
           ? `
 ## TYPE DE FONDATION GARAGE - DALLE MONOLITHIQUE (Québec 2025)
 IMPORTANT: Ce garage utilise une DALLE MONOLITHIQUE - fondation ET plancher en une seule coulée.
+
+### SUPERFICIE DU PROJET: ${garageSqft} pi²
 
 ### COÛTS DE RÉFÉRENCE QUÉBEC 2025:
 - Dalle monolithique installée: 25$ à 30$/pi²
@@ -2521,7 +2528,11 @@ IMPORTANT: Ce garage utilise une DALLE MONOLITHIQUE - fondation ET plancher en u
 - Isolation rigide polystyrène: 2$ à 4$/pi²
 - Excavation: 2$ à 5$/pi²
 - Nivellement/compactage: 500$ à 1,500$
-- EXEMPLE: Garage 24x24 (576 pi²) = 14,400$ à 17,300$ TOTAL
+
+### CALCUL POUR CE PROJET (${garageSqft} pi²):
+- Coût minimum estimé: ${garageSqft} pi² × 25$/pi² = ${minCostEstimate.toLocaleString()}$
+- Coût maximum estimé: ${garageSqft} pi² × 30$/pi² = ${maxCostEstimate.toLocaleString()}$
+- FOURCHETTE FONDATION: ${minCostEstimate.toLocaleString()}$ à ${maxCostEstimate.toLocaleString()}$
 
 ### CATÉGORIES À EXCLURE COMPLÈTEMENT (budget = 0$):
 - "Coulée de dalle du sous-sol" → N'EXISTE PAS pour une dalle monolithique (la dalle EST la fondation)
@@ -2585,11 +2596,18 @@ Retourne le JSON structuré COMPLET avec TOUTES les catégories.`;
       const isGarageProject = projectType?.toLowerCase()?.includes('garage');
       const isMonolithicSlab = garageFoundationType === 'dalle-monolithique';
       
+      // Calculate dynamic cost estimates based on actual project square footage
+      const projectSqft = foundationSqft || squareFootage || 576;
+      const minFoundationCost = Math.round(projectSqft * 25);
+      const maxFoundationCost = Math.round(projectSqft * 30);
+      
       const garageFoundationInstruction = isGarageProject ? (
         isMonolithicSlab 
           ? `
 ## TYPE DE FONDATION - DALLE MONOLITHIQUE (Québec 2025)
 Ce garage utilise une DALLE MONOLITHIQUE - structure béton servant de fondation ET plancher en une seule coulée.
+
+### SUPERFICIE DU PROJET: ${projectSqft} pi²
 
 ### SPÉCIFICATIONS TECHNIQUES
 - Épaisseur MINIMUM au Québec: 6 pouces (150mm)
@@ -2601,7 +2619,11 @@ Ce garage utilise une DALLE MONOLITHIQUE - structure béton servant de fondation
 - Dalle monolithique installée: 25$ à 30$/pi²
 - Excavation spécifique: 2$ à 5$/pi²
 - Nivellement et compactage: 500$ à 1,500$ (forfait)
-- EXEMPLE: Garage 24x24 (576 pi²) = 14,400$ à 17,300$ TOTAL
+
+### CALCUL POUR CE PROJET (${projectSqft} pi²):
+- Coût minimum estimé: ${projectSqft} pi² × 25$/pi² = ${minFoundationCost.toLocaleString()}$
+- Coût maximum estimé: ${projectSqft} pi² × 30$/pi² = ${maxFoundationCost.toLocaleString()}$
+- FOURCHETTE FONDATION: ${minFoundationCost.toLocaleString()}$ à ${maxFoundationCost.toLocaleString()}$
 
 ### CATÉGORIES À EXCLURE COMPLÈTEMENT (NE PAS GÉNÉRER, budget = 0$):
 - "Coulée de dalle du sous-sol" → N'EXISTE PAS (la dalle monolithique EST le plancher final)
