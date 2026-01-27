@@ -586,7 +586,6 @@ export const constructionSteps: Step[] = [
         id: "inspection-electrique",
         title: "Inspection électrique",
         description: "Inspection obligatoire avant de fermer les murs.",
-        documents: ["Certificat d'inspection électrique"],
         tips: [
           "Prendre des photos de tous les emplacements de boîtiers électriques avec des repères clairs pour localiser les boîtiers oubliés après la pose du gypse"
         ]
