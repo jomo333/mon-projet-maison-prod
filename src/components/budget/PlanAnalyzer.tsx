@@ -930,39 +930,46 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label>Nombre d'étages</Label>
-                <Select 
-                  value={numberOfFloors} 
-                  onValueChange={(v) => {
-                    setNumberOfFloors(v);
-                    const floors = parseInt(v) || 1;
-                    setFloorSqftDetails(Array(floors).fill(""));
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1 étage (plain-pied)</SelectItem>
-                    <SelectItem value="2">2 étages</SelectItem>
-                    <SelectItem value="3">3 étages</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* Nombre d'étages - masqué pour garage détaché (mais visible pour garage avec étage) */}
+              {projectType !== "garage" && (
+                <div className="space-y-2">
+                  <Label>Nombre d'étages</Label>
+                  <Select 
+                    value={numberOfFloors} 
+                    onValueChange={(v) => {
+                      setNumberOfFloors(v);
+                      const floors = parseInt(v) || 1;
+                      setFloorSqftDetails(Array(floors).fill(""));
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 étage (plain-pied)</SelectItem>
+                      <SelectItem value="2">2 étages</SelectItem>
+                      <SelectItem value="3">3 étages</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
-              <div className="space-y-2">
-                <Label htmlFor="foundation">Superficie fondation (pi²)</Label>
-                <Input
-                  id="foundation"
-                  type="number"
-                  value={foundationSqft}
-                  onChange={(e) => setFoundationSqft(e.target.value)}
-                  placeholder="Ex: 1200"
-                />
-              </div>
+              {/* Superficie fondation - masqué pour garage détaché */}
+              {projectType !== "garage" && projectType !== "garage-etage" && (
+                <div className="space-y-2">
+                  <Label htmlFor="foundation">Superficie fondation (pi²)</Label>
+                  <Input
+                    id="foundation"
+                    type="number"
+                    value={foundationSqft}
+                    onChange={(e) => setFoundationSqft(e.target.value)}
+                    placeholder="Ex: 1200"
+                  />
+                </div>
+              )}
 
-              {parseInt(numberOfFloors) > 1 && floorSqftDetails.map((_, index) => (
+              {/* Superficie par étage - masqué pour garage détaché */}
+              {projectType !== "garage" && projectType !== "garage-etage" && parseInt(numberOfFloors) > 1 && floorSqftDetails.map((_, index) => (
                 <div key={index} className="space-y-2">
                   <Label>Superficie étage {index + 1} (pi²)</Label>
                   <Input
