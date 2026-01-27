@@ -542,6 +542,9 @@ export const constructionSteps: Step[] = [
         id: "chauffe-eau",
         title: "Chauffe-eau",
         description: "Installation du chauffe-eau (électrique, au gaz ou thermopompe).",
+        tips: [
+          "Installez un bac de récupération raccordé au drain pour capter l'eau en cas de fuite et éviter les dégâts d'eau"
+        ]
       },
       {
         id: "branchements",
