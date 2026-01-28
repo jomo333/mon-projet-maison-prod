@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Loader2, Shield } from "lucide-react";
+import { Loader2, Shield, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -86,12 +86,38 @@ export function LegalAcceptanceDialog({ open, userId, onAccepted }: LegalAccepta
             </DialogTitle>
           </div>
           <DialogDescription>
-            Pour utiliser Mon Projet Maison, vous devez accepter nos conditions d'utilisation et notre politique de confidentialité.
+            Pour utiliser Monprojetmaison.ca, vous devez accepter nos conditions d'utilisation et notre politique de confidentialité.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <div className="flex items-start space-x-3">
+          {/* Boutons pour lire les documents */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              asChild
+            >
+              <Link to="/conditions" target="_blank">
+                <FileText className="h-4 w-4 mr-2" />
+                Lire les Conditions d'utilisation
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              asChild
+            >
+              <Link to="/confidentialite" target="_blank">
+                <FileText className="h-4 w-4 mr-2" />
+                Lire la Politique de confidentialité
+              </Link>
+            </Button>
+          </div>
+
+          <div className="flex items-start space-x-3 pt-2 border-t">
             <Checkbox
               id="legal-acceptance"
               checked={accepted}
@@ -103,21 +129,9 @@ export function LegalAcceptanceDialog({ open, userId, onAccepted }: LegalAccepta
               className="text-sm leading-relaxed cursor-pointer"
             >
               J'accepte les{" "}
-              <Link 
-                to="/conditions" 
-                target="_blank"
-                className="text-primary hover:underline font-medium"
-              >
-                Conditions d'utilisation
-              </Link>{" "}
-              et la{" "}
-              <Link 
-                to="/confidentialite" 
-                target="_blank"
-                className="text-primary hover:underline font-medium"
-              >
-                Politique de confidentialité
-              </Link>
+              <span className="font-medium text-primary">Conditions d'utilisation</span>
+              {" "}et la{" "}
+              <span className="font-medium text-primary">Politique de confidentialité</span>
             </Label>
           </div>
 
