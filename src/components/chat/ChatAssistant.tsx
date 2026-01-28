@@ -117,16 +117,33 @@ export function ChatAssistant() {
 
   if (!isOpen) {
     return (
-      <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2">
-        <div className="bg-background border rounded-full px-3 py-2 shadow-lg animate-fade-in">
-          <span className="text-sm font-medium">Besoin d'aide ?</span>
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3">
+        {/* Welcome bubble with gradient */}
+        <div className="relative bg-gradient-to-br from-primary via-accent to-primary/80 text-primary-foreground rounded-2xl px-4 py-3 shadow-xl max-w-[280px] animate-fade-in">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-muted/80 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Fermer"
+          >
+            <X className="h-3 w-3" />
+          </button>
+          <div className="flex items-start gap-2">
+            <Bot className="h-5 w-5 mt-0.5 shrink-0" />
+            <p className="text-sm font-medium leading-relaxed">
+              👋 Salut ! Je suis l'assistant MonProjetMaison ! Je peux t'aider en un seul clic !
+            </p>
+          </div>
+          {/* Bubble tail */}
+          <div className="absolute -bottom-2 right-6 w-4 h-4 bg-gradient-to-br from-primary/80 to-accent rotate-45" />
         </div>
+        
+        {/* FAB button */}
         <Button
           onClick={() => setIsOpen(true)}
-          className="h-14 w-14 rounded-full shadow-lg"
+          className="h-14 w-14 rounded-full shadow-xl bg-gradient-to-br from-primary to-accent hover:from-primary/90 hover:to-accent/90 transition-all hover:scale-105"
           size="icon"
         >
-          <MessageCircle className="h-6 w-6" />
+          <Bot className="h-6 w-6" />
         </Button>
       </div>
     );
