@@ -13,6 +13,7 @@ import Guide from "./pages/Guide";
 import StartProject from "./pages/StartProject";
 import ConstructionGuide from "./pages/ConstructionGuide";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import MyProjects from "./pages/MyProjects";
 import ProjectGallery from "./pages/ProjectGallery";
 import Project from "./pages/Project";
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/guide" element={<Guide />} />
             <Route path="/etapes" element={<ConstructionGuide />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/mes-projets" element={<MyProjects />} />
             <Route path="/galerie" element={<ProjectGallery />} />
             <Route path="*" element={<NotFound />} />

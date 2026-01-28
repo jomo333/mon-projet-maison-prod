@@ -9,14 +9,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { Loader2, Mail, Lock, User, Eye, EyeOff, ArrowLeft, CheckCircle2 } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, resetPassword, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showSignInPassword, setShowSignInPassword] = useState(false);
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
 
   // Redirect if already logged in
   if (user) {
@@ -65,6 +68,110 @@ const Auth = () => {
     setIsLoading(false);
   };
 
+  const handleForgotPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const { error } = await resetPassword(forgotEmail);
+
+    if (error) {
+      toast.error("Erreur: " + error.message);
+    } else {
+      setResetEmailSent(true);
+      toast.success("Email de réinitialisation envoyé!");
+    }
+
+    setIsLoading(false);
+  };
+
+  // Forgot password view
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 flex items-center justify-center py-12 px-4">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <CardTitle className="font-display text-2xl">Mot de passe oublié</CardTitle>
+              <CardDescription>
+                {resetEmailSent 
+                  ? "Un email vous a été envoyé"
+                  : "Entrez votre adresse email pour réinitialiser votre mot de passe"
+                }
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {resetEmailSent ? (
+                <div className="space-y-4">
+                  <div className="flex flex-col items-center justify-center py-6">
+                    <div className="p-3 rounded-full bg-primary/10 mb-4">
+                      <CheckCircle2 className="h-8 w-8 text-primary" />
+                    </div>
+                    <h3 className="font-medium text-lg mb-2">Email envoyé!</h3>
+                    <p className="text-sm text-muted-foreground text-center max-w-xs">
+                      Vérifiez votre boîte de réception à <strong>{forgotEmail}</strong> et cliquez sur le lien pour réinitialiser votre mot de passe.
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-4">
+                      Vous ne trouvez pas l'email? Vérifiez votre dossier spam.
+                    </p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      setShowForgotPassword(false);
+                      setResetEmailSent(false);
+                      setForgotEmail("");
+                    }}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Retour à la connexion
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="forgot-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="forgot-email"
+                        name="email"
+                        type="email"
+                        placeholder="vous@exemple.com"
+                        className="pl-10"
+                        required
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                    Envoyer le lien de réinitialisation
+                  </Button>
+                  <Button 
+                    type="button"
+                    variant="ghost" 
+                    className="w-full"
+                    onClick={() => {
+                      setShowForgotPassword(false);
+                      setForgotEmail("");
+                    }}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Retour à la connexion
+                  </Button>
+                </form>
+              )}
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
@@ -100,7 +207,16 @@ const Auth = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signin-password">Mot de passe</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="signin-password">Mot de passe</Label>
+                      <button
+                        type="button"
+                        className="text-xs text-primary hover:underline"
+                        onClick={() => setShowForgotPassword(true)}
+                      >
+                        Mot de passe oublié?
+                      </button>
+                    </div>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -185,6 +301,9 @@ const Auth = () => {
                         )}
                       </button>
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      Minimum 6 caractères
+                    </p>
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
