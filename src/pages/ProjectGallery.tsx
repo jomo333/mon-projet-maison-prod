@@ -268,10 +268,16 @@ const ProjectGallery = () => {
     ? photos 
     : photos.filter(p => p.step_id === selectedStep);
 
-  // Filter documents
+  // Filter documents - exclude soumissions (they appear in their own tab)
+  const nonSoumissionDocs = documents.filter(d => 
+    d.step_id !== "soumissions" && 
+    d.category !== "soumission" && 
+    d.category !== "analyse"
+  );
+  
   const filteredDocuments = selectedCategory === "all"
-    ? documents
-    : documents.filter(d => d.category === selectedCategory);
+    ? nonSoumissionDocs
+    : nonSoumissionDocs.filter(d => d.category === selectedCategory);
 
   // Parse supplier info from notes JSON
   const parseSupplierInfo = (notes: string | null) => {
@@ -428,7 +434,7 @@ const ProjectGallery = () => {
               </TabsTrigger>
               <TabsTrigger value="documents" className="gap-2">
                 <FileText className="h-4 w-4" />
-                Documents ({documents.length})
+                Documents ({nonSoumissionDocs.length})
               </TabsTrigger>
               <TabsTrigger value="soumissions" className="gap-2">
                 <ClipboardCheck className="h-4 w-4" />
