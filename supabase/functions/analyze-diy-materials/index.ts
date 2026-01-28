@@ -5,8 +5,36 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
+
+// Helper to validate authentication
+async function validateAuth(authHeader: string | null): Promise<{ userId: string } | { error: string; status: number }> {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { error: "Authentification requise. Veuillez vous connecter.", status: 401 };
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+    
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    
+    if (claimsError || !claimsData?.claims?.sub) {
+      return { error: "Session invalide. Veuillez vous reconnecter.", status: 401 };
+    }
+    
+    return { userId: claimsData.claims.sub as string };
+  } catch (err) {
+    console.error('Auth validation error:', err);
+    return { error: "Erreur de validation de l'authentification.", status: 500 };
+  }
+}
 
 // Helper to increment AI usage for a user
 async function incrementAiUsage(authHeader: string | null): Promise<void> {
@@ -212,8 +240,16 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Get auth header for AI usage tracking
+  // Validate authentication
   const authHeader = req.headers.get('Authorization');
+  const authResult = await validateAuth(authHeader);
+  
+  if ('error' in authResult) {
+    return new Response(
+      JSON.stringify({ error: authResult.error }),
+      { status: authResult.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
 
   try {
     const body = await req.json();
