@@ -37,6 +37,11 @@ export function Footer() {
             <h4 className="font-display font-semibold mb-4">Navigation</h4>
             <ul className="space-y-2">
               <li>
+                <Link to="/forfaits" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Forfaits
+                </Link>
+              </li>
+              <li>
                 <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Tableau de bord
                 </Link>

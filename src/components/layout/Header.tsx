@@ -1,4 +1,4 @@
-import { LayoutDashboard, Calculator, BookOpen, User, LogOut, FolderOpen, Scale, FolderDown, CalendarDays, Shield } from "lucide-react";
+import { LayoutDashboard, Calculator, BookOpen, User, LogOut, FolderOpen, Scale, FolderDown, CalendarDays, Shield, CreditCard } from "lucide-react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ const navItems = [
   { href: "/echeancier", label: "Échéancier", icon: CalendarDays },
   { href: "/code-batiment", label: "Code du bâtiment", icon: Scale },
   { href: "/guide", label: "Guide", icon: BookOpen },
+  { href: "/forfaits", label: "Forfaits", icon: CreditCard },
 ];
 
 export function Header() {
