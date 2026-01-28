@@ -72,57 +72,57 @@ export function LegalAcceptanceDialog({ open, userId, onAccepted }: LegalAccepta
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent 
-        className="sm:max-w-md [&>button]:hidden"
+        className="sm:max-w-lg max-h-[90vh] overflow-y-auto [&>button]:hidden"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-2 rounded-full bg-primary/10">
+        <DialogHeader className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-full bg-primary/10 shrink-0">
               <Shield className="h-5 w-5 text-primary" />
             </div>
-            <DialogTitle className="font-display text-xl">
+            <DialogTitle className="font-display text-lg sm:text-xl">
               Acceptation requise
             </DialogTitle>
           </div>
-          <DialogDescription>
+          <DialogDescription className="text-sm">
             Pour utiliser Monprojetmaison.ca, vous devez accepter nos conditions d'utilisation et notre politique de confidentialité.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-2">
           {/* Boutons pour lire les documents */}
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="grid grid-cols-1 gap-2">
             <Button
               variant="outline"
               size="sm"
-              className="flex-1"
+              className="w-full justify-start text-left h-auto py-2"
               asChild
             >
               <Link to="/conditions" target="_blank">
-                <FileText className="h-4 w-4 mr-2" />
-                Lire les Conditions d'utilisation
+                <FileText className="h-4 w-4 mr-2 shrink-0" />
+                <span className="truncate">Lire les Conditions d'utilisation</span>
               </Link>
             </Button>
             <Button
               variant="outline"
               size="sm"
-              className="flex-1"
+              className="w-full justify-start text-left h-auto py-2"
               asChild
             >
               <Link to="/confidentialite" target="_blank">
-                <FileText className="h-4 w-4 mr-2" />
-                Lire la Politique de confidentialité
+                <FileText className="h-4 w-4 mr-2 shrink-0" />
+                <span className="truncate">Lire la Politique de confidentialité</span>
               </Link>
             </Button>
           </div>
 
-          <div className="flex items-start space-x-3 pt-2 border-t">
+          <div className="flex items-start gap-3 pt-3 border-t">
             <Checkbox
               id="legal-acceptance"
               checked={accepted}
               onCheckedChange={(checked) => setAccepted(checked === true)}
-              className="mt-1"
+              className="mt-0.5 shrink-0"
             />
             <Label 
               htmlFor="legal-acceptance" 
@@ -144,10 +144,10 @@ export function LegalAcceptanceDialog({ open, userId, onAccepted }: LegalAccepta
         <Button 
           onClick={handleAccept} 
           disabled={!accepted || isLoading}
-          className="w-full"
+          className="w-full mt-2"
         >
           {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-          Continuer vers l'application
+          Continuer
         </Button>
       </DialogContent>
     </Dialog>
