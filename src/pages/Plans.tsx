@@ -27,31 +27,31 @@ interface Plan {
   display_order: number;
 }
 
-const principles = [
-  {
-    icon: Home,
-    title: "Conçu pour les autoconstructeurs résidentiels",
-    description: "Une plateforme pensée exclusivement pour ceux qui bâtissent leur propre maison.",
-  },
+const benefits = [
   {
     icon: ClipboardList,
-    title: "Un projet à la fois, bien structuré",
-    description: "Accompagnement étape par étape pour une gestion claire et organisée.",
+    title: "Structurer votre projet",
+    description: "Étape par étape, avec une vue claire de ce qui reste à faire.",
   },
   {
     icon: Sparkles,
-    title: "Outils d'aide à la décision",
-    description: "Des analyses et suggestions pour vous guider, sans décisions imposées.",
+    title: "Visualiser budget et échéancier",
+    description: "Gardez le contrôle sur les coûts et le calendrier de votre projet.",
+  },
+  {
+    icon: Home,
+    title: "Centraliser l'information",
+    description: "Documents, soumissions et notes au même endroit.",
   },
   {
     icon: Shield,
-    title: "Transparence totale",
-    description: "Limites et fonctionnalités clairement indiquées pour chaque forfait.",
+    title: "Identifier les risques",
+    description: "Repérez les éléments souvent oubliés avant qu'ils ne deviennent des problèmes.",
   },
   {
     icon: Heart,
-    title: "Vous restez maître de votre projet",
-    description: "L'utilisateur reste responsable de ses choix et de ses professionnels.",
+    title: "Décider au bon moment",
+    description: "Prenez des décisions plus réfléchies, sans pression.",
   },
 ];
 
@@ -110,26 +110,40 @@ export default function Plans() {
         <section className="py-16 lg:py-20 bg-gradient-to-b from-muted/50 to-background">
           <div className="container max-w-4xl text-center">
             <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-6">
-              Des forfaits adaptés à votre projet
+              Des forfaits pensés pour mieux gérer votre projet, dès le départ
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-              Les forfaits de Monprojetmaison.ca sont conçus pour s'adapter au niveau d'implication 
-              et aux besoins de chaque autoconstructeur. Chaque forfait offre un accès progressif 
-              aux outils de planification, de gestion et d'analyse, afin de vous accompagner dans 
-              la prise de décisions tout au long de votre projet.
-            </p>
           </div>
         </section>
 
-        {/* Principles Section */}
+        {/* Problem Statement Section */}
+        <section className="py-12 lg:py-16">
+          <div className="container max-w-3xl">
+            <div className="prose prose-lg dark:prose-invert mx-auto text-center">
+              <p className="text-muted-foreground leading-relaxed">
+                Construire sa maison en autoconstruction est un projet important, autant sur le plan financier que personnel.
+                Même avec de la motivation et de la bonne volonté, une mauvaise planification ou une gestion imprécise peut rapidement entraîner des conséquences coûteuses : <strong className="text-foreground">retards, décisions prises dans l'urgence, dépassements de budget ou travaux à reprendre</strong>.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mt-4">
+                Dans bien des cas, ces problèmes ne viennent pas d'un manque de compétence, mais d'un <strong className="text-foreground">manque de structure, de visibilité et d'outils adaptés</strong> à la réalité de l'autoconstruction.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <Separator className="max-w-4xl mx-auto" />
+
+        {/* Approach Section */}
         <section className="py-12 lg:py-16">
           <div className="container">
-            <h2 className="text-2xl font-semibold text-center mb-10 text-foreground">
-              Notre philosophie
+            <h2 className="text-2xl font-semibold text-center mb-4 text-foreground">
+              Une approche basée sur la clarté et la prévention
             </h2>
+            <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">
+              Les forfaits de Monprojetmaison.ca sont conçus pour aider les autoconstructeurs à :
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-              {principles.map((principle, index) => {
-                const Icon = principle.icon;
+              {benefits.map((benefit, index) => {
+                const Icon = benefit.icon;
                 return (
                   <div
                     key={index}
@@ -139,15 +153,33 @@ export default function Plans() {
                       <Icon className="h-6 w-6 text-primary" />
                     </div>
                     <h3 className="font-medium text-foreground mb-2 text-sm">
-                      {principle.title}
+                      {benefit.title}
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      {principle.description}
+                      {benefit.description}
                     </p>
                   </div>
                 );
               })}
             </div>
+            <p className="text-center text-muted-foreground mt-10 max-w-2xl mx-auto text-sm">
+              L'objectif n'est pas de remplacer les professionnels, mais de <strong className="text-foreground">réduire les erreurs évitables</strong> et d'améliorer la coordination tout au long du projet.
+            </p>
+          </div>
+        </section>
+
+        <Separator className="max-w-4xl mx-auto" />
+
+        {/* Evolving Plans Section */}
+        <section className="py-12 lg:py-16 bg-muted/30">
+          <div className="container max-w-3xl text-center">
+            <h2 className="text-2xl font-semibold mb-4 text-foreground">
+              Des forfaits évolutifs, selon vos besoins réels
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Chaque forfait offre un accès progressif aux outils de planification, de gestion et d'analyse.
+              Vous pouvez commencer simplement, puis évoluer vers des fonctionnalités plus avancées lorsque votre projet gagne en complexité.
+            </p>
           </div>
         </section>
 
