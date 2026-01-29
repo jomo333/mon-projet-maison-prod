@@ -1142,7 +1142,15 @@
     "change": "Changer",
     "smartSearch": "Recherche intelligente",
     "newSearch": "Nouvelle recherche",
-    "guideYou": "Je vous guiderai avec des questions pour trouver la meilleure réponse."
+    "guideYou": "Je vous guiderai avec des questions pour trouver la meilleure réponse.",
+    "examples": [
+      "Hauteur garde-corps",
+      "Dimensions escalier",
+      "Isolation murs",
+      "Marge avant minimale",
+      "Prises électriques",
+      "Sorties de secours"
+    ]
   },
   "dashboard": {
     "title": "Tableau de bord",

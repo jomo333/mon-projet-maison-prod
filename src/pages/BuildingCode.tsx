@@ -1411,14 +1411,17 @@ const BuildingCode = () => {
     }
   };
 
-  const exampleSearches = [
-    "Hauteur garde-corps",
-    "Dimensions escalier",
-    "Isolation murs",
-    "Marge avant minimale",
-    "Prises électriques",
-    "Sorties de secours"
-  ];
+  const exampleSearches = (t("buildingCode.examples", {
+    returnObjects: true,
+    defaultValue: [
+      "Hauteur garde-corps",
+      "Dimensions escalier",
+      "Isolation murs",
+      "Marge avant minimale",
+      "Prises électriques",
+      "Sorties de secours",
+    ],
+  }) as string[]).filter(Boolean);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

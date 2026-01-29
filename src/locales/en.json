@@ -1142,7 +1142,15 @@
     "change": "Change",
     "smartSearch": "Smart search",
     "newSearch": "New search",
-    "guideYou": "I will guide you with questions to find the best answer."
+    "guideYou": "I will guide you with questions to find the best answer.",
+    "examples": [
+      "Guardrail height",
+      "Stair dimensions",
+      "Wall insulation",
+      "Minimum front setback",
+      "Electrical outlets",
+      "Emergency exits"
+    ]
   },
   "dashboard": {
     "title": "Dashboard",
