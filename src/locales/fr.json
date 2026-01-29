@@ -315,7 +315,15 @@
     "finalTotal": "Total final",
     "totalWithTaxes": "Total (taxes incluses)",
     "noItems": "Aucun item détaillé",
-    "noItemsDesc": "Analysez vos plans pour générer les items"
+    "noItemsDesc": "Analysez vos plans pour générer les items",
+    "detailedBudgetDesc": "Budget et dépenses par poste — Téléchargez vos soumissions pour ajuster votre budget réel",
+    "exceeded": "Dépassement",
+    "includedTasks": "Tâches incluses (étapes du guide)",
+    "noItemsAnalyzed": "Aucun élément analysé pour cette catégorie pour l'instant.",
+    "noItemsAssociated": "Aucun élément associé.",
+    "otherItems": "Autres éléments",
+    "contingencyBudget": "Budget imprévu (5%)",
+    "taxesTpsQst": "Taxes (TPS 5% + TVQ 9,975%)"
   },
   "schedule": {
     "title": "Échéancier",
@@ -397,7 +405,31 @@
     "askQuestion": "Posez votre question sur le code du bâtiment...",
     "resultsFor": "Résultats pour",
     "noResults": "Aucun résultat trouvé",
-    "tryDifferent": "Essayez avec d'autres mots-clés"
+    "tryDifferent": "Essayez avec d'autres mots-clés",
+    "disclaimer": {
+      "title": "Avis important",
+      "text": "Les informations fournies sont à titre indicatif seulement. Consultez toujours un professionnel qualifié et les autorités locales."
+    },
+    "selectedProject": "Projet sélectionné",
+    "activeMunicipalCodes": "Codes municipaux actifs",
+    "change": "Changer",
+    "smartSearch": "Recherche intelligente",
+    "newSearch": "Nouvelle recherche",
+    "askQuestion": "Posez votre question",
+    "guideYou": "Je vous guiderai avec des questions pour trouver la meilleure réponse.",
+    "searchPlaceholder": "Posez votre question sur le code du bâtiment...",
+    "categories": {
+      "all": "Tout",
+      "structure": "Structure",
+      "safety": "Sécurité",
+      "stairs": "Escaliers",
+      "insulation": "Isolation",
+      "plumbing": "Plomberie",
+      "electrical": "Électricité",
+      "ventilation": "Ventilation",
+      "windows": "Fenêtres",
+      "municipal": "Code municipal"
+    }
   },
   "dashboard": {
     "title": "Tableau de bord",

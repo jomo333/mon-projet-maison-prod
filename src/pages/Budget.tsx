@@ -815,9 +815,9 @@ const Budget = () => {
             {/* Category List */}
             <Card className="animate-fade-in" style={{ animationDelay: "400ms" }}>
               <CardHeader>
-                <CardTitle className="font-display">Détail par catégorie</CardTitle>
+                <CardTitle className="font-display">{t("budget.detailedBudget")}</CardTitle>
                 <CardDescription>
-                  Budget et dépenses par poste — Téléchargez vos soumissions pour ajuster votre budget réel
+                  {t("budget.detailedBudgetDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -863,12 +863,12 @@ const Budget = () => {
                                   {isOverBudget && (
                                     <Badge variant="destructive" className="text-xs">
                                       <AlertTriangle className="h-3 w-3 mr-1" />
-                                      Dépassement
+                                      {t("budget.exceeded")}
                                     </Badge>
                                   )}
                                   {isNearLimit && (
                                     <Badge variant="secondary" className="text-xs bg-warning/10 text-warning">
-                                      Attention
+                                      {t("common.warning")}
                                     </Badge>
                                   )}
                                 </div>
@@ -920,19 +920,19 @@ const Budget = () => {
                                       {stepTasks.length > 0 && (
                                         <div>
                                           <div className="text-xs font-medium text-muted-foreground mb-2">
-                                            Tâches incluses (étapes du guide)
+                                            {t("budget.includedTasks")}
                                           </div>
                                           <ul className="list-disc pl-5 space-y-1 text-sm">
-                                            {stepTasks.map((t) => (
-                                              <li key={t} className="text-muted-foreground">
-                                                {t}
+                                            {stepTasks.map((task) => (
+                                              <li key={task} className="text-muted-foreground">
+                                                {task}
                                               </li>
                                             ))}
                                           </ul>
                                         </div>
                                       )}
                                       <div className="text-sm text-muted-foreground italic">
-                                        Aucun élément analysé pour cette catégorie pour l'instant.
+                                        {t("budget.noItemsAnalyzed")}
                                       </div>
                                     </>
                                   );
@@ -972,21 +972,21 @@ const Budget = () => {
                                                    </li>
                                                  ))}
                                                </ul>
-                                             ) : (
-                                               <div className="ml-6 text-sm text-muted-foreground italic">
-                                                 Aucun élément associé.
-                                               </div>
-                                             )}
+                                              ) : (
+                                                <div className="ml-6 text-sm text-muted-foreground italic">
+                                                  {t("budget.noItemsAssociated")}
+                                                </div>
+                                              )}
                                            </div>
                                          );
                                        })}
 
-                                       {otherItems.length > 0 && (
-                                         <div>
-                                           <div className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
-                                             <CheckCircle2 className="h-4 w-4 text-primary" />
-                                             Autres éléments
-                                           </div>
+                                        {otherItems.length > 0 && (
+                                          <div>
+                                            <div className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                                              <CheckCircle2 className="h-4 w-4 text-primary" />
+                                              {t("budget.otherItems")}
+                                            </div>
                                            <ul className="ml-6 list-disc pl-4 space-y-1">
                                              {otherItems.map((item, idx) => (
                                                <li key={idx} className="text-sm text-muted-foreground">
@@ -1040,7 +1040,7 @@ const Budget = () => {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <div className="w-4 h-4 rounded shrink-0 bg-amber-500" />
-                            <span className="font-medium text-amber-700 dark:text-amber-400">Budget imprévu (5%)</span>
+                            <span className="font-medium text-amber-700 dark:text-amber-400">{t("budget.contingencyBudget")}</span>
                           </div>
                           <div className="text-right shrink-0">
                             <div className="text-sm font-medium text-amber-700 dark:text-amber-400">
@@ -1055,7 +1055,7 @@ const Budget = () => {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <div className="w-4 h-4 rounded shrink-0 bg-blue-500" />
-                            <span className="font-medium text-blue-700 dark:text-blue-400">Taxes (TPS 5% + TVQ 9,975%)</span>
+                            <span className="font-medium text-blue-700 dark:text-blue-400">{t("budget.taxesTpsQst")}</span>
                           </div>
                           <div className="text-right shrink-0">
                             <div className="text-sm font-medium text-blue-700 dark:text-blue-400">

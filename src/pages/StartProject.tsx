@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { format, parseISO } from "date-fns";
-import { fr } from "date-fns/locale";
+import { getDateLocale } from "@/lib/i18n";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/landing/Footer";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,7 @@ const projectTypes = [
 type NextAction = "budget" | "schedule" | "steps" | "";
 
 const StartProject = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { canCreateProject, canUpload, refetch: refetchLimits } = usePlanLimits();
@@ -591,17 +593,17 @@ const StartProject = () => {
           <div className="space-y-6">
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-display font-bold">
-                Comment voulez-vous nommer votre projet?
+                {t("startProject.projectName")}
               </h2>
               <p className="text-muted-foreground">
-                Un nom qui vous aidera à l'identifier facilement
+                {t("startProject.projectNameHelp")}
               </p>
             </div>
             <div className="max-w-md mx-auto">
-              <Label htmlFor="projectName" className="sr-only">Nom du projet</Label>
+              <Label htmlFor="projectName" className="sr-only">{t("projects.projectName")}</Label>
               <Input
                 id="projectName"
-                placeholder="Ex: Maison famille Tremblay"
+                placeholder={t("startProject.projectNamePlaceholder")}
                 value={projectData.projectName}
                 onChange={(e) => setProjectData({ ...projectData, projectName: e.target.value })}
                 className="text-lg py-6 text-center"
@@ -616,10 +618,10 @@ const StartProject = () => {
           <div className="space-y-6">
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-display font-bold">
-                Quel type de projet réalisez-vous?
+                {t("startProject.projectType")}
               </h2>
               <p className="text-muted-foreground">
-                Sélectionnez le type qui correspond le mieux
+                {t("startProject.projectTypeHelp")}
               </p>
             </div>
             <RadioGroup
@@ -658,10 +660,10 @@ const StartProject = () => {
           <div className="space-y-6">
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-display font-bold">
-                Où se situe votre projet?
+                {t("startProject.municipality")}
               </h2>
               <p className="text-muted-foreground">
-                La municipalité où sera construit votre projet
+                {t("startProject.municipalityHelp")}
               </p>
             </div>
             <div className="max-w-md mx-auto">
@@ -669,7 +671,7 @@ const StartProject = () => {
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="municipality"
-                  placeholder="Ex: Sherbrooke, Québec"
+                  placeholder={t("startProject.municipalityPlaceholder")}
                   value={projectData.municipality}
                   onChange={(e) => setProjectData({ ...projectData, municipality: e.target.value })}
                   className="text-lg py-6 pl-10"
@@ -685,10 +687,10 @@ const StartProject = () => {
           <div className="space-y-6">
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-display font-bold">
-                Où en êtes-vous rendu avec votre projet?
+                {t("startProject.currentStage")}
               </h2>
               <p className="text-muted-foreground">
-                Sélectionnez l'étape actuelle de votre projet
+                {t("startProject.currentStageHelp")}
               </p>
             </div>
             <RadioGroup
@@ -698,7 +700,7 @@ const StartProject = () => {
             >
               {/* Pré-construction */}
               <div className="space-y-2">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">Pré-construction</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">{t("startProject.phases.preConstruction")}</p>
                 {startingStepOptions.filter(s => s.phase === "pre-construction").map((stage, index) => (
                   <Label
                     key={stage.value}
@@ -730,7 +732,7 @@ const StartProject = () => {
               
               {/* Gros œuvre */}
               <div className="space-y-2 pt-2">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">Gros œuvre</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">{t("startProject.phases.roughWork")}</p>
                 {startingStepOptions.filter(s => s.phase === "gros-oeuvre").map((stage) => (
                   <Label
                     key={stage.value}
@@ -762,7 +764,7 @@ const StartProject = () => {
               
               {/* Second œuvre */}
               <div className="space-y-2 pt-2">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">Second œuvre</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">{t("startProject.phases.secondaryWork")}</p>
                 {startingStepOptions.filter(s => s.phase === "second-oeuvre").map((stage) => (
                   <Label
                     key={stage.value}
@@ -794,7 +796,7 @@ const StartProject = () => {
               
               {/* Finitions */}
               <div className="space-y-2 pt-2">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">Finitions</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-1">{t("startProject.phases.finishing")}</p>
                 {startingStepOptions.filter(s => s.phase === "finitions").map((stage) => (
                   <Label
                     key={stage.value}
@@ -832,10 +834,10 @@ const StartProject = () => {
           <div className="space-y-6">
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-display font-bold">
-                Quelle est votre date visée pour le début des travaux?
+                {t("startProject.targetDate")}
               </h2>
               <p className="text-muted-foreground">
-                Cette date nous aidera à planifier votre échéancier et les étapes préparatoires
+                {t("startProject.targetDateHelp")}
               </p>
             </div>
             <div className="max-w-md mx-auto space-y-6">
@@ -850,8 +852,8 @@ const StartProject = () => {
                   >
                     <CalendarIcon className="mr-3 h-5 w-5" />
                     {projectData.targetStartDate
-                      ? format(parseISO(projectData.targetStartDate), "PPP", { locale: fr })
-                      : "Sélectionner une date"}
+                      ? format(parseISO(projectData.targetStartDate), "PPP", { locale: getDateLocale() })
+                      : t("startProject.selectADate")}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="center">
@@ -910,7 +912,7 @@ const StartProject = () => {
 
               {!projectData.targetStartDate && (
                 <p className="text-center text-sm text-muted-foreground">
-                  Vous pourrez modifier cette date plus tard si nécessaire
+                  {t("startProject.skipForNow")}
                 </p>
               )}
             </div>
@@ -922,10 +924,10 @@ const StartProject = () => {
           <div className="space-y-6">
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-display font-bold">
-                Avez-vous déjà vos plans de construction?
+                {t("startProject.planUpload.title")}
               </h2>
               <p className="text-muted-foreground">
-                Téléversez-les maintenant pour les utiliser dans l'analyse budgétaire IA
+                {t("startProject.planUpload.subtitle")}
               </p>
             </div>
 
@@ -944,23 +946,23 @@ const StartProject = () => {
                   className="hidden"
                 />
                 <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm font-medium">Cliquez pour téléverser vos plans</p>
+                <p className="text-sm font-medium">{t("startProject.planUpload.uploadArea")}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Images ou PDF (max 10 pages par PDF)
+                  {t("startProject.planUpload.formats")}
                 </p>
               </div>
 
               {isConverting && (
                 <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm">Conversion du PDF... {Math.round(pdfProgress)}%</span>
+                  <span className="text-sm">{t("startProject.planUpload.converting")} {Math.round(pdfProgress)}%</span>
                 </div>
               )}
 
               {isAnalyzing && (
                 <div className="flex items-center gap-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
                   <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                  <span className="text-sm text-primary font-medium">{analysisProgress || "Analyse en cours..."}</span>
+                  <span className="text-sm text-primary font-medium">{analysisProgress || t("startProject.analyzing")}</span>
                 </div>
               )}
 
@@ -1013,7 +1015,7 @@ const StartProject = () => {
               {/* Skip button */}
               <div className="text-center pt-4">
                 <Button variant="ghost" onClick={handleSkipPlans} disabled={isSaving}>
-                  Je n'ai pas encore de plans, passer cette étape
+                  {t("startProject.planUpload.skipPlans")}
                 </Button>
               </div>
             </div>
@@ -1045,7 +1047,7 @@ const StartProject = () => {
           {currentStep !== 7 && (
             <div className="mb-8">
               <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
-                <span>Étape {currentStep} de {totalSteps}</span>
+                <span>{t("common.step")} {currentStep} {t("common.of")} {totalSteps}</span>
                 <span>{Math.round(progress)}%</span>
               </div>
               <Progress value={progress} className="h-2" />
@@ -1069,7 +1071,7 @@ const StartProject = () => {
                 className="gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Retour
+                {t("common.back")}
               </Button>
               <Button
                 onClick={handleNext}
@@ -1079,15 +1081,15 @@ const StartProject = () => {
                 {isSaving ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    {currentStep === 6 ? "Téléversement..." : "Enregistrement..."}
+                    {currentStep === 6 ? t("common.upload") + "..." : t("startProject.creating")}
                   </>
                 ) : (
                   <>
                     {currentStep === 6 
-                      ? (uploadedPlans.length > 0 ? "Téléverser et continuer" : "Continuer")
+                      ? (uploadedPlans.length > 0 ? t("startProject.planUpload.continue") : t("common.next"))
                       : currentStep === 5 
-                        ? (shouldOfferPlanUpload(projectData.currentStage) ? "Continuer" : "Créer mon projet")
-                        : "Continuer"
+                        ? (shouldOfferPlanUpload(projectData.currentStage) ? t("common.next") : t("startProject.projectCreated"))
+                        : t("common.next")
                     }
                     <ArrowRight className="h-4 w-4" />
                   </>

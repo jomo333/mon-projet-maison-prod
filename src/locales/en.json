@@ -315,7 +315,15 @@
     "finalTotal": "Final total",
     "totalWithTaxes": "Total (taxes included)",
     "noItems": "No detailed items",
-    "noItemsDesc": "Analyze your plans to generate items"
+    "noItemsDesc": "Analyze your plans to generate items",
+    "detailedBudgetDesc": "Budget and expenses by category — Upload your quotes to adjust your actual budget",
+    "exceeded": "Over budget",
+    "includedTasks": "Included tasks (guide steps)",
+    "noItemsAnalyzed": "No items analyzed for this category yet.",
+    "noItemsAssociated": "No items associated.",
+    "otherItems": "Other items",
+    "contingencyBudget": "Contingency budget (5%)",
+    "taxesTpsQst": "Taxes (GST 5% + QST 9.975%)"
   },
   "schedule": {
     "title": "Schedule",
@@ -397,7 +405,31 @@
     "askQuestion": "Ask your question about the building code...",
     "resultsFor": "Results for",
     "noResults": "No results found",
-    "tryDifferent": "Try different keywords"
+    "tryDifferent": "Try different keywords",
+    "disclaimer": {
+      "title": "Important notice",
+      "text": "The information provided is for reference only. Always consult a qualified professional and local authorities."
+    },
+    "selectedProject": "Selected project",
+    "activeMunicipalCodes": "Active municipal codes",
+    "change": "Change",
+    "smartSearch": "Smart search",
+    "newSearch": "New search",
+    "askQuestion": "Ask your question",
+    "guideYou": "I will guide you with questions to find the best answer.",
+    "searchPlaceholder": "Ask your question about the building code...",
+    "categories": {
+      "all": "All",
+      "structure": "Structure",
+      "safety": "Safety",
+      "stairs": "Stairs",
+      "insulation": "Insulation",
+      "plumbing": "Plumbing",
+      "electrical": "Electrical",
+      "ventilation": "Ventilation",
+      "windows": "Windows",
+      "municipal": "Municipal code"
+    }
   },
   "dashboard": {
     "title": "Dashboard",

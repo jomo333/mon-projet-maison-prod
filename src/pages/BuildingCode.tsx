@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/landing/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1015,6 +1016,7 @@ interface UserProject {
 }
 
 const BuildingCode = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -1067,16 +1069,16 @@ const BuildingCode = () => {
   }, [messages]);
 
   const categories = [
-    { id: 'all', name: 'Tout' },
-    { id: 'structure', name: 'Structure' },
-    { id: 'securite', name: 'Sécurité' },
-    { id: 'escaliers', name: 'Escaliers' },
-    { id: 'isolation', name: 'Isolation' },
-    { id: 'plomberie', name: 'Plomberie' },
-    { id: 'electricite', name: 'Électricité' },
-    { id: 'ventilation', name: 'Ventilation' },
-    { id: 'fenestration', name: 'Fenêtres' },
-    { id: 'municipal', name: 'Code municipal' }
+    { id: 'all', name: t('buildingCode.categories.all', 'All') },
+    { id: 'structure', name: t('buildingCode.categories.structure') },
+    { id: 'securite', name: t('buildingCode.categories.safety') },
+    { id: 'escaliers', name: t('buildingCode.categories.stairs') },
+    { id: 'isolation', name: t('buildingCode.categories.insulation') },
+    { id: 'plomberie', name: t('buildingCode.categories.plumbing') },
+    { id: 'electricite', name: t('buildingCode.categories.electrical') },
+    { id: 'ventilation', name: t('buildingCode.categories.ventilation') },
+    { id: 'fenestration', name: t('buildingCode.categories.windows', 'Windows') },
+    { id: 'municipal', name: t('buildingCode.categories.municipal', 'Municipal code') }
   ];
 
   const findClarificationQuestions = (query: string): string[] | null => {
@@ -1428,9 +1430,9 @@ const BuildingCode = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
               <BookOpen className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold mb-2">Code du bâtiment</h1>
+            <h1 className="text-3xl font-bold mb-2">{t("buildingCode.title")}</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Recherchez des informations sur le Code national du bâtiment et les codes municipaux.
+              {t("buildingCode.subtitle")}
             </p>
           </div>
 
@@ -1439,8 +1441,7 @@ const BuildingCode = () => {
             <CardContent className="flex items-start gap-3 py-4">
               <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Avis important :</strong> Les informations fournies sont à titre indicatif seulement. 
-                Consultez toujours un professionnel qualifié et les autorités locales.
+                <strong className="text-foreground">{t("buildingCode.disclaimer.title", "Important notice")}:</strong> {t("buildingCode.disclaimer.text", "The information provided is for reference only. Always consult a qualified professional and local authorities.")}
               </p>
             </CardContent>
           </Card>
@@ -1449,9 +1450,9 @@ const BuildingCode = () => {
           {userProjects.length > 0 && (
             <Card className="mb-4">
               <CardContent className="py-4">
-                <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-2">
                   <Building2 className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">Projet sélectionné:</span>
+                  <span className="text-sm font-medium">{t("buildingCode.selectedProject", "Selected project")}:</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {userProjects.map(project => (
@@ -1479,7 +1480,7 @@ const BuildingCode = () => {
               <CardContent className="flex items-center gap-3 py-3">
                 <MapPin className="h-5 w-5 text-primary flex-shrink-0" />
                 <p className="text-sm">
-                  <strong>Codes municipaux actifs:</strong> {userMunicipality}
+                  <strong>{t("buildingCode.activeMunicipalCodes", "Active municipal codes")}:</strong> {userMunicipality}
                   <Button 
                     variant="link" 
                     size="sm" 
@@ -1489,7 +1490,7 @@ const BuildingCode = () => {
                       setSelectedProject(null);
                     }}
                   >
-                    Changer
+                    {t("buildingCode.change", "Change")}
                   </Button>
                 </p>
               </CardContent>
@@ -1520,11 +1521,11 @@ const BuildingCode = () => {
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquare className="h-5 w-5" />
-                  Recherche intelligente
+                  {t("buildingCode.smartSearch", "Smart search")}
                 </CardTitle>
                 {messages.length > 0 && (
                   <Button variant="outline" size="sm" onClick={handleNewSearch}>
-                    Nouvelle recherche
+                    {t("buildingCode.newSearch", "New search")}
                   </Button>
                 )}
               </div>
@@ -1533,9 +1534,9 @@ const BuildingCode = () => {
               {messages.length === 0 ? (
                 <div className="text-center py-8">
                   <Search className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Posez votre question</h3>
+                  <h3 className="text-lg font-medium mb-2">{t("buildingCode.askQuestion", "Ask your question")}</h3>
                   <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                    Je vous guiderai avec des questions pour trouver la meilleure réponse.
+                    {t("buildingCode.guideYou", "I will guide you with questions to find the best answer.")}
                   </p>
                   <div className="flex flex-wrap justify-center gap-2">
                     {exampleSearches.map((example) => (
