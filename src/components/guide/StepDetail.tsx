@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Step, phases } from "@/data/constructionSteps";
+import { Step, usePhases } from "@/hooks/useConstructionSteps";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -66,6 +66,7 @@ export function StepDetail({
 }: StepDetailProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const phases = usePhases();
   const phase = phases.find(p => p.id === step.phase);
   const IconComponent = iconMap[step.icon] || Circle;
   

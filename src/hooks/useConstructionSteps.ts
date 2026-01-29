@@ -20,6 +20,12 @@ export interface Step {
   tasks: Task[];
 }
 
+export interface Phase {
+  id: "pre-construction" | "gros-oeuvre" | "second-oeuvre" | "finitions";
+  label: string;
+  color: string;
+}
+
 // Step IDs for reference
 export const stepIds = [
   "planification",
@@ -161,4 +167,16 @@ export function useConstructionSteps(): Step[] {
 export function useConstructionStep(stepId: string): Step | undefined {
   const steps = useConstructionSteps();
   return useMemo(() => steps.find((s) => s.id === stepId), [steps, stepId]);
+}
+
+// Hook for phases with translated labels
+export function usePhases(): Phase[] {
+  const { t } = useTranslation();
+
+  return useMemo(() => [
+    { id: "pre-construction", label: t("steps.phases.preConstruction"), color: "bg-blue-500" },
+    { id: "gros-oeuvre", label: t("steps.phases.grosOeuvre"), color: "bg-orange-500" },
+    { id: "second-oeuvre", label: t("steps.phases.secondOeuvre"), color: "bg-purple-500" },
+    { id: "finitions", label: t("steps.phases.finitions"), color: "bg-green-500" },
+  ], [t]);
 }

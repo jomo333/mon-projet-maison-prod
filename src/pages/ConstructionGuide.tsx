@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/landing/Footer";
-import { constructionSteps, phases } from "@/data/constructionSteps";
+import { useConstructionSteps, usePhases } from "@/hooks/useConstructionSteps";
 import { StepCard } from "@/components/guide/StepCard";
 import { StepDetail } from "@/components/guide/StepDetail";
 import { ScheduleDatesBanner } from "@/components/guide/ScheduleDatesBanner";
@@ -14,6 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ArrowLeft, RotateCcw, AlertTriangle, X, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProjectSchedule } from "@/hooks/useProjectSchedule";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +25,9 @@ import {
 } from "@/components/ui/dialog";
 
 const ConstructionGuide = () => {
+  const { t } = useTranslation();
+  const constructionSteps = useConstructionSteps();
+  const phases = usePhases();
   const [searchParams] = useSearchParams();
   const stepFromUrl = searchParams.get("step");
   const projectId = searchParams.get("project");
@@ -107,7 +111,7 @@ const ConstructionGuide = () => {
               className="mb-6 gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              Retour aux étapes
+              {t("dashboard.backToSteps")}
             </Button>
 
             {/* Schedule dates banner */}
@@ -115,7 +119,7 @@ const ConstructionGuide = () => {
 
             <div className="mb-6">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                <span>Étape {currentStepIndex} de {totalSteps}</span>
+                <span>{t("dashboard.stepOf", { current: currentStepIndex, total: totalSteps })}</span>
               </div>
               <Progress value={(currentStepIndex / totalSteps) * 100} className="h-2" />
             </div>
@@ -154,10 +158,10 @@ const ConstructionGuide = () => {
           <div className="mb-8 flex items-start justify-between">
             <div>
               <h1 className="font-display text-3xl font-bold tracking-tight">
-                Guide de construction
+                {t("guide.title")}
               </h1>
               <p className="text-muted-foreground mt-1">
-                Suivez ces étapes pour mener à bien votre projet d'autoconstruction.
+                {t("guide.subtitle")}
               </p>
             </div>
             <div className="flex gap-2">
@@ -165,39 +169,39 @@ const ConstructionGuide = () => {
                 <DialogTrigger asChild>
                   <Button variant="outline" className="gap-2">
                     <HelpCircle className="h-4 w-4" />
-                    Comment utiliser cette page
+                    {t("dashboard.howToUse")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-2xl">
                   <DialogHeader>
-                    <DialogTitle>Comment utiliser cette page</DialogTitle>
+                    <DialogTitle>{t("dashboard.howToUse")}</DialogTitle>
                     <DialogDescription>
-                      Voici les fonctionnalités disponibles pour gérer vos étapes de construction.
+                      {t("dashboard.howToUseDesc")}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 sm:grid-cols-2 py-4">
                     <div className="space-y-1 p-3 rounded-lg bg-muted/50">
-                      <h3 className="font-medium text-sm text-primary">📋 Filtrer par phase</h3>
+                      <h3 className="font-medium text-sm text-primary">📋 {t("dashboard.tips.filterPhase")}</h3>
                       <p className="text-sm text-muted-foreground">
-                        Utilisez les badges pour afficher uniquement les étapes d'une phase spécifique (pré-construction, gros œuvre, second œuvre, finitions).
+                        {t("dashboard.tips.filterPhaseDesc")}
                       </p>
                     </div>
                     <div className="space-y-1 p-3 rounded-lg bg-muted/50">
-                      <h3 className="font-medium text-sm text-primary">📖 Consulter une étape</h3>
+                      <h3 className="font-medium text-sm text-primary">📖 {t("dashboard.tips.viewStep")}</h3>
                       <p className="text-sm text-muted-foreground">
-                        Cliquez sur une carte pour voir les tâches détaillées, conseils pratiques et documents requis pour chaque étape.
+                        {t("dashboard.tips.viewStepDesc")}
                       </p>
                     </div>
                     <div className="space-y-1 p-3 rounded-lg bg-muted/50">
-                      <h3 className="font-medium text-sm text-primary">🔄 Recalculer l'échéancier</h3>
+                      <h3 className="font-medium text-sm text-primary">🔄 {t("guide.recalculateSchedule")}</h3>
                       <p className="text-sm text-muted-foreground">
-                        Le bouton « Recalculer » met à jour automatiquement les dates de votre projet selon les durées estimées.
+                        {t("guide.recalculateScheduleDesc")}
                       </p>
                     </div>
                     <div className="space-y-1 p-3 rounded-lg bg-muted/50">
-                      <h3 className="font-medium text-sm text-primary">✅ Marquer comme terminé</h3>
+                      <h3 className="font-medium text-sm text-primary">✅ {t("dashboard.tips.markComplete")}</h3>
                       <p className="text-sm text-muted-foreground">
-                        Dans chaque étape, marquez les tâches complétées pour suivre votre progression et ajuster l'échéancier.
+                        {t("guide.markCompleteDesc")}
                       </p>
                     </div>
                   </div>
@@ -213,7 +217,7 @@ const ConstructionGuide = () => {
                   className="gap-2"
                 >
                   <RotateCcw className={`h-4 w-4 ${isUpdating ? "animate-spin" : ""}`} />
-                  Recalculer
+                  {t("guide.recalculate")}
                 </Button>
               )}
             </div>
@@ -224,17 +228,13 @@ const ConstructionGuide = () => {
             <Alert className="mb-6 border-amber-500/50 bg-amber-50 dark:bg-amber-950/20">
               <AlertTriangle className="h-4 w-4 text-amber-600" />
               <AlertTitle className="text-amber-800 dark:text-amber-400">
-                Échéancier préliminaire
+                {t("guide.preliminarySchedule")}
               </AlertTitle>
               <AlertDescription className="text-amber-700 dark:text-amber-300">
                 {dateWarning ? (
                   <span>{dateWarning}</span>
                 ) : (
-                  <span>
-                    Votre date de début de travaux est basée sur une estimation préliminaire. 
-                    Elle pourrait varier selon l'avancement de votre planification, l'obtention des permis 
-                    et la disponibilité des entrepreneurs. Complétez les étapes de préparation pour affiner cette date.
-                  </span>
+                  <span>{t("guide.preliminaryScheduleDesc")}</span>
                 )}
               </AlertDescription>
               <Button
@@ -261,7 +261,7 @@ const ConstructionGuide = () => {
               className="cursor-pointer px-4 py-2"
               onClick={() => setActivePhase(null)}
             >
-              Toutes les phases
+              {t("dashboard.allPhases")}
             </Badge>
             {phases.map((phase) => (
               <Badge 

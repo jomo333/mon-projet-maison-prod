@@ -481,11 +481,12 @@
     "regenerate": "Regenerate"
   },
   "guide": {
-    "title": "Owner-Builder's Guide",
-    "subtitle": "References and best practices for your construction project",
+    "title": "Construction Guide",
+    "subtitle": "Follow these steps to successfully complete your self-build project.",
     "steps": "Steps",
     "tasks": "Tasks",
     "markComplete": "Mark as complete",
+    "markCompleteDesc": "In each step, mark completed tasks to track your progress and adjust the schedule.",
     "notes": "Notes",
     "attachments": "Attachments",
     "disclaimer": "Important Notice",
@@ -493,6 +494,11 @@
     "usefulLinks": "Useful Links",
     "usefulLinksDesc": "Official resources for your project",
     "official": "Official",
+    "recalculate": "Recalculate",
+    "recalculateSchedule": "Recalculate Schedule",
+    "recalculateScheduleDesc": "The \"Recalculate\" button automatically updates your project dates based on estimated durations.",
+    "preliminarySchedule": "Preliminary Schedule",
+    "preliminaryScheduleDesc": "Your work start date is based on a preliminary estimate. It may vary depending on your planning progress, permit acquisition, and contractor availability. Complete the preparation steps to refine this date.",
     "categories": {
       "rbq": "RBQ Requirements",
       "rbqDesc": "Régie du bâtiment du Québec",
@@ -589,7 +595,9 @@
     },
     "reminder": "Important reminder",
     "reminderText": "Make sure all previous steps have been completed before starting this one.",
-    "viewAllSteps": "View all steps"
+    "viewAllSteps": "View all steps",
+    "allSteps": "All construction steps",
+    "allStepsDesc": "Follow this guide to successfully complete your self-build project."
   },
   "gallery": {
     "title": "My Files",
@@ -2207,6 +2215,732 @@
       "8": {
         "title": "Updates",
         "content": "We may update this cookie policy from time to time to reflect changes in our use of cookies or legal requirements. We encourage you to regularly check this page. The date of the last update is indicated at the top of this page."
+      }
+    }
+  },
+  "steps": {
+    "phases": {
+      "preConstruction": "Pre-construction",
+      "grosOeuvre": "Structural Work",
+      "secondOeuvre": "Mechanical & Envelope",
+      "finitions": "Finishing"
+    },
+    "planification": {
+      "title": "Project Planning",
+      "description": "Define your needs, budget and goals before starting.",
+      "duration": "4-5 days",
+      "tasks": {
+        "besoins": {
+          "title": "Define your needs",
+          "description": "List the number of bedrooms, bathrooms, storage spaces and desired features.",
+          "tips": [
+            "Think about your future needs (growing family, working from home)",
+            "Visit model homes for inspiration"
+          ]
+        },
+        "budget-initial": {
+          "title": "Establish preliminary budget",
+          "description": "Calculate your financial capacity including land, construction and contingencies.",
+          "tips": [
+            "Plan for 10-15% of the budget for contingencies",
+            "Include connection fees (electricity, water, sewer)"
+          ]
+        },
+        "terrain": {
+          "title": "Land search and purchase",
+          "description": "Find land that meets your criteria and verify zoning.",
+          "tips": [
+            "Check municipal zoning regulations",
+            "Have a soil study done before purchase"
+          ],
+          "documents": ["Location certificate", "Deed of sale", "Geotechnical study"]
+        },
+        "preapprobation-planification": {
+          "title": "Mortgage pre-approval",
+          "description": "Get pre-approval from your financial institution to know your maximum borrowing capacity.",
+          "tips": [
+            "Compare offers from several banks and brokers",
+            "A pre-approval is generally valid for 90 to 120 days",
+            "Prepare your proof of income and bank statements"
+          ],
+          "documents": ["Pay stubs", "Tax assessment notice", "Bank statements"]
+        }
+      }
+    },
+    "plans-permis": {
+      "title": "Plans and Permits",
+      "description": "Have your plans prepared and obtain all necessary permits.",
+      "duration": "6-8 weeks",
+      "tasks": {
+        "plans-architecture": {
+          "title": "Architectural plans",
+          "description": "Hire an architect or technologist to draw your plans.",
+          "tips": [
+            "Consider purchasing pre-designed plans to speed up the process and reduce costs — several Quebec suppliers offer adaptable models",
+            "Ensure plans comply with the Building Code",
+            "Include structural and mechanical plans",
+            "As soon as you get your plans, start soliciting quotes to speed up project preparation"
+          ],
+          "documents": ["Architectural plans", "Structural plans", "Mechanical plans"]
+        },
+        "test-sol": {
+          "title": "Soil test (geotechnical study)",
+          "description": "Have a geotechnical study done to determine soil bearing capacity and required foundation type.",
+          "tips": [
+            "Required to obtain permit in many municipalities",
+            "Determines the appropriate foundation type",
+            "Identifies high water table risks"
+          ],
+          "documents": ["Geotechnical report", "Foundation recommendations"]
+        },
+        "services-publics": {
+          "title": "Services validation (water, sewer)",
+          "description": "Check availability of municipal services (water, sewer) or plan private installations (well, septic tank, drain field).",
+          "tips": [
+            "Contact the municipality to find out what services are available",
+            "If off-grid: plan soil study for septic installation",
+            "The drain field requires adequate land area",
+            "An artesian well may require multiple drillings"
+          ],
+          "documents": ["Septic compliance certificate", "Septic installation permit", "Water analysis (well)"]
+        },
+        "permis-construction": {
+          "title": "Building permit application",
+          "description": "Submit your application to the municipality with all required documents.",
+          "tips": [
+            "Processing time varies by municipality (2-8 weeks)",
+            "Some municipalities require a professional's commitment"
+          ],
+          "documents": ["Application form", "Certified plans", "Location certificate"]
+        }
+      }
+    },
+    "soumissions": {
+      "title": "Quotes",
+      "description": "Obtain and compare quotes from different trades.",
+      "duration": "2-3 weeks",
+      "tasks": {
+        "obtenir-soumissions": {
+          "title": "Obtain quotes",
+          "description": "Request detailed quotes from different trades.",
+          "tips": [
+            "Get at least 3 quotes per specialty",
+            "Don't choose solely based on the lowest price — use AI analysis to help you compare",
+            "Check contractor references",
+            "Request proof of liability insurance",
+            "Verify RBQ licenses of contractors (https://www.rbq.gouv.qc.ca/en/be/citizen/check-contractors-licence/)",
+            "Compare warranties and proposed timelines"
+          ],
+          "documents": ["Signed quotes", "Proof of insurance", "RBQ licenses"]
+        },
+        "assurance-chantier": {
+          "title": "Construction insurance",
+          "description": "Take out construction insurance to protect your project.",
+          "tips": [
+            "⚠️ IMPORTANT: Make sure coverage starts BEFORE the first shovel hits the ground",
+            "Construction insurance covers damage during construction",
+            "Verify coverage includes theft, vandalism and weather damage",
+            "Request proof of liability insurance from all your contractors",
+            "In case of injury on site, the owner-builder is held responsible — liability insurance is essential",
+            "Compare several brokers to get the best rate"
+          ],
+          "documents": ["Construction insurance policy", "Contractor insurance certificates"]
+        }
+      }
+    },
+    "financement": {
+      "title": "Financing",
+      "description": "Obtain your financing and prepare your financial plan.",
+      "duration": "2-4 weeks",
+      "tasks": {
+        "pret-construction": {
+          "title": "Construction loan",
+          "description": "Negotiate your construction loan with progressive disbursements.",
+          "tips": [
+            "Funds are released in stages based on progress",
+            "Plan for personal funds for initial expenses"
+          ],
+          "documents": ["Contractor quotes", "Plans and specifications", "Detailed budget"]
+        }
+      }
+    },
+    "excavation": {
+      "title": "Excavation",
+      "description": "Site preparation and digging for foundations.",
+      "duration": "3-5 days",
+      "tasks": {
+        "implantation": {
+          "title": "House staking",
+          "description": "The surveyor positions the house on the lot according to plans.",
+          "tips": [
+            "Respect required setbacks",
+            "Have it verified before excavation"
+          ],
+          "documents": ["Staking certificate"]
+        },
+        "deboisement": {
+          "title": "Land clearing",
+          "description": "Tree felling and clearing of the construction zone.",
+          "tips": [
+            "Check municipal regulations regarding tree cutting",
+            "Some municipalities require a cutting permit",
+            "Plan for transport or chipping of branches and stumps"
+          ]
+        },
+        "excavation-creusage": {
+          "title": "Digging and excavation",
+          "description": "Digging for basement and site preparation.",
+          "tips": [
+            "Plan for storage of excavated soil or budget for hauling",
+            "Protect excavation from rain and have a pump ready for water removal"
+          ]
+        }
+      }
+    },
+    "fondation": {
+      "title": "Foundation",
+      "description": "Foundation construction and waterproofing.",
+      "duration": "1-2 weeks",
+      "tasks": {
+        "coulage-fondation": {
+          "title": "Foundation pouring",
+          "description": "Installation of forms and concrete pouring for footings and walls.",
+          "tips": [
+            "Concrete curing: wait at least 21 days before loading",
+            "Waterproof foundation walls with tar membrane or Delta-MS membrane for optimal waterproofing"
+          ]
+        },
+        "drain-remblai": {
+          "title": "Drain and backfill",
+          "description": "Installation of French drain and backfilling around foundations.",
+          "tips": [
+            "Use perforated PVC drain with cleanouts for durable and easy maintenance drainage"
+          ],
+          "documents": ["Foundation inspection report"]
+        }
+      }
+    },
+    "structure": {
+      "title": "Structure and Framing",
+      "description": "Erection of the wood or steel structure of the house.",
+      "duration": "2-4 weeks",
+      "tasks": {
+        "plancher": {
+          "title": "Ground floor",
+          "description": "Installation of joists and subfloor.",
+          "tips": [
+            "Protect subfloor from weather during construction",
+            "Check level before continuing",
+            "Use open-web trusses to facilitate electrical and plumbing runs"
+          ]
+        },
+        "murs": {
+          "title": "Wall erection",
+          "description": "Construction and raising of exterior and load-bearing interior walls.",
+          "tips": [
+            "Respect openings shown on plans",
+            "Install headers above openings"
+          ]
+        },
+        "etage": {
+          "title": "Upper floor structure",
+          "description": "If applicable, construction of floor and walls of upper level.",
+          "tips": [
+            "Use open-web trusses to facilitate electrical and plumbing runs"
+          ]
+        },
+        "fermes-toit": {
+          "title": "Roof truss installation",
+          "description": "Installation of prefabricated trusses or traditional framing construction.",
+          "documents": ["Certified truss plans"]
+        },
+        "pontage": {
+          "title": "Roof sheathing",
+          "description": "Installation of plywood on roof trusses to close the structure.",
+          "tips": [
+            "Protect sheathing from weather quickly",
+            "Check panel alignment"
+          ]
+        },
+        "etancheite": {
+          "title": "Waterproofing",
+          "description": "Installation of waterproofing membranes and infiltration protection.",
+          "tips": [
+            "Ensure all joints are properly sealed",
+            "Check waterproofing around openings (windows, doors)"
+          ]
+        }
+      }
+    },
+    "toiture": {
+      "title": "Roofing",
+      "description": "Installation of membrane and roofing material.",
+      "duration": "2 days",
+      "tasks": {
+        "membrane": {
+          "title": "Membrane and shingles",
+          "description": "Installation of waterproof membrane and asphalt shingles or other covering.",
+          "tips": [
+            "Install flashing around chimneys and vents",
+            "Self-adhesive membrane is required in risk areas",
+            "Apply self-adhesive membrane in the first 4 feet of roof edges for better protection",
+            "Ensure good ventilation to release heat. Poor ventilation can prematurely deteriorate the covering",
+            "Have fascia starter strips installed under the self-adhesive membrane for proper water runoff in case of leak"
+          ]
+        }
+      }
+    },
+    "fenetres-portes": {
+      "title": "Windows and Exterior Doors",
+      "description": "Installation of windows and doors to close the envelope.",
+      "duration": "2 days",
+      "tasks": {
+        "fenetres": {
+          "title": "Window installation",
+          "description": "Window installation with insulation and perimeter sealing.",
+          "tips": [
+            "Use low-expansion foam insulation",
+            "Install window flashing correctly"
+          ]
+        },
+        "portes-ext": {
+          "title": "Exterior doors",
+          "description": "Installation of entry, garage and patio doors."
+        }
+      }
+    },
+    "isolation": {
+      "title": "Insulation and Vapor Barrier",
+      "description": "Installation of thermal insulation and vapor barrier.",
+      "duration": "1-2 weeks",
+      "tasks": {
+        "isolation-murs": {
+          "title": "Wall insulation",
+          "description": "Installation of insulation in exterior walls (batt, cellulose or foam).",
+          "tips": [
+            "R-24 minimum for walls in Quebec",
+            "Avoid thermal bridges"
+          ]
+        },
+        "isolation-toit": {
+          "title": "Roof/attic insulation",
+          "description": "Insulation of top floor ceiling or cathedral ceiling.",
+          "tips": [
+            "R-41 minimum for roofs in Quebec",
+            "Maintain adequate attic ventilation, use a deflector at the bottom of sheathing to maximize ventilation"
+          ]
+        },
+        "insonorisation": {
+          "title": "Soundproofing",
+          "description": "Installation of acoustic insulation between rooms and floors.",
+          "tips": [
+            "Good soundproofing of bedrooms and bathrooms improves comfort and privacy by reducing airborne noise through acoustic insulation and proper installation techniques",
+            "Prioritize walls between bedrooms and bathrooms",
+            "Use acoustic wool or specialized membranes",
+            "Floor soundproofing significantly reduces impact noise"
+          ]
+        },
+        "pare-vapeur": {
+          "title": "Vapor barrier",
+          "description": "Installation of 6 mil polyethylene on the warm side of insulation.",
+          "tips": [
+            "Seal all joints and penetrations",
+            "Blower door test will verify airtightness",
+            "Ensure there are no perforations in the vapor barrier, repair with vapor barrier tape"
+          ],
+          "documents": ["Blower door test report"]
+        },
+        "fourrures-clouage": {
+          "title": "Strapping and backing",
+          "description": "Installation of wood strapping and backing for interior finish attachment.",
+          "tips": [
+            "Ensure strapping is level",
+            "Plan backing at cabinet and wall accessory locations"
+          ]
+        }
+      }
+    },
+    "plomberie-sous-dalle": {
+      "title": "Under-Slab Plumbing",
+      "description": "Installation of plumbing under concrete slab before pouring.",
+      "duration": "1 day",
+      "tasks": {
+        "plomberie-sous-dalle-visite": {
+          "title": "Under-slab plumbing - first visit",
+          "description": "Installation of drains and plumbing pipes under the concrete slab.",
+          "tips": [
+            "This step must be completed before pouring the slab",
+            "Check drainage slopes and connections",
+            "Ensure all connections are accessible"
+          ]
+        }
+      }
+    },
+    "dalle-sous-sol": {
+      "title": "Basement Slab Pour",
+      "description": "Pouring of basement concrete slab after rough plumbing installation.",
+      "duration": "2-3 days",
+      "tasks": {
+        "preparation-dalle": {
+          "title": "Ground preparation",
+          "description": "Leveling, compaction and installation of vapor barrier membrane under slab.",
+          "tips": [
+            "Ensure drainage is in place before pouring",
+            "Install rigid insulation under slab and sealed vapor barrier to reduce heat loss and moisture"
+          ]
+        },
+        "coulage-dalle": {
+          "title": "Concrete pouring",
+          "description": "Pouring and leveling of concrete slab.",
+          "tips": [
+            "Plan control joints to prevent cracking",
+            "Concrete curing: keep moist for minimum 7 days"
+          ]
+        }
+      }
+    },
+    "murs-division": {
+      "title": "Partition Walls",
+      "description": "Construction of non-load-bearing interior partition walls.",
+      "duration": "2-3 days",
+      "tasks": {
+        "construire-escalier": {
+          "title": "Build stairs",
+          "description": "Construction and installation of interior stairs.",
+          "tips": [
+            "Follow Building Code standards for tread dimensions",
+            "Provide temporary guardrail during construction"
+          ]
+        },
+        "ossature-murs": {
+          "title": "Wall framing",
+          "description": "Installation of wood or steel framing for partition walls.",
+          "tips": [
+            "Use 2x4 studs for non-load-bearing walls",
+            "Plan for door and opening locations",
+            "Ensure walls are securely attached between floors and ceilings (poorly anchored walls can cause drywall cracking)",
+            "Use 2x6 walls for dryer venting and drain stack runs"
+          ]
+        },
+        "cadrage-portes": {
+          "title": "Door framing",
+          "description": "Installation of door frames in partition walls.",
+          "tips": [
+            "Check level and plumb of frames",
+            "Plan space for pocket doors if desired",
+            "Ensure correct door opening height based on floor covering thickness"
+          ]
+        }
+      }
+    },
+    "plomberie-roughin": {
+      "title": "Plumbing - Rough-in",
+      "description": "Rough plumbing installation before closing walls.",
+      "duration": "4 days",
+      "tasks": {
+        "plomberie-brute": {
+          "title": "Rough plumbing",
+          "description": "Installation of supply and drain pipes in walls.",
+          "tips": [
+            "It's best to run plumbing before electrical, as it's easier for electricians to work around pipes than vice versa",
+            "PEX is easier to install and less expensive than copper",
+            "Respect drainage slopes"
+          ]
+        },
+        "chauffe-eau": {
+          "title": "Water heater",
+          "description": "Installation of water heater (electric, gas or heat pump).",
+          "tips": [
+            "Install a drain pan connected to drain to catch water in case of leak and prevent water damage"
+          ]
+        },
+        "conduite-gaz": {
+          "title": "Gas line",
+          "description": "Installation of gas lines for fireplace and stove.",
+          "tips": [
+            "Use a certified installer for natural gas or propane",
+            "Plan appliance locations before installing lines"
+          ]
+        },
+        "branchements": {
+          "title": "Municipal connections",
+          "description": "Connection to water and sewer (or septic installation).",
+          "documents": ["Connection permit", "Pressure test"]
+        }
+      }
+    },
+    "electricite-roughin": {
+      "title": "Electrical - Rough-in",
+      "description": "Rough electrical wiring before closing walls.",
+      "duration": "4 days",
+      "tasks": {
+        "entree-electrique": {
+          "title": "Electrical service",
+          "description": "Installation of electrical panel and utility connection.",
+          "tips": [
+            "Plan for sufficient amperage for future needs",
+            "200A is standard for a modern home"
+          ],
+          "documents": ["Utility connection request"]
+        },
+        "filage": {
+          "title": "Rough wiring",
+          "description": "Running wires in walls before drywall installation.",
+          "tips": [
+            "Plan outlet and switch locations",
+            "Provide dedicated circuits (kitchen, laundry)"
+          ]
+        },
+        "inspection-electrique": {
+          "title": "Electrical inspection",
+          "description": "Mandatory inspection before closing walls.",
+          "tips": [
+            "Take photos of all electrical box locations with clear landmarks to locate forgotten boxes after drywall"
+          ]
+        }
+      }
+    },
+    "hvac": {
+      "title": "Heating and Ventilation",
+      "description": "Installation of heating, cooling and ventilation systems.",
+      "duration": "2-3 days",
+      "tasks": {
+        "chauffage": {
+          "title": "Heating system",
+          "description": "Installation of electric baseboards, radiant floor or heat pump.",
+          "tips": [
+            "Position electric baseboards under windows to neutralize cold air — windows often represent the biggest heat loss, even when new",
+            "Plan electric baseboards even if installing central or wall heat pump, as backup heating during extreme cold",
+            "Calculate heating needs per room",
+            "A heat pump can reduce your heating costs"
+          ]
+        },
+        "vrc": {
+          "title": "Heat Recovery Ventilator (HRV)",
+          "description": "Mandatory installation to ensure air quality.",
+          "tips": [
+            "HRV is mandatory in new construction",
+            "Plan ducts to each room"
+          ]
+        },
+        "conduits": {
+          "title": "Ventilation ducts",
+          "description": "Installation of ducts for range hood, dryer and bathroom fans.",
+          "tips": [
+            "Duct must be insulated at minimum for the first 24 inches from its exit through an exterior wall, even in a heated ceiling, and fully insulated in the attic"
+          ]
+        }
+      }
+    },
+    "exterieur": {
+      "title": "Exterior Cladding",
+      "description": "Finishing of the house's exterior envelope.",
+      "duration": "3-4 weeks",
+      "tasks": {
+        "revetement": {
+          "title": "Exterior cladding",
+          "description": "Installation of siding (vinyl, fiber cement, brick, wood).",
+          "tips": [
+            "Install air barrier membrane before cladding and ensure no perforations",
+            "Respect ventilation spacing",
+            "Always provide an air gap behind cladding for proper circulation. Never install horizontal wood strapping as it blocks air and water flow."
+          ]
+        },
+        "fascia-soffite": {
+          "title": "Fascia and soffit",
+          "description": "Installation of roof trim and attic ventilation."
+        },
+        "balcons-terrasses": {
+          "title": "Balconies and decks",
+          "description": "Construction of balconies, porches and decks.",
+          "tips": [
+            "Always apply self-healing waterproof membrane on sill plate (building belt). Provide air space between membrane and balcony structure to allow drying and prevent premature deterioration."
+          ]
+        },
+        "amenagement": {
+          "title": "Landscaping",
+          "description": "Final grading, driveway, lawn and plantings."
+        }
+      }
+    },
+    "gypse": {
+      "title": "Drywall and Painting",
+      "description": "Interior wall and ceiling finishing.",
+      "duration": "10-12 days",
+      "tasks": {
+        "pose-gypse": {
+          "title": "Drywall installation",
+          "description": "Installation of drywall panels on all walls and ceilings.",
+          "tips": [
+            "Use moisture-resistant drywall in bathrooms",
+            "5/8 drywall on garage walls mandatory for fire protection"
+          ]
+        },
+        "tirage-joints": {
+          "title": "Taping and mudding",
+          "description": "Application of joint compound and sanding for smooth finish.",
+          "tips": [
+            "3 coats minimum for a good finish",
+            "Level 4 or 5 depending on desired finish"
+          ]
+        },
+        "peinture": {
+          "title": "Painting",
+          "description": "Application of primer and paint on walls and ceilings.",
+          "tips": [
+            "A good primer is essential. After primer application, inspect all walls and repair visible defects with a light. Inspection is done at 3 feet from walls. Re-prime all repairs before applying finish coats.",
+            "At this stage, apply final paint on ceilings and a first finish coat on walls. Final wall finish coat will be applied after finishing work installation (trim, doors, etc.)."
+          ]
+        }
+      }
+    },
+    "revetements-sol": {
+      "title": "Floor Coverings",
+      "description": "Floor installation in all rooms.",
+      "duration": "5-7 days",
+      "tasks": {
+        "plancher-bois": {
+          "title": "Hardwood or laminate floor",
+          "description": "Installation in living areas.",
+          "tips": [
+            "Acclimate wood 48-72h before installation",
+            "Leave expansion gap at perimeter"
+          ]
+        },
+        "ceramique": {
+          "title": "Ceramic tile",
+          "description": "Tile installation in bathrooms, kitchen and entry.",
+          "tips": [
+            "Add 5/8\" plywood screwed every 6 inches before floor tile installation. Minimum 1 1/4\" substrate is recommended.",
+            "Use waterproof membrane in shower",
+            "Have you considered heated floor option?"
+          ]
+        }
+      }
+    },
+    "cuisine-sdb": {
+      "title": "Cabinetry Work",
+      "description": "Installation of cabinets, countertops and fixtures.",
+      "duration": "3-5 days",
+      "tasks": {
+        "armoires": {
+          "title": "Kitchen cabinets and vanities",
+          "description": "Installation of cabinets and vanity units.",
+          "tips": [
+            "Validate measurements with your cabinet maker once drywall stages are complete"
+          ]
+        },
+        "comptoirs": {
+          "title": "Countertops",
+          "description": "Installation of kitchen and bathroom countertops.",
+          "tips": [
+            "Measurement after cabinet installation",
+            "Fabrication lead time: 2-4 weeks"
+          ]
+        }
+      }
+    },
+    "finitions-int": {
+      "title": "Interior Finishing",
+      "description": "Final details to complete the interior.",
+      "duration": "1-2 weeks",
+      "tasks": {
+        "portes-int": {
+          "title": "Interior doors",
+          "description": "Installation of doors, frames and hardware.",
+          "tips": [
+            "Plan a fire-rated self-closing door between garage and house (building code requirement)"
+          ]
+        },
+        "moulures": {
+          "title": "Trim and baseboards",
+          "description": "Installation of baseboards, casings and decorative moldings."
+        },
+        "escalier": {
+          "title": "Staircase",
+          "description": "Staircase finishing (treads, risers, railing)."
+        },
+        "peinture-finition": {
+          "title": "Finish painting",
+          "description": "Application of final paint coat on walls after finishing work installation.",
+          "tips": [
+            "This step allows correcting touch-ups needed after trim, door and other finishing element installation"
+          ]
+        }
+      }
+    },
+    "electricite-finition": {
+      "title": "Electrical - Finishing",
+      "description": "Final installation of electrical devices after interior finishing.",
+      "duration": "3 days",
+      "tasks": {
+        "prises-interrupteurs": {
+          "title": "Outlets and switches",
+          "description": "Installation of outlet and switch cover plates.",
+          "tips": [
+            "Check operation of each circuit",
+            "Use plates matching your decor"
+          ]
+        },
+        "luminaires": {
+          "title": "Light fixtures",
+          "description": "Installation of all light fixtures (ceiling, wall-mounted, etc.)."
+        },
+        "appareils-electriques": {
+          "title": "Appliance hookup",
+          "description": "Connection of appliances and equipment (range, dryer, etc.)."
+        }
+      }
+    },
+    "plomberie-finition": {
+      "title": "Plumbing - Finishing",
+      "description": "Final installation of fixtures after interior finishing.",
+      "duration": "3 days",
+      "tasks": {
+        "robinetterie": {
+          "title": "Faucets",
+          "description": "Installation of faucets (kitchen, bathrooms, laundry).",
+          "tips": [
+            "Check each connection for leaks",
+            "Choose recognized brand faucets with lifetime warranty. Before purchase, verify replacement parts availability from local distributors: this will facilitate future repairs and avoid the cost of complete replacement long-term."
+          ]
+        },
+        "toilettes-lavabos": {
+          "title": "Toilets and sinks",
+          "description": "Installation of toilets, sinks and vanities."
+        },
+        "douche-bain": {
+          "title": "Shower and bathtub",
+          "description": "Final connection of showers and bathtubs.",
+          "tips": [
+            "Plan a specialized installer for shower doors and bath enclosures"
+          ]
+        }
+      }
+    },
+    "inspections-finales": {
+      "title": "Final Inspections",
+      "description": "Final verifications and obtaining certificate of occupancy.",
+      "duration": "2 days",
+      "tasks": {
+        "inspection-municipale": {
+          "title": "Final municipal inspection",
+          "description": "Mandatory inspection to obtain certificate of occupancy.",
+          "documents": ["Certificate of occupancy"]
+        },
+        "inspection-garantie": {
+          "title": "Pre-reception inspection",
+          "description": "Complete inspection to identify deficiencies.",
+          "tips": [
+            "Hire an independent inspector",
+            "Document everything with photos"
+          ]
+        },
+        "certificat-localisation": {
+          "title": "Final location certificate",
+          "description": "New certificate showing completed construction.",
+          "documents": ["Final location certificate"]
+        }
       }
     }
   }

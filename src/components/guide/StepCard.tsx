@@ -1,4 +1,4 @@
-import { Step, phases } from "@/data/constructionSteps";
+import { Step, usePhases } from "@/hooks/useConstructionSteps";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,6 +50,7 @@ export function StepCard({
   onToggleComplete
 }: StepCardProps) {
   const { t, i18n } = useTranslation();
+  const phases = usePhases();
   const phase = phases.find(p => p.id === step.phase);
   const IconComponent = iconMap[step.icon] || Circle;
   const dateLocale = i18n.language === 'en' ? enCA : fr;

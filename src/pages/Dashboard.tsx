@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/landing/Footer";
-import { constructionSteps, phases } from "@/data/constructionSteps";
+import { useConstructionSteps, usePhases } from "@/hooks/useConstructionSteps";
 import { StepCard } from "@/components/guide/StepCard";
 import { StepDetail } from "@/components/guide/StepDetail";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +32,8 @@ import { getDateLocale } from "@/lib/i18n";
 const Dashboard = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const constructionSteps = useConstructionSteps();
+  const phases = usePhases();
   const [searchParams, setSearchParams] = useSearchParams();
   const stepFromUrl = searchParams.get("step");
   const projectFromUrl = searchParams.get("project");
@@ -470,9 +472,9 @@ const Dashboard = () => {
 
           {/* Section title */}
           <div className="mb-6">
-            <h2 className="text-lg font-semibold">Toutes les étapes de construction</h2>
+            <h2 className="text-lg font-semibold">{t("dashboard.allSteps")}</h2>
             <p className="text-muted-foreground">
-              Suivez ce guide pour mener à bien votre projet d'autoconstruction.
+              {t("dashboard.allStepsDesc")}
             </p>
           </div>
 
