@@ -55,11 +55,20 @@ import {
   Users,
   Shield,
   ShieldOff,
+  FileCheck,
+  FileX,
 } from "lucide-react";
 
 interface UserSession {
   last_session_start: string | null;
   total_time_seconds: number;
+}
+
+interface UserConsent {
+  terms_version: string | null;
+  privacy_version: string | null;
+  terms_accepted_at: string | null;
+  privacy_accepted_at: string | null;
 }
 
 interface UserWithSubscription {
@@ -70,6 +79,7 @@ interface UserWithSubscription {
   created_at: string;
   isAdmin: boolean;
   session: UserSession | null;
+  consent: UserConsent | null;
   subscription: {
     id: string;
     status: string;
@@ -175,6 +185,13 @@ export default function AdminSubscribers() {
 
       if (sessionsError) throw sessionsError;
 
+      // Fetch all user consents
+      const { data: consents, error: consentsError } = await supabase
+        .from("user_consents")
+        .select("user_id, terms_version, privacy_version, terms_accepted_at, privacy_accepted_at");
+
+      if (consentsError) throw consentsError;
+
       // Create sets/maps for quick lookup
       const subscriptionMap = new Map();
       (subscriptions || []).forEach((sub) => {
@@ -182,6 +199,17 @@ export default function AdminSubscribers() {
       });
 
       const adminUserIds = new Set((adminRoles || []).map((r) => r.user_id));
+
+      // Build consent map per user
+      const consentMap = new Map<string, UserConsent>();
+      (consents || []).forEach((consent) => {
+        consentMap.set(consent.user_id, {
+          terms_version: consent.terms_version,
+          privacy_version: consent.privacy_version,
+          terms_accepted_at: consent.terms_accepted_at,
+          privacy_accepted_at: consent.privacy_accepted_at,
+        });
+      });
 
       // Build session stats per user
       const sessionStatsMap = new Map<string, UserSession>();
@@ -197,7 +225,7 @@ export default function AdminSubscribers() {
         }
       });
 
-      // Combine profiles with their subscriptions, admin status and email
+      // Combine profiles with their subscriptions, admin status, consent and email
       const usersWithSubs: UserWithSubscription[] = (profiles || []).map((profile) => ({
         id: profile.id,
         user_id: profile.user_id,
@@ -206,6 +234,7 @@ export default function AdminSubscribers() {
         created_at: profile.created_at,
         isAdmin: adminUserIds.has(profile.user_id),
         session: sessionStatsMap.get(profile.user_id) || null,
+        consent: consentMap.get(profile.user_id) || null,
         subscription: subscriptionMap.get(profile.user_id) || null,
       }));
 
@@ -415,12 +444,14 @@ export default function AdminSubscribers() {
   };
 
   const exportCSV = () => {
-    const headers = ["Courriel", "Nom", "Statut", "Forfait", "Dernière connexion", "Temps total (min)", "Date inscription"];
+    const headers = ["Courriel", "Nom", "Statut", "Forfait", "Conditions acceptées", "Politique acceptée", "Dernière connexion", "Temps total (min)", "Date inscription"];
     const rows = filteredUsers.map((user) => [
       user.email || "N/A",
       user.display_name || "N/A",
       user.subscription?.status || "Gratuit",
       user.subscription?.plans?.name || "Gratuit",
+      user.consent?.terms_version ? `Oui (v${user.consent.terms_version})` : "Non",
+      user.consent?.privacy_version ? `Oui (v${user.consent.privacy_version})` : "Non",
       user.session?.last_session_start 
         ? format(new Date(user.session.last_session_start), "yyyy-MM-dd HH:mm") 
         : "Jamais",
@@ -554,6 +585,7 @@ export default function AdminSubscribers() {
                         <TableHead>Admin</TableHead>
                         <TableHead>Statut</TableHead>
                         <TableHead>Forfait</TableHead>
+                        <TableHead>Consentements</TableHead>
                         <TableHead>Dernière connexion</TableHead>
                         <TableHead>Temps total</TableHead>
                         <TableHead>Inscription</TableHead>
@@ -588,6 +620,30 @@ export default function AdminSubscribers() {
                               {user.subscription?.plans 
                                 ? formatCurrency(user.subscription.plans.price_monthly) + "/mois" 
                                 : "0 $/mois"}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-1.5">
+                                {user.consent?.terms_version ? (
+                                  <FileCheck className="h-3.5 w-3.5 text-primary" />
+                                ) : (
+                                  <FileX className="h-3.5 w-3.5 text-destructive" />
+                                )}
+                                <span className="text-xs">
+                                  Conditions {user.consent?.terms_version ? `v${user.consent.terms_version}` : "—"}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                {user.consent?.privacy_version ? (
+                                  <FileCheck className="h-3.5 w-3.5 text-primary" />
+                                ) : (
+                                  <FileX className="h-3.5 w-3.5 text-destructive" />
+                                )}
+                                <span className="text-xs">
+                                  Politique {user.consent?.privacy_version ? `v${user.consent.privacy_version}` : "—"}
+                                </span>
+                              </div>
                             </div>
                           </TableCell>
                           <TableCell>
