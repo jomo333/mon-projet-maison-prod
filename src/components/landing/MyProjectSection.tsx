@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Plus, FolderOpen, Calendar, DollarSign, Trash2 } from "lucide-react";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
+import { fr, enCA } from "date-fns/locale";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -32,42 +33,44 @@ interface Project {
   updated_at: string;
 }
 
-const getStatusBadge = (status: string | null) => {
+const getStatusBadge = (status: string | null, t: (key: string) => string) => {
   switch (status) {
     case "planification":
-      return <Badge variant="secondary">Planification</Badge>;
+      return <Badge variant="secondary">{t("projects.statuses.planning")}</Badge>;
     case "permis":
-      return <Badge className="bg-warning/20 text-warning border-warning/30">En attente de permis</Badge>;
+      return <Badge className="bg-warning/20 text-warning border-warning/30">{t("projects.statuses.permit")}</Badge>;
     case "en_cours":
-      return <Badge className="bg-primary/20 text-primary border-primary/30">En cours</Badge>;
+      return <Badge className="bg-primary/20 text-primary border-primary/30">{t("projects.statuses.in_progress")}</Badge>;
     case "termine":
-      return <Badge className="bg-success/20 text-success border-success/30">Terminé</Badge>;
+      return <Badge className="bg-success/20 text-success border-success/30">{t("projects.statuses.completed")}</Badge>;
     default:
-      return <Badge variant="outline">{status || "Non défini"}</Badge>;
+      return <Badge variant="outline">{status || t("projects.statuses.undefined")}</Badge>;
   }
 };
 
-const getProjectTypeLabel = (type: string | null) => {
+const getProjectTypeLabel = (type: string | null, t: (key: string) => string) => {
   switch (type) {
     case "maison-neuve":
-      return "Maison neuve";
+      return t("projects.types.newHome");
     case "agrandissement":
-      return "Agrandissement";
+      return t("projects.types.extension");
     case "garage-detache":
-      return "Garage détaché";
+      return t("projects.types.detachedGarage");
     case "renovation-majeure":
-      return "Rénovation majeure";
+      return t("projects.types.majorRenovation");
     case "chalet":
-      return "Chalet";
+      return t("projects.types.cabin");
     default:
-      return type || "Non défini";
+      return type || t("projects.statuses.undefined");
   }
 };
 
 export function MyProjectSection() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, loading: authLoading } = useAuth();
+  const dateLocale = i18n.language === 'en' ? enCA : fr;
 
   const { data: projects, isLoading } = useQuery({
     queryKey: ["user-projects", user?.id],
@@ -104,11 +107,11 @@ export function MyProjectSection() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-projects"] });
-      toast.success("Projet supprimé avec succès");
+      toast.success(t("projects.deleted"));
     },
     onError: (error) => {
       console.error("Delete error:", error);
-      toast.error("Erreur lors de la suppression du projet");
+      toast.error(t("projects.deleteError"));
     },
   });
 
@@ -125,14 +128,14 @@ export function MyProjectSection() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-              Mon projet
+              {t("myProjectSection.title")}
             </h2>
             <p className="mt-2 text-muted-foreground">
-              Continuez là où vous en étiez
+              {t("myProjectSection.subtitle")}
             </p>
           </div>
           <Button variant="outline" onClick={() => navigate("/mes-projets")}>
-            Voir tous mes projets
+            {t("myProjectSection.viewAll")}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
@@ -166,11 +169,11 @@ export function MyProjectSection() {
                         {project.name}
                       </CardTitle>
                       <CardDescription className="mt-1">
-                        {getProjectTypeLabel(project.project_type)}
+                        {getProjectTypeLabel(project.project_type, t)}
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
-                      {getStatusBadge(project.status)}
+                      {getStatusBadge(project.status, t)}
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button
@@ -184,13 +187,13 @@ export function MyProjectSection() {
                         </AlertDialogTrigger>
                         <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Supprimer ce projet?</AlertDialogTitle>
+                            <AlertDialogTitle>{t("myProjectSection.deleteTitle")}</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Cette action est irréversible. Toutes les données du projet "{project.name}" seront définitivement supprimées, y compris le budget et les pièces jointes.
+                              {t("myProjectSection.deleteDescription", { name: project.name })}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -198,7 +201,7 @@ export function MyProjectSection() {
                               }}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              Supprimer
+                              {t("common.delete")}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -217,8 +220,8 @@ export function MyProjectSection() {
                       <Calendar className="h-4 w-4" />
                       <span>
                         {project.updated_at && !isNaN(new Date(project.updated_at).getTime())
-                          ? format(new Date(project.updated_at), "d MMM yyyy", { locale: fr })
-                          : "Date inconnue"}
+                          ? format(new Date(project.updated_at), "d MMM yyyy", { locale: dateLocale })
+                          : t("common.unknownDate")}
                       </span>
                     </div>
                     {project.total_budget && project.total_budget > 0 && (
@@ -237,14 +240,14 @@ export function MyProjectSection() {
             <CardContent className="py-12 text-center">
               <FolderOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="font-display text-lg font-semibold mb-2">
-                Aucun projet pour l'instant
+                {t("projects.noProjects")}
               </h3>
               <p className="text-muted-foreground mb-6">
-                Commencez votre premier projet de construction dès maintenant
+                {t("projects.noProjectsDesc")}
               </p>
               <Button onClick={() => navigate("/start")}>
                 <Plus className="mr-2 h-4 w-4" />
-                Créer mon premier projet
+                {t("projects.createFirst")}
               </Button>
             </CardContent>
           </Card>
