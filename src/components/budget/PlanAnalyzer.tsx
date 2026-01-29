@@ -1270,6 +1270,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
                   </div>
                 )}
 
+                <div className="flex flex-wrap items-center gap-2">
                   <Select
                     value="none"
                     onValueChange={(v) => {
