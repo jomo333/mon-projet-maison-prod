@@ -289,11 +289,11 @@ const Budget = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["project-budget", selectedProjectId] });
       queryClient.invalidateQueries({ queryKey: ["user-projects"] });
-      toast.success("Budget sauvegardé avec succès!");
+      toast.success(t("toasts.budgetSaved"));
     },
     onError: (error) => {
       console.error("Save error:", error);
-      toast.error("Erreur lors de la sauvegarde du budget");
+      toast.error(t("toasts.budgetSaveError"));
     },
   });
 
@@ -371,17 +371,17 @@ const Budget = () => {
       if (variables?.deletePlans) {
         queryClient.invalidateQueries({ queryKey: ["project-plans", selectedProjectId] });
       }
-      toast.success("Budget réinitialisé avec succès!");
+      toast.success(t("toasts.budgetReset"));
     },
     onError: (error) => {
       console.error("Reset error:", error);
-      toast.error("Erreur lors de la réinitialisation du budget");
+      toast.error(t("toasts.budgetResetError"));
     },
   });
 
   const handleResetBudget = () => {
     if (!selectedProjectId) {
-      toast.error("Aucun projet sélectionné");
+      toast.error(t("toasts.noProjectSelected"));
       return;
     }
     

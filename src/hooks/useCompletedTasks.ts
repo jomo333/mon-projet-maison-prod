@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 export interface CompletedTask {
   id: string;
@@ -60,7 +59,6 @@ export function useCompletedTasks(projectId: string | null) {
       queryClient.invalidateQueries({ queryKey: ["completed-tasks", projectId] });
     },
     onError: (error) => {
-      toast.error("Erreur lors de la mise à jour de la tâche");
       console.error("Error toggling task:", error);
     },
   });
