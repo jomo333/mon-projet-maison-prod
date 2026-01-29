@@ -1169,7 +1169,20 @@
     "plansReady": "{{count}} plan(s) ready",
     "plansReadyForAnalysis": "{{count}} plan(s) ready for analysis",
     "noPlanSelected": "No plan selected",
-    "analysisComplete": "Analysis complete!"
+    "analysisComplete": "Analysis complete!",
+    "autoSchedule": {
+      "title": "Automatic schedule",
+      "businessDays": "business days",
+      "preparationDays": "preparation days",
+      "beforeWorkStarts": "before work starts",
+      "constructionDays": "construction days",
+      "fromTargetDate": "from target date",
+      "targetDateExplanation": "📅 Target date = Day 1 of construction",
+      "preparationExplanation": "Preparation steps (plans, permits, financing) will be scheduled <strong>before</strong> this date to give you a clear view of timelines.",
+      "planningBeforeDate": "Planning and financing before target date",
+      "permitAlerts": "Alerts for permit applications",
+      "supplierDelays": "Supplier and fabrication lead times calculated"
+    }
   },
   "plans": {
     "title": "Plans",

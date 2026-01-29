@@ -878,33 +878,31 @@ const StartProject = () => {
                 return (
                   <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-primary">Échéancier automatique</p>
+                      <p className="text-sm font-medium text-primary">{t("startProject.autoSchedule.title")}</p>
                       <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                        ~{duration.totalDays} jours ouvrables
+                        ~{duration.totalDays} {t("startProject.autoSchedule.businessDays")}
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-4 py-2">
                       <div className="text-center p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800">
                         <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{duration.preparationDays}</p>
-                        <p className="text-xs text-amber-700 dark:text-amber-300">jours de préparation</p>
-                        <p className="text-xs text-muted-foreground mt-1">avant le début des travaux</p>
+                        <p className="text-xs text-amber-700 dark:text-amber-300">{t("startProject.autoSchedule.preparationDays")}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t("startProject.autoSchedule.beforeWorkStarts")}</p>
                       </div>
                       <div className="text-center p-3 bg-primary/10 rounded-lg border border-primary/20">
                         <p className="text-2xl font-bold text-primary">{duration.constructionDays}</p>
-                        <p className="text-xs text-primary">jours de construction</p>
-                        <p className="text-xs text-muted-foreground mt-1">à partir de la date visée</p>
+                        <p className="text-xs text-primary">{t("startProject.autoSchedule.constructionDays")}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t("startProject.autoSchedule.fromTargetDate")}</p>
                       </div>
                     </div>
                     <div className="bg-muted/50 rounded p-3 text-sm">
-                      <p className="font-medium text-foreground mb-1">📅 Date visée = Jour 1 des travaux</p>
-                      <p className="text-muted-foreground text-xs">
-                        Les étapes de préparation (plans, permis, financement) seront planifiées <strong>avant</strong> cette date pour vous donner une vision claire des délais.
-                      </p>
+                      <p className="font-medium text-foreground mb-1">{t("startProject.autoSchedule.targetDateExplanation")}</p>
+                      <p className="text-muted-foreground text-xs" dangerouslySetInnerHTML={{ __html: t("startProject.autoSchedule.preparationExplanation") }} />
                     </div>
                     <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
-                      <li>Planification et financement avant la date visée</li>
-                      <li>Alertes pour les demandes de permis</li>
-                      <li>Délais fournisseurs et fabrication calculés</li>
+                      <li>{t("startProject.autoSchedule.planningBeforeDate")}</li>
+                      <li>{t("startProject.autoSchedule.permitAlerts")}</li>
+                      <li>{t("startProject.autoSchedule.supplierDelays")}</li>
                     </ul>
                   </div>
                 );

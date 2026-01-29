@@ -1169,7 +1169,20 @@
     "plansReady": "{{count}} plan(s) prêt(s)",
     "plansReadyForAnalysis": "{{count}} plan(s) prêt(s) pour l'analyse",
     "noPlanSelected": "Aucun plan sélectionné",
-    "analysisComplete": "Analyse terminée!"
+    "analysisComplete": "Analyse terminée!",
+    "autoSchedule": {
+      "title": "Échéancier automatique",
+      "businessDays": "jours ouvrables",
+      "preparationDays": "jours de préparation",
+      "beforeWorkStarts": "avant le début des travaux",
+      "constructionDays": "jours de construction",
+      "fromTargetDate": "à partir de la date visée",
+      "targetDateExplanation": "📅 Date visée = Jour 1 des travaux",
+      "preparationExplanation": "Les étapes de préparation (plans, permis, financement) seront planifiées <strong>avant</strong> cette date pour vous donner une vision claire des délais.",
+      "planningBeforeDate": "Planification et financement avant la date visée",
+      "permitAlerts": "Alertes pour les demandes de permis",
+      "supplierDelays": "Délais fournisseurs et fabrication calculés"
+    }
   },
   "plans": {
     "title": "Forfaits",
