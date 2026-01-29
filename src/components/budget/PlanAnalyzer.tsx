@@ -1422,144 +1422,144 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
 
                   {/* Revêtement extérieur */}
                   <div className="space-y-2">
-                    <Label>Revêtement extérieur</Label>
+                    <Label>{t("planAnalyzer.exteriorSiding")}</Label>
                     <Select value={exteriorSiding} onValueChange={setExteriorSiding}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner..." />
+                        <SelectValue placeholder={t("planAnalyzer.select")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="vinyle">Vinyle</SelectItem>
-                        <SelectItem value="canexel">Canexel / Fibrociment</SelectItem>
-                        <SelectItem value="bois">Bois naturel</SelectItem>
-                        <SelectItem value="brique">Brique</SelectItem>
-                        <SelectItem value="pierre">Pierre / Placage de pierre</SelectItem>
-                        <SelectItem value="aluminium">Aluminium</SelectItem>
-                        <SelectItem value="mixte">Mixte (plusieurs matériaux)</SelectItem>
+                        <SelectItem value="vinyle">{t("planAnalyzer.sidingTypes.vinyle")}</SelectItem>
+                        <SelectItem value="canexel">{t("planAnalyzer.sidingTypes.canexel")}</SelectItem>
+                        <SelectItem value="bois">{t("planAnalyzer.sidingTypes.bois")}</SelectItem>
+                        <SelectItem value="brique">{t("planAnalyzer.sidingTypes.brique")}</SelectItem>
+                        <SelectItem value="pierre">{t("planAnalyzer.sidingTypes.pierre")}</SelectItem>
+                        <SelectItem value="aluminium">{t("planAnalyzer.sidingTypes.aluminium")}</SelectItem>
+                        <SelectItem value="mixte">{t("planAnalyzer.sidingTypes.mixte")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {/* Toiture */}
                   <div className="space-y-2">
-                    <Label>Type de toiture</Label>
+                    <Label>{t("planAnalyzer.roofType")}</Label>
                     <Select value={roofingType} onValueChange={setRoofingType}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner..." />
+                        <SelectValue placeholder={t("planAnalyzer.select")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="bardeau-asphalte">Bardeau d'asphalte</SelectItem>
-                        <SelectItem value="bardeau-architectural">Bardeau architectural</SelectItem>
-                        <SelectItem value="metal">Tôle / Métal</SelectItem>
-                        <SelectItem value="elastomere">Membrane élastomère (toit plat)</SelectItem>
-                        <SelectItem value="tpo-epdm">TPO / EPDM (toit plat)</SelectItem>
+                        <SelectItem value="bardeau-asphalte">{t("planAnalyzer.roofTypes.bardeauAsphalte")}</SelectItem>
+                        <SelectItem value="bardeau-architectural">{t("planAnalyzer.roofTypes.bardeauArchitectural")}</SelectItem>
+                        <SelectItem value="metal">{t("planAnalyzer.roofTypes.metal")}</SelectItem>
+                        <SelectItem value="elastomere">{t("planAnalyzer.roofTypes.elastomere")}</SelectItem>
+                        <SelectItem value="tpo-epdm">{t("planAnalyzer.roofTypes.tpoEpdm")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {/* Fenêtres */}
                   <div className="space-y-2">
-                    <Label>Type de fenêtres</Label>
+                    <Label>{t("planAnalyzer.windowType")}</Label>
                     <Select value={windowType} onValueChange={setWindowType}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner..." />
+                        <SelectValue placeholder={t("planAnalyzer.select")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="pvc-standard">PVC standard</SelectItem>
-                        <SelectItem value="pvc-triple">PVC triple vitrage</SelectItem>
-                        <SelectItem value="aluminium">Aluminium</SelectItem>
-                        <SelectItem value="pvc-alu">Hybride PVC/Alu</SelectItem>
-                        <SelectItem value="bois">Bois massif</SelectItem>
+                        <SelectItem value="pvc-standard">{t("planAnalyzer.windowTypes.pvcStandard")}</SelectItem>
+                        <SelectItem value="pvc-triple">{t("planAnalyzer.windowTypes.pvcTriple")}</SelectItem>
+                        <SelectItem value="aluminium">{t("planAnalyzer.windowTypes.aluminium")}</SelectItem>
+                        <SelectItem value="pvc-alu">{t("planAnalyzer.windowTypes.pvcAlu")}</SelectItem>
+                        <SelectItem value="bois">{t("planAnalyzer.windowTypes.bois")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {/* Isolation */}
                   <div className="space-y-2">
-                    <Label>Type d'isolation</Label>
+                    <Label>{t("planAnalyzer.insulationType")}</Label>
                     <Select value={insulationType} onValueChange={setInsulationType}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner..." />
+                        <SelectValue placeholder={t("planAnalyzer.select")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="laine-standard">Laine isolante standard</SelectItem>
-                        <SelectItem value="laine-haute-densite">Laine haute densité</SelectItem>
-                        <SelectItem value="polyurethane">Polyuréthane giclé</SelectItem>
-                        <SelectItem value="cellulose">Cellulose soufflée</SelectItem>
-                        <SelectItem value="panneau-rigide">Panneaux rigides (SIP)</SelectItem>
+                        <SelectItem value="laine-standard">{t("planAnalyzer.insulationTypes.laineStandard")}</SelectItem>
+                        <SelectItem value="laine-haute-densite">{t("planAnalyzer.insulationTypes.laineHauteDensite")}</SelectItem>
+                        <SelectItem value="polyurethane">{t("planAnalyzer.insulationTypes.polyurethane")}</SelectItem>
+                        <SelectItem value="cellulose">{t("planAnalyzer.insulationTypes.cellulose")}</SelectItem>
+                        <SelectItem value="panneau-rigide">{t("planAnalyzer.insulationTypes.panneauRigide")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {/* Chauffage / CVAC */}
                   <div className="space-y-2">
-                    <Label>Système de chauffage</Label>
+                    <Label>{t("planAnalyzer.heatingType")}</Label>
                     <Select value={heatingType} onValueChange={setHeatingType}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner..." />
+                        <SelectValue placeholder={t("planAnalyzer.select")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="plinthes">Plinthes électriques</SelectItem>
-                        <SelectItem value="thermopompe-murale">Thermopompe murale</SelectItem>
-                        <SelectItem value="thermopompe-centrale">Thermopompe centrale</SelectItem>
-                        <SelectItem value="plancher-radiant">Plancher radiant électrique</SelectItem>
-                        <SelectItem value="plancher-radiant-hydro">Plancher radiant hydronique</SelectItem>
-                        <SelectItem value="bi-energie">Bi-énergie (fournaise + thermopompe)</SelectItem>
-                        <SelectItem value="geothermie">Géothermie</SelectItem>
+                        <SelectItem value="plinthes">{t("planAnalyzer.heatingTypes.plinthes")}</SelectItem>
+                        <SelectItem value="thermopompe-murale">{t("planAnalyzer.heatingTypes.thermopompeMurale")}</SelectItem>
+                        <SelectItem value="thermopompe-centrale">{t("planAnalyzer.heatingTypes.thermopompeCentrale")}</SelectItem>
+                        <SelectItem value="plancher-radiant">{t("planAnalyzer.heatingTypes.plancherRadiant")}</SelectItem>
+                        <SelectItem value="plancher-radiant-hydro">{t("planAnalyzer.heatingTypes.plancherRadiantHydro")}</SelectItem>
+                        <SelectItem value="bi-energie">{t("planAnalyzer.heatingTypes.biEnergie")}</SelectItem>
+                        <SelectItem value="geothermie">{t("planAnalyzer.heatingTypes.geothermie")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {/* Planchers */}
                   <div className="space-y-2">
-                    <Label>Type de plancher principal</Label>
+                    <Label>{t("planAnalyzer.flooringType")}</Label>
                     <Select value={flooringType} onValueChange={setFlooringType}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner..." />
+                        <SelectValue placeholder={t("planAnalyzer.select")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="flottant-stratifie">Flottant stratifié</SelectItem>
-                        <SelectItem value="vinyle-luxe">Vinyle de luxe (LVP)</SelectItem>
-                        <SelectItem value="bois-ingenierie">Bois d'ingénierie</SelectItem>
-                        <SelectItem value="bois-franc">Bois franc massif</SelectItem>
-                        <SelectItem value="ceramique">Céramique / Porcelaine</SelectItem>
-                        <SelectItem value="beton-poli">Béton poli</SelectItem>
+                        <SelectItem value="flottant-stratifie">{t("planAnalyzer.flooringTypes.flottantStratifie")}</SelectItem>
+                        <SelectItem value="vinyle-luxe">{t("planAnalyzer.flooringTypes.vinyleLuxe")}</SelectItem>
+                        <SelectItem value="bois-ingenierie">{t("planAnalyzer.flooringTypes.boisIngenierie")}</SelectItem>
+                        <SelectItem value="bois-franc">{t("planAnalyzer.flooringTypes.boisFranc")}</SelectItem>
+                        <SelectItem value="ceramique">{t("planAnalyzer.flooringTypes.ceramique")}</SelectItem>
+                        <SelectItem value="beton-poli">{t("planAnalyzer.flooringTypes.betonPoli")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {/* Armoires */}
                   <div className="space-y-2">
-                    <Label>Type d'armoires cuisine</Label>
+                    <Label>{t("planAnalyzer.cabinetType")}</Label>
                     <Select value={cabinetType} onValueChange={setCabinetType}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner..." />
+                        <SelectValue placeholder={t("planAnalyzer.select")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="melamine">Mélamine</SelectItem>
-                        <SelectItem value="polyester">Polymère / Polyester</SelectItem>
-                        <SelectItem value="thermoplastique">Thermoplastique</SelectItem>
-                        <SelectItem value="laque">Laque / Acrylique</SelectItem>
-                        <SelectItem value="bois-massif">Bois massif</SelectItem>
-                        <SelectItem value="sur-mesure-haut-gamme">Sur mesure haut de gamme</SelectItem>
+                        <SelectItem value="melamine">{t("planAnalyzer.cabinetTypes.melamine")}</SelectItem>
+                        <SelectItem value="polyester">{t("planAnalyzer.cabinetTypes.polyester")}</SelectItem>
+                        <SelectItem value="thermoplastique">{t("planAnalyzer.cabinetTypes.thermoplastique")}</SelectItem>
+                        <SelectItem value="laque">{t("planAnalyzer.cabinetTypes.laque")}</SelectItem>
+                        <SelectItem value="bois-massif">{t("planAnalyzer.cabinetTypes.boisMassif")}</SelectItem>
+                        <SelectItem value="sur-mesure-haut-gamme">{t("planAnalyzer.cabinetTypes.surMesure")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {/* Comptoirs */}
                   <div className="space-y-2">
-                    <Label>Type de comptoirs</Label>
+                    <Label>{t("planAnalyzer.countertopType")}</Label>
                     <Select value={countertopType} onValueChange={setCountertopType}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner..." />
+                        <SelectValue placeholder={t("planAnalyzer.select")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="stratifie">Stratifié</SelectItem>
-                        <SelectItem value="quartz">Quartz</SelectItem>
-                        <SelectItem value="granit">Granit</SelectItem>
-                        <SelectItem value="marbre">Marbre</SelectItem>
-                        <SelectItem value="bois-boucher">Bloc de boucher (bois)</SelectItem>
-                        <SelectItem value="beton">Béton</SelectItem>
-                        <SelectItem value="dekton">Dekton / Ultra-compact</SelectItem>
+                        <SelectItem value="stratifie">{t("planAnalyzer.countertopTypes.stratifie")}</SelectItem>
+                        <SelectItem value="quartz">{t("planAnalyzer.countertopTypes.quartz")}</SelectItem>
+                        <SelectItem value="granit">{t("planAnalyzer.countertopTypes.granit")}</SelectItem>
+                        <SelectItem value="marbre">{t("planAnalyzer.countertopTypes.marbre")}</SelectItem>
+                        <SelectItem value="bois-boucher">{t("planAnalyzer.countertopTypes.blocBoucher")}</SelectItem>
+                        <SelectItem value="beton">{t("planAnalyzer.countertopTypes.beton")}</SelectItem>
+                        <SelectItem value="dekton">{t("planAnalyzer.countertopTypes.dekton")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -1574,7 +1574,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
                       />
                       <label htmlFor="garage-plan" className="text-sm font-medium flex items-center gap-2">
                         <Car className="h-4 w-4" />
-                        Inclure un garage
+                        {t("planAnalyzer.includeGarage")}
                       </label>
                     </div>
                   </div>
@@ -1582,15 +1582,15 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
 
                 {/* Notes détaillées */}
                 <div className="space-y-2">
-                  <Label>Notes sur le projet (optionnel)</Label>
+                  <Label>{t("planAnalyzer.projectNotes")}</Label>
                   <textarea
                     value={additionalNotes}
                     onChange={(e) => setAdditionalNotes(e.target.value)}
-                    placeholder="Ex: Cuisine ouverte avec îlot, 3 chambres, sous-sol fini, thermopompe murale, plancher chauffant salle de bain, balcon 12x10..."
+                    placeholder={t("planAnalyzer.projectNotesPlaceholder")}
                     className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Plus vous donnez de détails, plus l'estimation sera précise (matériaux souhaités, équipements spéciaux, etc.)
+                    {t("planAnalyzer.moreDetailsNote")}
                   </p>
                 </div>
 
@@ -1599,7 +1599,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
                   <div className="flex items-center justify-between">
                     <Label className="flex items-center gap-2">
                       <Image className="h-4 w-4" />
-                      Images d'inspiration (optionnel)
+                      {t("planAnalyzer.inspirationImages")}
                     </Label>
                     <Button
                       variant="outline"
@@ -1612,7 +1612,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
                       ) : (
                         <>
                           <Upload className="h-4 w-4 mr-1" />
-                          Ajouter
+                          {t("planAnalyzer.add")}
                         </>
                       )}
                     </Button>
