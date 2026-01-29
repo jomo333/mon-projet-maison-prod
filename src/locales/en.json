@@ -1650,5 +1650,467 @@
         }
       }
     }
+  },
+  "privacy": {
+    "lastUpdated": "Last updated: January 2026",
+    "title": "Privacy",
+    "titleHighlight": "Policy",
+    "subtitle": "At Monprojetmaison.ca, we take the protection of your personal information seriously.",
+    "contactTitle": "Contact us",
+    "contactDescription": "For any questions regarding this privacy policy or to exercise your personal information rights, please contact us:",
+    "email": "Email",
+    "address": "Address",
+    "companyAddress": "Monprojetmaison.ca\nLaval, Quebec, Canada",
+    "legalNote": "Note: This privacy policy complies with Quebec's Act Respecting the Protection of Personal Information in the Private Sector and Canada's Personal Information Protection and Electronic Documents Act (PIPEDA).",
+    "copyright": "© {{year}} Monprojetmaison.ca. All rights reserved.",
+    "sections": {
+      "1": {
+        "title": "Information collection",
+        "intro": "Monprojetmaison.ca collects personal information when you use our platform to plan your residential construction or renovation project. The information we collect may include:",
+        "items": [
+          "Your name, email address, and phone number",
+          "Details of your construction or renovation project",
+          "Your geographic location in Quebec",
+          "Your project preferences and specifications",
+          "Information about how you use our platform"
+        ]
+      },
+      "2": {
+        "title": "Use of information",
+        "intro": "We use your personal information for the following purposes:",
+        "items": [
+          "Providing and improving our project planning services",
+          "Connecting you with qualified contractors and professionals",
+          "Personalizing your experience on our platform",
+          "Sending you relevant communications about your project",
+          "Complying with our legal and regulatory obligations",
+          "Analyzing and optimizing platform usage"
+        ]
+      },
+      "3": {
+        "title": "Information sharing",
+        "intro": "Monprojetmaison.ca never sells your personal information. We may share your information in the following circumstances:",
+        "items": [
+          "With qualified contractors and professionals to carry out your project",
+          "With service providers who help us operate our platform",
+          "When required by law or to protect our legal rights",
+          "With your explicit consent for specific purposes"
+        ],
+        "footer": "All our partners are required to respect the confidentiality of your information and comply with applicable data protection laws."
+      },
+      "4": {
+        "title": "Information protection",
+        "intro": "We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, modification, disclosure, or destruction. These measures include:",
+        "items": [
+          "Encryption of sensitive data in transit and at rest",
+          "Strict access controls and secure authentication",
+          "Continuous monitoring of our security systems",
+          "Regular staff training on data protection",
+          "Periodic security audits"
+        ]
+      },
+      "5": {
+        "title": "International data transfers",
+        "intro": "Some of our service providers and technology partners may be located outside Canada, particularly in the United States. When your personal information is transferred internationally, we ensure that:",
+        "items": [
+          "Appropriate contractual protection measures are in place",
+          "Providers meet equivalent security standards",
+          "Transfers are limited to what is strictly necessary",
+          "Your rights remain protected under Canadian law"
+        ],
+        "footer": "By using our platform, you consent to these transfers under the conditions described above."
+      },
+      "6": {
+        "title": "Your rights",
+        "intro": "In accordance with Quebec and Canadian personal information protection laws, you have the following rights:",
+        "items": [
+          "Right of access: You may request a copy of the personal information we hold about you",
+          "Right of rectification: You may request correction of inaccurate or incomplete information",
+          "Right of deletion: You may request deletion of your personal information in certain circumstances",
+          "Right of objection: You may object to certain uses of your information",
+          "Right to withdraw consent: You may withdraw your consent at any time"
+        ],
+        "footer": "To exercise these rights, please contact us using the information provided below."
+      },
+      "7": {
+        "title": "Cookies and similar technologies",
+        "intro": "Our platform uses cookies and similar technologies to enhance your user experience, analyze site usage, and personalize content. You can manage your cookie preferences through your browser settings.",
+        "items": [],
+        "footer": "The cookies we use include essential cookies necessary for site operation, analytics cookies to understand how you use our platform, and performance cookies to optimize your experience."
+      },
+      "8": {
+        "title": "Data retention",
+        "intro": "We retain your personal information for as long as necessary to provide our services and meet our legal obligations. Retention periods vary by data type:",
+        "items": [
+          "Account data: For the duration of your active account plus 2 years after closure",
+          "Project data: For the duration of the project plus 7 years for reference and tax compliance",
+          "Communications: 3 years after the last interaction",
+          "Analytics data: In aggregated and anonymized form indefinitely",
+          "Legal documents: In accordance with applicable legal requirements (generally 7 years)"
+        ],
+        "footer": "After these periods, we securely delete or anonymize your information, unless we are legally required to retain it longer."
+      },
+      "9": {
+        "title": "Third-party services and integrations",
+        "intro": "Our platform may integrate or use third-party services to enhance your experience:",
+        "items": [
+          "Payment processors: To securely process transactions (e.g., Stripe, PayPal)",
+          "Analytics tools: To understand platform usage (e.g., Google Analytics)",
+          "Mapping services: To locate projects and contractors",
+          "Social networks: Share buttons that may transmit information to social platforms"
+        ],
+        "footer": "These third-party services have their own privacy policies. We encourage you to review them. Monprojetmaison.ca is not responsible for the privacy practices of these third parties."
+      },
+      "10": {
+        "title": "Use of artificial intelligence",
+        "intro": "Monprojetmaison.ca may use artificial intelligence technologies to improve our services, including:",
+        "items": [
+          "Recommending qualified contractors based on your project",
+          "Estimating project costs and timelines",
+          "Personalizing your platform experience",
+          "Detecting and preventing fraudulent activities"
+        ],
+        "footer": "Data used to train our AI models is aggregated and anonymized. We never share your identifiable personal information with external AI systems without your explicit consent."
+      },
+      "11": {
+        "title": "Security incident management",
+        "intro": "In the event of a data breach likely to pose a serious risk of harm, we commit to:",
+        "items": [
+          "Notifying you as soon as possible, in accordance with legal requirements",
+          "Informing the Privacy Commissioner of Canada if required",
+          "Providing information about the nature of the incident and corrective measures",
+          "Taking immediate action to limit damage and prevent future incidents",
+          "Advising you on actions you can take to protect your information"
+        ],
+        "footer": "We maintain an incident response plan that is regularly tested and updated."
+      },
+      "12": {
+        "title": "Protection of minors",
+        "intro": "Our services are not intended for persons under 18 years of age. We do not knowingly collect personal information from minors.",
+        "items": [],
+        "footer": "If we discover that a minor has provided us with personal information, we will immediately delete this information from our systems. If you believe a minor has provided us with personal information, please contact us immediately."
+      },
+      "13": {
+        "title": "\"Do Not Track\" (DNT) signal",
+        "intro": "Some browsers include a \"Do Not Track\" (DNT) feature that sends a signal to websites indicating that you do not wish to be tracked.",
+        "items": [],
+        "footer": "Currently, there is no recognized industry standard for responding to DNT signals. Therefore, we do not automatically respond to DNT signals. However, you can manage your cookie preferences through your browser settings and our consent banner."
+      },
+      "14": {
+        "title": "Policy modifications",
+        "intro": "We reserve the right to modify this privacy policy at any time. Any modifications will be posted on this page with a revised update date. We encourage you to regularly review this policy to stay informed about how we protect your information.",
+        "items": [],
+        "footer": "If we make significant changes, we will notify you by email or through a notification on our platform."
+      }
+    }
+  },
+  "terms": {
+    "effectiveDate": "Effective since: January 2026",
+    "title": "Terms",
+    "titleHighlight": "of Use",
+    "subtitle": "Please read these terms carefully before using the Monprojetmaison.ca platform.",
+    "legalAgreement": {
+      "title": "Legal Agreement",
+      "description": "By accessing and using the Monprojetmaison.ca platform (hereinafter \"the Platform\"), you agree to be bound by these Terms of Use. If you do not accept these terms, please do not use our Platform. These terms constitute a legally binding contract between you and Monprojetmaison.ca."
+    },
+    "contactTitle": "Questions about these terms",
+    "contactDescription": "If you have any questions regarding these Terms of Use, please contact us:",
+    "email": "Email",
+    "address": "Address",
+    "companyAddress": "Monprojetmaison.ca\nLaval, Quebec, Canada",
+    "copyright": "© {{year}} Monprojetmaison.ca. All rights reserved.",
+    "sections": {
+      "1": {
+        "title": "Definitions",
+        "intro": "In this document:",
+        "items": [
+          "\"Platform\" means the monprojetmaison.ca website and all associated services",
+          "\"User\" means any individual or legal entity using the Platform",
+          "\"Owner\" means a person planning a construction or renovation project",
+          "\"Professional\" means a contractor, architect, designer, or other professional registered on the Platform",
+          "\"Project\" means any residential construction, renovation, or improvement",
+          "\"Content\" means any text, image, video, document, or other material published on the Platform"
+        ]
+      },
+      "2": {
+        "title": "Description of services",
+        "intro": "Monprojetmaison.ca offers an online platform that allows you to:",
+        "items": [
+          "Plan and manage residential construction and renovation projects",
+          "Connect owners with qualified professionals",
+          "Estimate project costs and timelines",
+          "Access planning resources and tools",
+          "Communicate and collaborate on projects",
+          "Share and store project documents"
+        ],
+        "footer": "The Platform acts as an intermediary and does not directly provide construction or renovation services. Contracts for work are concluded directly between Owners and Professionals."
+      },
+      "3": {
+        "title": "Registration and user account",
+        "intro": "To use certain features of the Platform, you must create an account. You agree to:",
+        "items": [
+          "Provide accurate, complete, and up-to-date information",
+          "Maintain the confidentiality of your login credentials",
+          "Be at least 18 years old or have parental consent",
+          "Immediately notify Monprojetmaison.ca of any unauthorized use of your account",
+          "Use only one account per person or entity",
+          "Not share your account with others"
+        ],
+        "footer": "You are responsible for all activities performed under your account. Monprojetmaison.ca reserves the right to suspend or terminate any account in case of violation of these terms."
+      },
+      "4": {
+        "title": "User obligations",
+        "intro": "By using the Platform, you agree NOT to:",
+        "items": [
+          "Violate any law or regulation applicable in Quebec or Canada",
+          "Post illegal, offensive, defamatory, or fraudulent content",
+          "Impersonate another person or entity",
+          "Transmit viruses, malware, or any malicious code",
+          "Attempt to access Platform systems without authorization",
+          "Use robots, scrapers, or automated tools without permission",
+          "Harass, threaten, or intimidate other users",
+          "Post false reviews or testimonials",
+          "Circumvent Platform security measures",
+          "Use the Platform for unauthorized commercial purposes"
+        ],
+        "footer": "Any violation of these obligations may result in immediate suspension of your account and legal action if necessary."
+      },
+      "5": {
+        "title": "Professional responsibilities",
+        "intro": "Professionals registered on the Platform agree to:",
+        "items": [
+          "Hold all licenses, permits, and insurance required in Quebec",
+          "Provide truthful information about their qualifications and experience",
+          "Comply with applicable building codes and construction standards",
+          "Maintain adequate liability insurance",
+          "Communicate professionally and courteously",
+          "Honor quotes and commitments made to Owners",
+          "Disclose any potential conflicts of interest"
+        ],
+        "footer": "Monprojetmaison.ca does not exhaustively verify the qualifications of all Professionals. Owners are encouraged to conduct their own due diligence, including validation of RBQ licenses and references."
+      },
+      "6": {
+        "title": "Intellectual property",
+        "intro": "Monprojetmaison.ca content: All Platform content, including the logo, design, texts, graphics, software, and databases, is protected by copyright laws and belongs to Monprojetmaison.ca or its licensors. By posting content on the Platform, you:",
+        "items": [
+          "Retain all ownership rights to your content",
+          "Grant Monprojetmaison.ca a worldwide, non-exclusive, royalty-free license to use, display, reproduce, and distribute your content in connection with providing our services",
+          "Warrant that you hold all necessary rights to the posted content",
+          "Accept that your content may be visible to other users"
+        ],
+        "footer": "Monprojetmaison.ca respects intellectual property rights. If you believe content violates your rights, please contact us immediately."
+      },
+      "7": {
+        "title": "Payments and fees",
+        "intro": "The Platform may offer free and paid features. Applicable terms include:",
+        "items": [
+          "Subscription or service fees are clearly indicated before any purchase",
+          "Payments are processed through secure third-party processors",
+          "All fees are in Canadian dollars (CAD) unless otherwise indicated",
+          "Applicable taxes (GST/QST) will be added according to Quebec laws",
+          "Subscriptions are automatically renewed unless cancelled",
+          "Refunds are granted according to our refund policy"
+        ],
+        "footer": "Important: Payments between Owners and Professionals for work are made directly between the parties. Monprojetmaison.ca does not collect these payments and is not responsible for contractual disputes."
+      },
+      "8": {
+        "title": "Limitation of liability",
+        "intro": "TO THE MAXIMUM EXTENT PERMITTED BY LAW:",
+        "items": [
+          "The Platform is provided \"as is\" without warranty of any kind",
+          "Monprojetmaison.ca is not responsible for the quality, safety, or legality of services provided by Professionals",
+          "Monprojetmaison.ca does not guarantee that the Platform will be uninterrupted, secure, or error-free",
+          "Monprojetmaison.ca is not a party to contracts between Owners and Professionals",
+          "Monprojetmaison.ca will not be liable for indirect, consequential, special, or punitive damages",
+          "Monprojetmaison.ca's total liability to you will not exceed the amount you paid to use the Platform in the past 12 months"
+        ],
+        "footer": "Important notice: You are responsible for verifying the licenses, insurance, and references of any Professional before entering into a contract. Monprojetmaison.ca strongly recommends obtaining multiple quotes and consulting independent experts for major projects.",
+        "isWarning": true
+      },
+      "9": {
+        "title": "Indemnification",
+        "intro": "You agree to indemnify and hold harmless Monprojetmaison.ca, its officers, employees, and partners from any claim, loss, liability, damage, cost, or expense (including reasonable legal fees) arising from:",
+        "items": [
+          "Your use of the Platform",
+          "Your violation of these Terms of Use",
+          "Your violation of any third party's rights",
+          "Any content you post on the Platform",
+          "Any dispute between you and another user",
+          "Work performed by a Professional you hired through the Platform"
+        ]
+      },
+      "10": {
+        "title": "Dispute resolution",
+        "intro": "In case of a dispute regarding the use of the Platform:",
+        "items": [
+          "You agree to first attempt to resolve the dispute informally by contacting us",
+          "If the dispute cannot be resolved amicably, the parties may resort to mediation",
+          "These Terms are governed by the laws of the Province of Quebec and the federal laws of Canada",
+          "Any litigation will be submitted to the exclusive jurisdiction of the courts of Laval, Quebec"
+        ],
+        "footer": "Disputes between users: Disputes between Owners and Professionals regarding work must be resolved directly between the parties. Monprojetmaison.ca may facilitate communication but does not act as a mediator or arbitrator."
+      },
+      "11": {
+        "title": "Suspension and termination",
+        "intro": "Monprojetmaison.ca reserves the right to:",
+        "items": [
+          "Suspend or terminate your account at any time for violation of these Terms",
+          "Remove any content that violates these Terms or applicable laws",
+          "Modify or discontinue the Platform (in whole or in part) temporarily or permanently",
+          "Refuse service to anyone for any reason"
+        ],
+        "footer": "Termination by user: You may terminate your account at any time through your account settings or by contacting us. Termination does not affect your existing obligations to other users or Monprojetmaison.ca. Effect of termination: Upon termination, you lose access to your account and associated data. We will retain certain information in accordance with our Privacy Policy and legal requirements."
+      },
+      "12": {
+        "title": "Links to third-party sites",
+        "intro": "The Platform may contain links to third-party websites or services that are not owned or controlled by Monprojetmaison.ca.",
+        "items": [],
+        "footer": "Monprojetmaison.ca assumes no responsibility for the content, privacy policies, or practices of any third-party site or service. You acknowledge and agree that Monprojetmaison.ca will not be liable, directly or indirectly, for any damage caused by the use of these sites or services. We strongly recommend reading the terms of use and privacy policies of any third-party site you visit."
+      },
+      "13": {
+        "title": "Force majeure",
+        "intro": "Monprojetmaison.ca will not be held responsible for any delay or failure to perform resulting from causes beyond its reasonable control, including but not limited to:",
+        "items": [
+          "Natural disasters (floods, earthquakes, storms)",
+          "Acts of war, terrorism, or civil unrest",
+          "Computer or telecommunications system failures",
+          "Government acts, strikes, or labor disputes",
+          "Internet service or cloud infrastructure interruptions",
+          "Cyberattacks or security breaches"
+        ]
+      },
+      "14": {
+        "title": "Modifications to terms",
+        "intro": "Monprojetmaison.ca reserves the right to modify these Terms of Use at any time. Modifications take effect upon posting on the Platform. In case of significant modifications, we will notify you by:",
+        "items": [
+          "Email notification to the address associated with your account",
+          "Alert message on the Platform upon your next login",
+          "Posting a notice on the homepage"
+        ],
+        "footer": "Your continued use of the Platform after the posting of modifications constitutes your acceptance of the new terms. If you do not accept the modifications, you must stop using the Platform and terminate your account."
+      },
+      "15": {
+        "title": "General provisions",
+        "intro": "Important clauses:",
+        "items": [
+          "Entire agreement: These Terms constitute the entire agreement between you and Monprojetmaison.ca regarding the use of the Platform",
+          "Severability: If any provision of these Terms is found invalid or unenforceable, the other provisions will remain in effect",
+          "Waiver: Failure by Monprojetmaison.ca to exercise a right under these Terms does not constitute a waiver of that right",
+          "Assignment: You may not assign these Terms without our prior written consent. Monprojetmaison.ca may assign these Terms at any time",
+          "Language versions: These Terms are written in French. In case of translation, the French version will prevail in case of conflict"
+        ]
+      }
+    }
+  },
+  "cookies": {
+    "lastUpdated": "Last updated: January 2026",
+    "title": "Cookie",
+    "titleHighlight": "Policy",
+    "subtitle": "This policy explains how Monprojetmaison.ca uses cookies and similar technologies.",
+    "managePreferences": "Manage my cookie preferences",
+    "contactTitle": "Questions about cookies",
+    "contactDescription": "If you have any questions regarding our use of cookies, please contact us:",
+    "email": "Email",
+    "copyright": "© {{year}} Monprojetmaison.ca. All rights reserved.",
+    "sections": {
+      "1": {
+        "title": "What is a cookie?",
+        "content": "A cookie is a small text file stored on your device (computer, tablet, smartphone) when you visit a website. Cookies allow the site to remember your actions and preferences (such as language, font size, and other display preferences) for a period of time, so you don't have to re-enter them every time you return to the site or navigate from one page to another."
+      },
+      "2": {
+        "title": "Types of cookies used",
+        "intro": "We use different categories of cookies on Monprojetmaison.ca:",
+        "categories": {
+          "essential": {
+            "name": "Essential cookies",
+            "description": "These cookies are essential for the website to function. They enable navigation, access to secure areas, and the use of basic features. Without these cookies, the site cannot function properly.",
+            "examples": [
+              "User authentication and session",
+              "Security preferences",
+              "Shopping cart (if applicable)",
+              "Cookie consent storage"
+            ]
+          },
+          "analytics": {
+            "name": "Analytics cookies",
+            "description": "These cookies collect anonymous information about how visitors use our site. They help us improve our platform by understanding which pages are most visited and how users navigate.",
+            "examples": [
+              "Google Analytics",
+              "Page view statistics",
+              "Bounce rate and time spent on site",
+              "Traffic sources"
+            ]
+          },
+          "marketing": {
+            "name": "Marketing cookies",
+            "description": "These cookies are used to track visitors across different websites. Their purpose is to display relevant and personalized advertisements, making them more useful for publishers and third-party advertisers.",
+            "examples": [
+              "Targeted advertising",
+              "Remarketing",
+              "Tracking pixels",
+              "Campaign effectiveness measurement"
+            ]
+          },
+          "functional": {
+            "name": "Functional cookies",
+            "description": "These cookies enhance website functionality and personalize your experience. They may be set by us or by third-party providers whose services we have added to our pages.",
+            "examples": [
+              "Preferred language storage",
+              "Interface personalization",
+              "Live chat",
+              "Social media integrations"
+            ]
+          }
+        }
+      },
+      "3": {
+        "title": "Retention period",
+        "intro": "The cookies we use have different retention periods:",
+        "items": [
+          "Session cookies: Automatically deleted when you close your browser",
+          "Persistent cookies: Retained for a set period (generally 1 month to 2 years depending on their function)",
+          "Third-party cookies: Their duration depends on the policies of the third parties concerned"
+        ]
+      },
+      "4": {
+        "title": "Managing your preferences",
+        "intro": "You have full control over cookies. You can:",
+        "items": [
+          "Accept or refuse non-essential cookies via our consent banner",
+          "Modify your preferences at any time by clicking the button below",
+          "Configure your browser to block or delete cookies",
+          "Use browser extensions to manage cookies"
+        ],
+        "hasButton": true
+      },
+      "5": {
+        "title": "Browser configuration",
+        "intro": "You can also manage cookies directly from your browser. Here are links to instructions for the main browsers:",
+        "browsers": [
+          { "name": "Google Chrome", "url": "https://support.google.com/chrome/answer/95647" },
+          { "name": "Mozilla Firefox", "url": "https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-desktop" },
+          { "name": "Safari", "url": "https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac" },
+          { "name": "Microsoft Edge", "url": "https://support.microsoft.com/en-us/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" }
+        ]
+      },
+      "6": {
+        "title": "Third-party cookies",
+        "content": "Our site may contain cookies placed by third parties (partners, advertisers, social networks). These third parties have their own privacy and cookie policies. We have no control over these cookies and encourage you to consult these third parties' policies for more information."
+      },
+      "7": {
+        "title": "Legal compliance",
+        "intro": "Our use of cookies complies with the following regulations:",
+        "items": [
+          "Canada's Personal Information Protection and Electronic Documents Act (PIPEDA)",
+          "Quebec's Act Respecting the Protection of Personal Information in the Private Sector (Law 25)",
+          "European Union's General Data Protection Regulation (GDPR)",
+          "European Union's ePrivacy Directive"
+        ]
+      },
+      "8": {
+        "title": "Updates",
+        "content": "We may update this cookie policy from time to time to reflect changes in our use of cookies or legal requirements. We encourage you to regularly check this page. The date of the last update is indicated at the top of this page."
+      }
+    }
   }
 }
