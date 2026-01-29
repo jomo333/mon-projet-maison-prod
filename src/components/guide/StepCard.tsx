@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Clock, ChevronRight, ClipboardList, DollarSign, FileText, Home, Umbrella, DoorOpen, Zap, Droplets, Wind, Thermometer, PaintBucket, Square, ChefHat, Sparkles, Building, ClipboardCheck, Circle, CalendarClock, CheckCircle2, Lock, Check } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { format, parseISO, differenceInDays } from "date-fns";
-import { fr } from "date-fns/locale";
+import { fr, enCA } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-
+import { useTranslation } from "react-i18next";
 const iconMap: Record<string, LucideIcon> = {
   ClipboardList,
   DollarSign,
@@ -49,8 +49,10 @@ export function StepCard({
   isManualDate = false,
   onToggleComplete
 }: StepCardProps) {
+  const { t, i18n } = useTranslation();
   const phase = phases.find(p => p.id === step.phase);
   const IconComponent = iconMap[step.icon] || Circle;
+  const dateLocale = i18n.language === 'en' ? enCA : fr;
 
   // Calculate days until deadline
   const getDaysUntilStart = () => {
@@ -64,13 +66,13 @@ export function StepCard({
   const daysUntilStart = getDaysUntilStart();
 
   const getDeadlineStatus = () => {
-    if (isCompleted) return { label: "Terminé", color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/30" };
+    if (isCompleted) return { label: t("stepCard.completed"), color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/30" };
     if (daysUntilStart === null) return null;
-    if (daysUntilStart < 0) return { label: "En retard", color: "text-destructive", bg: "bg-destructive/10" };
-    if (daysUntilStart === 0) return { label: "Aujourd'hui", color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-950/30" };
-    if (daysUntilStart <= 7) return { label: `${daysUntilStart}j`, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-950/30" };
-    if (daysUntilStart <= 30) return { label: `${daysUntilStart}j`, color: "text-primary", bg: "bg-primary/10" };
-    return { label: `${daysUntilStart}j`, color: "text-muted-foreground", bg: "bg-muted" };
+    if (daysUntilStart < 0) return { label: t("stepCard.late"), color: "text-destructive", bg: "bg-destructive/10" };
+    if (daysUntilStart === 0) return { label: t("stepCard.today"), color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-950/30" };
+    if (daysUntilStart <= 7) return { label: t("stepCard.daysShort", { count: daysUntilStart }), color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-950/30" };
+    if (daysUntilStart <= 30) return { label: t("stepCard.daysShort", { count: daysUntilStart }), color: "text-primary", bg: "bg-primary/10" };
+    return { label: t("stepCard.daysShort", { count: daysUntilStart }), color: "text-muted-foreground", bg: "bg-muted" };
   };
 
   const deadlineStatus = getDeadlineStatus();
@@ -113,7 +115,7 @@ export function StepCard({
           "text-sm font-medium",
           isCompleted ? "text-green-600 line-through" : "text-muted-foreground"
         )}>
-          Étape {stepNumber}
+          {t("stepCard.step", { number: stepNumber })}
         </span>
       </div>
       <h3 className={cn(
@@ -143,12 +145,12 @@ export function StepCard({
             {isCompleted ? (
               <>
                 <CheckCircle2 className="h-4 w-4" />
-                Étape complétée
+                {t("stepCard.stepCompleted")}
               </>
             ) : (
               <>
                 <Check className="h-4 w-4" />
-                Marquer comme complétée
+                {t("stepCard.markAsCompleted")}
               </>
             )}
           </Button>
@@ -167,11 +169,11 @@ export function StepCard({
             )}
             <div className="flex-1">
               <span className={cn("font-medium", deadlineStatus?.color)}>
-                {format(parseISO(scheduleStartDate), "d MMM", { locale: fr })}
+                {format(parseISO(scheduleStartDate), "d MMM", { locale: dateLocale })}
               </span>
               {scheduleEndDate && (
                 <span className="text-muted-foreground">
-                  {" → "}{format(parseISO(scheduleEndDate), "d MMM", { locale: fr })}
+                  {" → "}{format(parseISO(scheduleEndDate), "d MMM", { locale: dateLocale })}
                 </span>
               )}
             </div>
@@ -189,7 +191,7 @@ export function StepCard({
             <span>{step.duration}</span>
           </div>
           <div className="flex items-center gap-1 text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-            <span>Voir détails</span>
+            <span>{t("stepCard.viewDetails")}</span>
             <ChevronRight className="h-4 w-4" />
           </div>
         </div>

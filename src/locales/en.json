@@ -44,6 +44,16 @@
       "amount": "0.00"
     }
   },
+  "stepCard": {
+    "step": "Step {{number}}",
+    "completed": "Completed",
+    "late": "Late",
+    "today": "Today",
+    "daysShort": "{{count}}d",
+    "stepCompleted": "Step completed",
+    "markAsCompleted": "Mark as completed",
+    "viewDetails": "View details"
+  },
   "nav": {
     "myProjects": "My Projects",
     "steps": "Steps",
