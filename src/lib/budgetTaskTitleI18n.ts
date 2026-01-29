@@ -25,7 +25,7 @@ const TASK_TITLE_TO_I18N_KEY: Record<string, string> = {
   // FONDATION
   "semelle": "budgetTasks.footing",
   "coulage des fondations": "budgetTasks.pouringFoundations",
-  "imperméabilisation": "budgetTasks.waterproofing",
+  "impermeabilisation": "budgetTasks.waterproofing",
   "drain et remblai": "budgetTasks.frenchDrainBackfill",
   
   // STRUCTURE ET CHARPENTE
