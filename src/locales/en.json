@@ -1221,7 +1221,12 @@
     "retained": "Selected",
     "notRetained": "Not selected",
     "amount": "Amount",
-    "supplier": "Supplier"
+    "supplier": "Supplier",
+    "downloadAll": "Download all",
+    "downloading": "Downloading...",
+    "downloadSuccess": "Download complete!",
+    "downloadError": "Error downloading files",
+    "noFilesToDownload": "No files to download"
   },
   "startProject": {
     "title": "Create a new project",

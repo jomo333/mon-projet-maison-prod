@@ -1221,7 +1221,12 @@
     "retained": "Retenu",
     "notRetained": "Non retenu",
     "amount": "Montant",
-    "supplier": "Fournisseur"
+    "supplier": "Fournisseur",
+    "downloadAll": "Tout télécharger",
+    "downloading": "Téléchargement...",
+    "downloadSuccess": "Téléchargement terminé !",
+    "downloadError": "Erreur lors du téléchargement",
+    "noFilesToDownload": "Aucun fichier à télécharger"
   },
   "startProject": {
     "title": "Créer un nouveau projet",

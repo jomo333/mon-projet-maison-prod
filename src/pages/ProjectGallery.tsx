@@ -42,9 +42,12 @@ import {
   Phone,
   User,
   Eye,
-  X
+  X,
+  FolderArchive
 } from "lucide-react";
 import { PDFViewer } from "@/components/ui/pdf-viewer";
+import JSZip from "jszip";
+import { toast } from "sonner";
 
 const ProjectGallery = () => {
   const { t, i18n } = useTranslation();
@@ -94,6 +97,7 @@ const ProjectGallery = () => {
   const [previewDocument, setPreviewDocument] = useState<{url: string; name: string; type: string} | null>(null);
   const [previewBlobUrl, setPreviewBlobUrl] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [isDownloadingAll, setIsDownloadingAll] = useState(false);
   const blobUrlRef = useRef<string | null>(null);
   
   // Signed URLs cache for photos and documents
@@ -180,7 +184,103 @@ const ProjectGallery = () => {
     }
   };
 
-  // Fetch all user projects
+  // Download all files as organized ZIP
+  const downloadAllAsZip = async () => {
+    if (!project || (!photos.length && !documents.length)) {
+      toast.error(t("gallery.noFilesToDownload", "Aucun fichier à télécharger"));
+      return;
+    }
+
+    setIsDownloadingAll(true);
+    const zip = new JSZip();
+    const projectName = project.name.replace(/[^a-zA-Z0-9àâäéèêëïîôùûüç\s-]/g, "").trim() || "projet";
+    
+    const addedFiles = new Set<string>(); // Track added files to avoid duplicates
+
+    try {
+      // Add photos organized by step
+      const photosFolder = zip.folder("Photos");
+      if (photosFolder) {
+        for (const photo of photos) {
+          const stepName = getStepTitle(photo.step_id).replace(/[^a-zA-Z0-9àâäéèêëïîôùûüç\s-]/g, "").trim() || photo.step_id;
+          const stepFolder = photosFolder.folder(stepName);
+          
+          if (stepFolder) {
+            const signedUrl = photoSignedUrls.get(photo.id) || await getSignedUrl("project-photos", photo.file_url);
+            if (signedUrl && !addedFiles.has(photo.file_url)) {
+              try {
+                const response = await fetch(signedUrl);
+                if (response.ok) {
+                  const blob = await response.blob();
+                  stepFolder.file(photo.file_name, blob);
+                  addedFiles.add(photo.file_url);
+                }
+              } catch (e) {
+                console.error("Error downloading photo:", e);
+              }
+            }
+          }
+        }
+      }
+
+      // Add documents organized by category
+      const docsFolder = zip.folder("Documents");
+      if (docsFolder) {
+        const categoryNames: Record<string, string> = {
+          plan: "Plans",
+          devis: "Devis",
+          contract: "Contrats",
+          permit: "Permis",
+          permis: "Permis",
+          facture: "Factures",
+          photo: "Photos",
+          other: "Autres",
+          soumission: "Soumissions",
+          analyse: "Analyses"
+        };
+
+        for (const doc of documents) {
+          const categoryName = categoryNames[doc.category] || "Autres";
+          const catFolder = docsFolder.folder(categoryName);
+          
+          if (catFolder && !addedFiles.has(doc.file_url)) {
+            const signedUrl = docSignedUrls.get(doc.id) || await getSignedUrlFromPublicUrl(doc.file_url);
+            const urlToUse = signedUrl || doc.file_url;
+            
+            try {
+              const response = await fetch(urlToUse);
+              if (response.ok) {
+                const blob = await response.blob();
+                catFolder.file(doc.file_name, blob);
+                addedFiles.add(doc.file_url);
+              }
+            } catch (e) {
+              console.error("Error downloading document:", e);
+            }
+          }
+        }
+      }
+
+      // Generate ZIP and download
+      const content = await zip.generateAsync({ type: "blob" });
+      const url = window.URL.createObjectURL(content);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${projectName}_dossiers.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.success(t("gallery.downloadSuccess", "Téléchargement terminé !"));
+    } catch (error) {
+      console.error("ZIP download error:", error);
+      toast.error(t("gallery.downloadError", "Erreur lors du téléchargement"));
+    } finally {
+      setIsDownloadingAll(false);
+    }
+  };
+
   const { data: projects = [], isLoading: projectsLoading } = useQuery({
     queryKey: ["projects", user?.id],
     queryFn: async () => {
@@ -480,21 +580,44 @@ const ProjectGallery = () => {
               </div>
             </div>
             
-            {/* Project selector */}
-            <div className="flex items-center gap-4">
-              <label className="text-sm font-medium">{t("common.project")} :</label>
-              <Select value={projectId} onValueChange={handleProjectChange}>
-                <SelectTrigger className="w-full max-w-xs">
-                  <SelectValue placeholder="Sélectionner un projet" />
-                </SelectTrigger>
-                <SelectContent>
-                  {projects.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            {/* Project selector and download button */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex items-center gap-4 flex-1">
+                <label className="text-sm font-medium">{t("common.project")} :</label>
+                <Select value={projectId} onValueChange={handleProjectChange}>
+                  <SelectTrigger className="w-full max-w-xs">
+                    <SelectValue placeholder="Sélectionner un projet" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projects.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Download all button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={downloadAllAsZip}
+                disabled={isDownloadingAll || (!photos.length && !documents.length)}
+                className="gap-2"
+              >
+                {isDownloadingAll ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t("gallery.downloading", "Téléchargement...")}
+                  </>
+                ) : (
+                  <>
+                    <FolderArchive className="h-4 w-4" />
+                    {t("gallery.downloadAll", "Tout télécharger")}
+                  </>
+                )}
+              </Button>
             </div>
           </div>
 
