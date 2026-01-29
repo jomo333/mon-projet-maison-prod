@@ -253,7 +253,7 @@ export function BudgetAnalysisResults({
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
                   <AlertTriangle className="h-5 w-5" />
-                  Alertes et Avertissements
+                  {t("budgetAnalysis.alertsWarnings")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -274,7 +274,7 @@ export function BudgetAnalysisResults({
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
                   <Info className="h-5 w-5" />
-                  Recommandations
+                  {t("budgetAnalysis.recommendations")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -310,11 +310,11 @@ export function BudgetAnalysisResults({
                           <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent className="max-w-[280px]">
-                          <p className="font-medium mb-1">Ce total inclut:</p>
+                          <p className="font-medium mb-1">{t("budgetAnalysis.totalIncludes")}</p>
                           <ul className="text-xs space-y-1">
-                            <li>• Tous les travaux de construction</li>
-                            <li>• Contingence (5% pour imprévus)</li>
-                            <li>• TPS (5%) + TVQ (9,975%)</li>
+                            <li>• {t("budgetAnalysis.allConstructionWork")}</li>
+                            <li>• {t("budgetAnalysis.contingencyForUnforeseen")}</li>
+                            <li>• {t("budgetAnalysis.tpsTvq")}</li>
                           </ul>
                         </TooltipContent>
                       </RadixTooltip>
@@ -322,7 +322,7 @@ export function BudgetAnalysisResults({
                   </CardTitle>
                   <CardDescription className="flex items-center gap-2 mt-1">
                     <Badge variant="outline" className="text-xs">±10%</Badge>
-                    Estimation préliminaire • Inclut taxes et contingence • {analysis.projectSummary}
+                    {t("budgetAnalysis.preliminaryEstimate")} • {t("budgetAnalysis.includesTaxesContingency")} • {analysis.projectSummary}
                   </CardDescription>
                 </>
               ) : (
@@ -335,19 +335,19 @@ export function BudgetAnalysisResults({
                           <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent className="max-w-[280px]">
-                          <p className="font-medium mb-1">Ce total inclut:</p>
+                          <p className="font-medium mb-1">{t("budgetAnalysis.totalIncludes")}</p>
                           <ul className="text-xs space-y-1">
-                            <li>• Tous les travaux de construction</li>
-                            <li>• Contingence (5% pour imprévus)</li>
-                            <li>• TPS (5%) + TVQ (9,975%)</li>
+                            <li>• {t("budgetAnalysis.allConstructionWork")}</li>
+                            <li>• {t("budgetAnalysis.contingencyForUnforeseen")}</li>
+                            <li>• {t("budgetAnalysis.tpsTvq")}</li>
                           </ul>
                         </TooltipContent>
                       </RadixTooltip>
                     </TooltipProvider>
                   </CardTitle>
                   <CardDescription className="flex items-center gap-1">
-                    <Badge variant="outline" className="text-xs mr-1">TTC</Badge>
-                    Inclut taxes et contingence • {analysis.projectSummary}
+                    <Badge variant="outline" className="text-xs mr-1">{t("budgetAnalysis.ttc")}</Badge>
+                    {t("budgetAnalysis.includesTaxesContingency")} • {analysis.projectSummary}
                   </CardDescription>
                 </>
               )}
@@ -373,19 +373,19 @@ export function BudgetAnalysisResults({
           {analysis.totauxDetails && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-lg bg-muted/50 mb-4">
               <div>
-                <p className="text-xs text-muted-foreground">Matériaux</p>
+                <p className="text-xs text-muted-foreground">{t("budgetAnalysis.materials")}</p>
                 <p className="font-semibold">{formatCurrency(analysis.totauxDetails.total_materiaux || 0)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Main-d'œuvre</p>
+                <p className="text-xs text-muted-foreground">{t("budgetAnalysis.labor")}</p>
                 <p className="font-semibold">{formatCurrency(analysis.totauxDetails.total_main_oeuvre || 0)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Contingence (5%)</p>
+                <p className="text-xs text-muted-foreground">{t("budgetAnalysis.contingency5")}</p>
                 <p className="font-semibold">{formatCurrency(analysis.totauxDetails.contingence_5_pourcent || 0)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Taxes (TPS+TVQ)</p>
+                <p className="text-xs text-muted-foreground">{t("budgetAnalysis.taxesTpsTvq")}</p>
                 <p className="font-semibold">
                   {formatCurrency((analysis.totauxDetails.tps_5_pourcent || 0) + (analysis.totauxDetails.tvq_9_975_pourcent || 0))}
                 </p>
@@ -405,7 +405,7 @@ export function BudgetAnalysisResults({
                 {analysis.validation.surfacesCompletes 
                   ? <CheckCircle2 className="h-4 w-4" /> 
                   : <AlertTriangle className="h-4 w-4" />}
-                Surfaces {analysis.validation.surfacesCompletes ? "complètes" : "incomplètes"}
+                {analysis.validation.surfacesCompletes ? t("budgetAnalysis.surfacesComplete") : t("budgetAnalysis.surfacesIncomplete")}
               </div>
               
               {analysis.validation.ratioMainOeuvre !== undefined && (
@@ -418,7 +418,7 @@ export function BudgetAnalysisResults({
                   {analysis.validation.ratioAcceptable 
                     ? <CheckCircle2 className="h-4 w-4" /> 
                     : <AlertTriangle className="h-4 w-4" />}
-                  Ratio M.O./Mat.: {(analysis.validation.ratioMainOeuvre * 100).toFixed(0)}%
+                  {t("budgetAnalysis.laborMaterialRatio")}: {(analysis.validation.ratioMainOeuvre * 100).toFixed(0)}%
                 </div>
               )}
             </div>
@@ -431,19 +431,19 @@ export function BudgetAnalysisResults({
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview" className="gap-2">
             <PieChart className="h-4 w-4" />
-            Vue d'ensemble
+            {t("budgetAnalysis.overview")}
           </TabsTrigger>
           <TabsTrigger value="details" className="gap-2">
             <BarChart3 className="h-4 w-4" />
-            Détails
+            {t("budgetAnalysis.details")}
           </TabsTrigger>
           <TabsTrigger value="table" className="gap-2">
             <FileSpreadsheet className="h-4 w-4" />
-            Tableau
+            {t("budgetAnalysis.table")}
           </TabsTrigger>
           <TabsTrigger value="export" className="gap-2">
             <Download className="h-4 w-4" />
-            Export
+            {t("budgetAnalysis.export")}
           </TabsTrigger>
         </TabsList>
 
@@ -453,7 +453,7 @@ export function BudgetAnalysisResults({
             {/* Pie Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Répartition du budget</CardTitle>
+                <CardTitle className="text-lg">{t("budgetAnalysis.budgetDistribution")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -484,7 +484,7 @@ export function BudgetAnalysisResults({
             {/* Bar Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Budget par catégorie</CardTitle>
+                <CardTitle className="text-lg">{t("budgetAnalysis.budgetByCategory")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -523,7 +523,7 @@ export function BudgetAnalysisResults({
                           <span className="text-xs text-muted-foreground">{percentage.toFixed(1)}%</span>
                         </div>
                         <p className="text-lg font-bold">{formatCurrency(cat.budget)}</p>
-                        <p className="text-xs text-muted-foreground mt-1">Avant taxes</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t("budgetAnalysis.beforeTaxes")}</p>
                         <Progress value={percentage} className="h-1 mt-2" />
                       </Card>
                     );
@@ -534,17 +534,17 @@ export function BudgetAnalysisResults({
                 <Card className="mt-4">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center gap-2">
-                      Récapitulatif du budget
+                      {t("budgetAnalysis.budgetSummary")}
                       <TooltipProvider>
                         <RadixTooltip>
                           <TooltipTrigger asChild>
                             <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
                           </TooltipTrigger>
-                          <TooltipContent className="max-w-[300px]">
-                            <p className="text-xs">
-                              Ce récapitulatif montre la ventilation complète: travaux, contingence (5% pour imprévus) et taxes applicables au Québec (TPS + TVQ).
-                            </p>
-                          </TooltipContent>
+                        <TooltipContent className="max-w-[300px]">
+                          <p className="text-xs">
+                            {t("budgetAnalysis.budgetSummaryTooltip")}
+                          </p>
+                        </TooltipContent>
                         </RadixTooltip>
                       </TooltipProvider>
                     </CardTitle>
@@ -552,22 +552,22 @@ export function BudgetAnalysisResults({
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between py-2 border-b">
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">Sous-total travaux</span>
-                        <Badge variant="outline" className="text-xs">Avant taxes</Badge>
+                        <span className="text-muted-foreground">{t("budgetAnalysis.workSubtotal")}</span>
+                        <Badge variant="outline" className="text-xs">{t("budgetAnalysis.beforeTaxes")}</Badge>
                       </div>
                       <span className="font-semibold">{formatCurrency(subTotalBeforeTaxes)}</span>
                     </div>
                     <div className="flex items-center justify-between py-2 border-b">
                       <div className="flex items-center gap-2">
                         <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs flex items-center justify-center font-medium">%</span>
-                        <span className="text-amber-700 dark:text-amber-400">Budget imprévu (5%)</span>
+                        <span className="text-amber-700 dark:text-amber-400">{t("budgetAnalysis.contingencyBudget")}</span>
                         <TooltipProvider>
                           <RadixTooltip>
                             <TooltipTrigger asChild>
                               <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent className="max-w-[250px]">
-                              <p className="text-xs">Réserve recommandée pour couvrir les imprévus et modifications pendant la construction.</p>
+                              <p className="text-xs">{t("budgetAnalysis.contingencyTooltip")}</p>
                             </TooltipContent>
                           </RadixTooltip>
                         </TooltipProvider>
@@ -577,14 +577,14 @@ export function BudgetAnalysisResults({
                     <div className="flex items-center justify-between py-2 border-b">
                       <div className="flex items-center gap-2">
                         <span className="w-5 h-5 rounded-full bg-blue-500/20 text-blue-700 dark:text-blue-400 text-xs flex items-center justify-center font-medium">$</span>
-                        <span className="text-blue-700 dark:text-blue-400">TPS (5%)</span>
+                        <span className="text-blue-700 dark:text-blue-400">{t("budgetAnalysis.tps5")}</span>
                         <TooltipProvider>
                           <RadixTooltip>
                             <TooltipTrigger asChild>
                               <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent className="max-w-[200px]">
-                              <p className="text-xs">Taxe sur les produits et services (fédérale)</p>
+                              <p className="text-xs">{t("budgetAnalysis.tpsTooltip")}</p>
                             </TooltipContent>
                           </RadixTooltip>
                         </TooltipProvider>
@@ -594,14 +594,14 @@ export function BudgetAnalysisResults({
                     <div className="flex items-center justify-between py-2 border-b">
                       <div className="flex items-center gap-2">
                         <span className="w-5 h-5 rounded-full bg-blue-500/20 text-blue-700 dark:text-blue-400 text-xs flex items-center justify-center font-medium">$</span>
-                        <span className="text-blue-700 dark:text-blue-400">TVQ (9,975%)</span>
+                        <span className="text-blue-700 dark:text-blue-400">{t("budgetAnalysis.tvq")}</span>
                         <TooltipProvider>
                           <RadixTooltip>
                             <TooltipTrigger asChild>
                               <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent className="max-w-[200px]">
-                              <p className="text-xs">Taxe de vente du Québec (provinciale)</p>
+                              <p className="text-xs">{t("budgetAnalysis.tvqTooltip")}</p>
                             </TooltipContent>
                           </RadixTooltip>
                         </TooltipProvider>
@@ -610,13 +610,13 @@ export function BudgetAnalysisResults({
                     </div>
                     <div className="flex items-center justify-between py-3 bg-primary/5 rounded-lg px-3 -mx-3">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-lg">TOTAL ESTIMÉ</span>
-                        <Badge variant="default" className="text-xs">TTC</Badge>
+                        <span className="font-bold text-lg">{t("budgetAnalysis.totalEstimated")}</span>
+                        <Badge variant="default" className="text-xs">{t("budgetAnalysis.ttc")}</Badge>
                       </div>
                       <span className="font-bold text-lg text-primary">{formatCurrency(subTotalBeforeTaxes + contingence + taxes)}</span>
                     </div>
                     <p className="text-xs text-muted-foreground text-center pt-2">
-                      Total incluant: travaux + contingence (5%) + taxes (TPS 5% + TVQ 9,975%)
+                      {t("budgetAnalysis.totalIncludesBreakdown")}
                     </p>
                   </CardContent>
                 </Card>
@@ -631,7 +631,7 @@ export function BudgetAnalysisResults({
           <div className="flex gap-4 items-center">
             <div className="flex-1">
               <Input
-                placeholder="Rechercher un item..."
+                placeholder={t("budgetAnalysis.searchItem")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="max-w-sm"
@@ -640,7 +640,7 @@ export function BudgetAnalysisResults({
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-[200px]">
                 <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Filtrer par catégorie" />
+                <SelectValue placeholder={t("budgetAnalysis.filterByCategory")} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("budgetAnalysis.allCategories")}</SelectItem>
@@ -679,7 +679,7 @@ export function BudgetAnalysisResults({
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-lg">{formatCurrency(cat.budget)}</p>
-                        <p className="text-xs text-muted-foreground">Avant taxes • {percentage.toFixed(1)}%</p>
+                        <p className="text-xs text-muted-foreground">{t("budgetAnalysis.beforeTaxes")} • {percentage.toFixed(1)}%</p>
                       </div>
                     </div>
                     <Progress value={percentage} className="h-2 mt-3" />
@@ -826,24 +826,24 @@ export function BudgetAnalysisResults({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Catégorie</TableHead>
+                    <TableHead>{t("budgetAnalysis.category")}</TableHead>
                     <TableHead className="text-right">
                       <div className="flex items-center justify-end gap-1">
-                        Budget
+                        {t("budgetAnalysis.budget")}
                         <TooltipProvider>
                           <RadixTooltip>
                             <TooltipTrigger asChild>
                               <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-xs">Montant avant taxes et contingence</p>
+                              <p className="text-xs">{t("budgetAnalysis.budgetTooltip")}</p>
                             </TooltipContent>
                           </RadixTooltip>
                         </TooltipProvider>
                       </div>
                     </TableHead>
-                    <TableHead className="text-right">% du total</TableHead>
-                    <TableHead>Description</TableHead>
+                    <TableHead className="text-right">{t("budgetAnalysis.percentOfTotal")}</TableHead>
+                    <TableHead>{t("budgetAnalysis.description")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -877,42 +877,42 @@ export function BudgetAnalysisResults({
                         <TableRow className="bg-muted/30">
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
-                              Sous-total travaux
-                              <Badge variant="outline" className="text-xs">Avant taxes</Badge>
+                              {t("budgetAnalysis.workSubtotal")}
+                              <Badge variant="outline" className="text-xs">{t("budgetAnalysis.beforeTaxes")}</Badge>
                             </div>
                           </TableCell>
                           <TableCell className="text-right font-mono font-semibold">{formatCurrency(subTotalBeforeTaxes)}</TableCell>
                           <TableCell className="text-right">—</TableCell>
-                          <TableCell className="text-muted-foreground text-sm">Montant hors taxes et contingence</TableCell>
+                          <TableCell className="text-muted-foreground text-sm">{t("budgetAnalysis.excludingTaxesContingency")}</TableCell>
                         </TableRow>
                         <TableRow className="bg-amber-50 dark:bg-amber-950/30">
-                          <TableCell className="font-medium text-amber-700 dark:text-amber-400">Budget imprévu (5%)</TableCell>
+                          <TableCell className="font-medium text-amber-700 dark:text-amber-400">{t("budgetAnalysis.contingencyBudget")}</TableCell>
                           <TableCell className="text-right font-mono text-amber-700 dark:text-amber-400">{formatCurrency(contingence)}</TableCell>
                           <TableCell className="text-right">—</TableCell>
-                          <TableCell className="text-muted-foreground text-sm">Réserve pour imprévus et modifications</TableCell>
+                          <TableCell className="text-muted-foreground text-sm">{t("budgetAnalysis.reserveForUnforeseen")}</TableCell>
                         </TableRow>
                         <TableRow className="bg-blue-50 dark:bg-blue-950/30">
-                          <TableCell className="font-medium text-blue-700 dark:text-blue-400">TPS (5%)</TableCell>
+                          <TableCell className="font-medium text-blue-700 dark:text-blue-400">{t("budgetAnalysis.tps5")}</TableCell>
                           <TableCell className="text-right font-mono text-blue-700 dark:text-blue-400">{formatCurrency(tps)}</TableCell>
                           <TableCell className="text-right">—</TableCell>
-                          <TableCell className="text-muted-foreground text-sm">Taxe fédérale sur produits et services</TableCell>
+                          <TableCell className="text-muted-foreground text-sm">{t("budgetAnalysis.federalTax")}</TableCell>
                         </TableRow>
                         <TableRow className="bg-blue-50 dark:bg-blue-950/30">
-                          <TableCell className="font-medium text-blue-700 dark:text-blue-400">TVQ (9,975%)</TableCell>
+                          <TableCell className="font-medium text-blue-700 dark:text-blue-400">{t("budgetAnalysis.tvq")}</TableCell>
                           <TableCell className="text-right font-mono text-blue-700 dark:text-blue-400">{formatCurrency(tvq)}</TableCell>
                           <TableCell className="text-right">—</TableCell>
-                          <TableCell className="text-muted-foreground text-sm">Taxe de vente du Québec</TableCell>
+                          <TableCell className="text-muted-foreground text-sm">{t("budgetAnalysis.provincialTax")}</TableCell>
                         </TableRow>
                         <TableRow className="bg-primary/10 font-bold">
                           <TableCell className="text-primary">
                             <div className="flex items-center gap-2">
-                              TOTAL ESTIMÉ
-                              <Badge variant="default" className="text-xs">TTC</Badge>
+                              {t("budgetAnalysis.totalEstimated")}
+                              <Badge variant="default" className="text-xs">{t("budgetAnalysis.ttc")}</Badge>
                             </div>
                           </TableCell>
                           <TableCell className="text-right font-mono text-primary">{formatCurrency(grandTotal)}</TableCell>
                           <TableCell className="text-right">100%</TableCell>
-                          <TableCell className="text-muted-foreground text-sm">Travaux + contingence + taxes</TableCell>
+                          <TableCell className="text-muted-foreground text-sm">{t("budgetAnalysis.workPlusContingencyTaxes")}</TableCell>
                         </TableRow>
                       </>
                     );
@@ -927,9 +927,9 @@ export function BudgetAnalysisResults({
         <TabsContent value="export">
           <Card>
             <CardHeader>
-              <CardTitle>Exporter l'analyse</CardTitle>
+              <CardTitle>{t("budgetAnalysis.exportAnalysis")}</CardTitle>
               <CardDescription>
-                Téléchargez votre analyse budgétaire dans différents formats
+                {t("budgetAnalysis.exportDescription")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -937,15 +937,15 @@ export function BudgetAnalysisResults({
                 <Button variant="outline" className="h-auto py-4" disabled>
                   <div className="flex flex-col items-center gap-2">
                     <FileText className="h-8 w-8" />
-                    <span>Export PDF professionnel</span>
-                    <span className="text-xs text-muted-foreground">Bientôt disponible</span>
+                    <span>{t("budgetAnalysis.exportPdf")}</span>
+                    <span className="text-xs text-muted-foreground">{t("budgetAnalysis.comingSoon")}</span>
                   </div>
                 </Button>
                 <Button variant="outline" className="h-auto py-4" disabled>
                   <div className="flex flex-col items-center gap-2">
                     <FileSpreadsheet className="h-8 w-8" />
-                    <span>Export Excel</span>
-                    <span className="text-xs text-muted-foreground">Bientôt disponible</span>
+                    <span>{t("budgetAnalysis.exportExcel")}</span>
+                    <span className="text-xs text-muted-foreground">{t("budgetAnalysis.comingSoon")}</span>
                   </div>
                 </Button>
               </div>
@@ -958,7 +958,7 @@ export function BudgetAnalysisResults({
       <div className="flex justify-end">
         <Button size="lg" onClick={onApplyBudget} className="gap-2">
           <CheckCircle2 className="h-5 w-5" />
-          Appliquer ce budget au projet
+          {t("budgetAnalysis.applyBudget")}
         </Button>
       </div>
     </div>
