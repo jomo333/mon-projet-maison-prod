@@ -44,8 +44,9 @@ const FULL_WARNING_TRANSLATIONS: Record<string, string> = {
     "budgetWarnings.fireSeparationFull",
 };
 
-// Missing element translations (common ones from AI)
+// Extended missing element translations (common ones from AI)
 const MISSING_ELEMENT_TRANSLATIONS: Record<string, string> = {
+  // Original entries
   "Plans de plancher détaillés": "budgetWarnings.missing.floorPlans",
   "Spécifications d'isolation": "budgetWarnings.missing.insulationSpecs",
   "Détails électriques et plomberie": "budgetWarnings.missing.electricalPlumbing",
@@ -62,6 +63,70 @@ const MISSING_ELEMENT_TRANSLATIONS: Record<string, string> = {
   "Détails de finition intérieure": "budgetWarnings.missing.interiorFinishDetails",
   "Type de revêtement extérieur": "budgetWarnings.missing.sidingType",
   "Système de chauffage": "budgetWarnings.missing.heatingSystem",
+  // Extended entries for more coverage
+  "Détails spécifiques des fenêtres et dimensions exactes": "budgetWarnings.missing.windowSpecificDetails",
+  "Finitions intérieures détaillées": "budgetWarnings.missing.interiorFinishesDetailed",
+  "Revêtement extérieur spécifié": "budgetWarnings.missing.exteriorSidingSpecified",
+  "Fenêtres et portes - dimensions non visibles": "budgetWarnings.missing.windowsDoorsDimensionsNotVisible",
+  "Électricité - circuits non détaillés": "budgetWarnings.missing.electricalCircuitsNotDetailed",
+  "Plomberie - appareils non spécifiés": "budgetWarnings.missing.plumbingAppliancesNotSpecified",
+  "Finitions intérieures - matériaux non précisés": "budgetWarnings.missing.interiorFinishesMaterialsNotSpecified",
+  "Comptoirs": "budgetWarnings.missing.countertops",
+  "Armoires de cuisine": "budgetWarnings.missing.kitchenCabinets",
+  "Vanités": "budgetWarnings.missing.vanities",
+  "Escalier": "budgetWarnings.missing.staircase",
+  "Rampes et garde-corps": "budgetWarnings.missing.railings",
+  "Planchers": "budgetWarnings.missing.flooring",
+  "Peinture": "budgetWarnings.missing.paint",
+  "Portes intérieures": "budgetWarnings.missing.interiorDoors",
+  "Moulures et plinthes": "budgetWarnings.missing.trimBaseboards",
+  "Luminaires": "budgetWarnings.missing.lightFixtures",
+  "Prises et interrupteurs": "budgetWarnings.missing.outletsSwitches",
+  "Robinetterie": "budgetWarnings.missing.faucets",
+  "Appareils sanitaires": "budgetWarnings.missing.sanitaryFixtures",
+  "Ventilation": "budgetWarnings.missing.ventilation",
+  "Système de climatisation": "budgetWarnings.missing.airConditioning",
+  "Foyer ou poêle": "budgetWarnings.missing.fireplaceOrStove",
+  "Garage": "budgetWarnings.missing.garage",
+  "Terrasse ou balcon": "budgetWarnings.missing.deckOrBalcony",
+  "Aménagement paysager": "budgetWarnings.missing.landscaping",
+  "Entrée de garage": "budgetWarnings.missing.driveway",
+  "Clôture": "budgetWarnings.missing.fence",
+};
+
+// Ambiguity translations
+const AMBIGUITY_TRANSLATIONS: Record<string, string> = {
+  "Dimensions exactes du bâtiment non clairement indiquées": "budgetWarnings.ambiguity.buildingDimensions",
+  "Types précis de fenêtres difficiles à distinguer": "budgetWarnings.ambiguity.windowTypes",
+  "Hauteur exacte des murs de fondation à confirmer": "budgetWarnings.ambiguity.foundationWallHeight",
+  "Hauteur exacte des murs de fondation": "budgetWarnings.ambiguity.foundationWallHeightSimple",
+  "Type exact de finition de plancher": "budgetWarnings.ambiguity.floorFinishType",
+  "Spécifications des systèmes mécaniques": "budgetWarnings.ambiguity.mechanicalSpecs",
+  "Nombre exact et dimensions des fenêtres non spécifiées": "budgetWarnings.ambiguity.windowCountDimensions",
+  "Hauteur exacte des murs (estimé 9')": "budgetWarnings.ambiguity.wallHeightEstimated9",
+  "Type de fondation (estimé béton coulé standard)": "budgetWarnings.ambiguity.foundationTypeEstimated",
+  "Nombre exact et dimensions des fenêtres non clairement indiqués": "budgetWarnings.ambiguity.windowCountDimensionsNotClear",
+  "Type de revêtement extérieur non spécifié": "budgetWarnings.ambiguity.exteriorSidingNotSpecified",
+  "Hauteur exacte des murs non précisée": "budgetWarnings.ambiguity.wallHeightNotSpecified",
+  "Hauteur exacte des murs - estimée à 8'": "budgetWarnings.ambiguity.wallHeightEstimated8",
+  "Type exact de revêtement extérieur": "budgetWarnings.ambiguity.exteriorSidingType",
+  "Nombre et dimensions des fenêtres": "budgetWarnings.ambiguity.windowCountAndDimensions",
+  "Superficie exacte non visible": "budgetWarnings.ambiguity.exactAreaNotVisible",
+  "Qualité des matériaux non précisée": "budgetWarnings.ambiguity.materialQualityNotSpecified",
+  "Niveau de finition non indiqué": "budgetWarnings.ambiguity.finishLevelNotIndicated",
+  "Type de chauffage non précisé": "budgetWarnings.ambiguity.heatingTypeNotSpecified",
+  "Configuration électrique non détaillée": "budgetWarnings.ambiguity.electricalConfigNotDetailed",
+};
+
+// Inconsistency translations
+const INCONSISTENCY_TRANSLATIONS: Record<string, string> = {
+  "Aucune incohérence majeure détectée sur cette page d'élévations": "budgetWarnings.inconsistency.noMajorOnElevations",
+  "Plan montre seulement le sous-sol, manque les étages supérieurs pour estimation complète": "budgetWarnings.inconsistency.basementOnlyMissingFloors",
+  "Aucune incohérence majeure détectée": "budgetWarnings.inconsistency.noMajorDetected",
+  "Plan montre coupe mais dimensions complètes non visibles": "budgetWarnings.inconsistency.sectionDimensionsNotVisible",
+  "Dimensions incohérentes entre les plans": "budgetWarnings.inconsistency.dimensionsMismatch",
+  "Superficie calculée ne correspond pas à la superficie indiquée": "budgetWarnings.inconsistency.areaMismatch",
+  "Nombre de fenêtres différent entre élévations et plans": "budgetWarnings.inconsistency.windowCountMismatch",
 };
 
 /**
@@ -82,7 +147,7 @@ export function translateWarning(t: TFunction, warning: string): string {
       const translatedPrefix = t(prefixKey);
       
       // Try to translate the content part too
-      const translatedContent = translateWarningContent(t, content);
+      const translatedContent = translateWarningContent(t, content, prefix);
       
       if (translatedPrefix !== prefixKey) {
         return `${translatedPrefix} ${translatedContent}`;
@@ -95,14 +160,28 @@ export function translateWarning(t: TFunction, warning: string): string {
 }
 
 /**
- * Try to translate the content portion of a warning
+ * Try to translate the content portion of a warning based on its type
  */
-function translateWarningContent(t: TFunction, content: string): string {
-  // Check for known missing element translations
-  const missingKey = MISSING_ELEMENT_TRANSLATIONS[content];
-  if (missingKey) {
-    const translated = t(missingKey);
-    if (translated !== missingKey) return translated;
+function translateWarningContent(t: TFunction, content: string, prefix: string): string {
+  // Determine which dictionary to use based on prefix
+  if (prefix.includes("Élément manquant")) {
+    const missingKey = MISSING_ELEMENT_TRANSLATIONS[content];
+    if (missingKey) {
+      const translated = t(missingKey);
+      if (translated !== missingKey) return translated;
+    }
+  } else if (prefix.includes("Ambiguïté")) {
+    const ambiguityKey = AMBIGUITY_TRANSLATIONS[content];
+    if (ambiguityKey) {
+      const translated = t(ambiguityKey);
+      if (translated !== ambiguityKey) return translated;
+    }
+  } else if (prefix.includes("Incohérence")) {
+    const inconsistencyKey = INCONSISTENCY_TRANSLATIONS[content];
+    if (inconsistencyKey) {
+      const translated = t(inconsistencyKey);
+      if (translated !== inconsistencyKey) return translated;
+    }
   }
   
   // Return original content if no specific translation
