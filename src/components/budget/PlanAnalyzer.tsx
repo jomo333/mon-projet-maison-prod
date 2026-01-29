@@ -81,7 +81,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
   prefillFloors,
   prefillSquareFootage
 }, ref) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<BudgetAnalysis | null>(null);
@@ -613,8 +613,10 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
       
       if (!hasPlansSelected) {
         // Mode manuel pur
+        const currentLang = i18n.language?.startsWith("en") ? "en" : "fr";
         const body = {
           mode: "manual",
+          lang: currentLang,
           ...manualData,
           stylePhotoUrls: stylePhotoUrls.length > 0 ? stylePhotoUrls : undefined,
           referenceImageUrls: manualReferenceImages.length > 0 ? manualReferenceImages : undefined,
@@ -743,8 +745,10 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
           
           toast.info(t("toasts.analyzingBatch", { current: batchIndex + 1, total: totalBatches, start: startIdx + 1, end: endIdx }));
           
+          const currentLang = i18n.language?.startsWith("en") ? "en" : "fr";
           const body = {
             mode: "plan",
+            lang: currentLang,
             imageUrls: batchUrls,
             finishQuality,
             manualContext: manualData,
@@ -798,9 +802,11 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
         if (batchResults.length === 1 && totalBatches === 1) {
           const singleResult = batchResults[0];
           // Appeler le serveur pour obtenir le format final
+          const currentLang = i18n.language?.startsWith("en") ? "en" : "fr";
           const { data: finalData } = await supabase.functions.invoke('analyze-plan', {
             body: {
               mode: "merge",
+              lang: currentLang,
               batchResults,
               finishQuality,
               manualContext: manualData,
@@ -845,9 +851,11 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
           // Plusieurs lots: envoyer tous les résultats au serveur pour fusion
           toast.info(t("toasts.mergingResults"));
           
+          const currentLang = i18n.language?.startsWith("en") ? "en" : "fr";
           const { data: mergedData, error: mergeError } = await supabase.functions.invoke('analyze-plan', {
             body: {
               mode: "merge",
+              lang: currentLang,
               batchResults,
               finishQuality,
               manualContext: manualData,

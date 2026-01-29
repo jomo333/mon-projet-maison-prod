@@ -7,6 +7,12 @@
  * any of the keywords (case-insensitive) to determine which task it belongs to.
  */
 
+/**
+ * Internal key for "other items" category. Use this constant for internal logic only.
+ * For display, use t("budget.categories.otherItems") instead.
+ */
+export const OTHER_ITEMS_KEY = "Autres éléments";
+
 export interface TaskKeywordMapping {
   taskTitle: string;
   keywords: string[];
@@ -670,7 +676,7 @@ export function groupItemsByTask(
 
   // Add "Autres éléments" only if there are unmatched items
   if (otherItems.length > 0) {
-    grouped.set("Autres éléments", otherItems);
+    grouped.set(OTHER_ITEMS_KEY, otherItems);
   }
 
   // Remove empty task groups

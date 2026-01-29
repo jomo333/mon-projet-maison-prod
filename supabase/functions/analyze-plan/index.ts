@@ -2370,7 +2370,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { mode, finishQuality = "standard", stylePhotoUrls = [], imageUrls: bodyImageUrls, imageUrl: singleImageUrl } = body;
+    const { mode, finishQuality = "standard", stylePhotoUrls = [], imageUrls: bodyImageUrls, imageUrl: singleImageUrl, lang = "fr" } = body;
     
     // Handle MERGE mode first (no API key needed - just data processing)
     if (mode === "merge") {
@@ -2468,7 +2468,7 @@ serve(async (req) => {
         resume_projet: resumeProjet,
       };
       
-      const transformedMerged = transformToLegacyFormat(mergedBudgetData, finishQuality);
+      const transformedMerged = transformToLegacyFormat(mergedBudgetData, finishQuality, lang);
       console.log('Merge complete - categories:', transformedMerged.categories?.length || 0);
       
       // Increment AI usage for the user (merge mode also counts as AI usage)
@@ -3028,7 +3028,7 @@ Retourne le JSON structuré COMPLET.`;
     }
 
     // Transform to expected format for frontend compatibility
-    const transformedData = transformToLegacyFormat(budgetData, finishQuality);
+    const transformedData = transformToLegacyFormat(budgetData, finishQuality, lang);
 
     console.log('Analysis complete - categories:', transformedData.categories?.length || 0);
 
@@ -3052,7 +3052,7 @@ Retourne le JSON structuré COMPLET.`;
 });
 
 // Transform the new detailed format to legacy format for frontend compatibility
-function transformToLegacyFormat(data: any, finishQuality: string): any {
+function transformToLegacyFormat(data: any, finishQuality: string, lang: string = "fr"): any {
   if (data.categories && Array.isArray(data.categories) && data.categories[0]?.budget !== undefined) {
     return data;
   }
@@ -3097,10 +3097,44 @@ function transformToLegacyFormat(data: any, finishQuality: string): any {
     });
   }
 
+  // Bilingual warning messages
+  const warningsFr = {
+    missingElement: "⚠️ Élément manquant:",
+    ambiguity: "❓ Ambiguïté:",
+    inconsistency: "⚡ Incohérence:",
+    sitePrep: "🏗️ PRÉPARATION DU SITE: Vérifier les coûts d'excavation, nivellement, et accès chantier",
+    permits: "🚧 PERMIS ET INSPECTIONS: Frais de permis de construction et inspections municipales à prévoir",
+    utilities: "📋 SERVICES PUBLICS: Confirmer les raccordements (eau, égout, électricité, gaz) et frais associés",
+    structuralJoin: "🔗 JUMELAGE STRUCTUREL: Travaux de connexion à la structure existante (linteaux, ancrages, renfort fondation)",
+    electricalConnection: "⚡ RACCORDEMENT ÉLECTRIQUE: Extension du panneau existant et mise aux normes possiblement requise",
+    plumbingConnection: "🔌 RACCORDEMENT PLOMBERIE: Connexion aux systèmes existants (eau, drainage, chauffage)",
+    waterproofing: "🏠 IMPERMÉABILISATION: Joint d'étanchéité entre nouvelle et ancienne construction critique",
+    harmonization: "🎨 HARMONISATION: Travaux de finition pour raccorder les matériaux extérieurs existants",
+    fireSeparation: "🔥 COUPE-FEU: Vérifier les exigences de séparation coupe-feu entre garage et habitation",
+  };
+
+  const warningsEn = {
+    missingElement: "⚠️ Missing element:",
+    ambiguity: "❓ Ambiguity:",
+    inconsistency: "⚡ Inconsistency:",
+    sitePrep: "🏗️ SITE PREPARATION: Verify excavation, grading, and site access costs",
+    permits: "🚧 PERMITS AND INSPECTIONS: Building permit fees and municipal inspections to be planned",
+    utilities: "📋 UTILITIES: Confirm connections (water, sewer, electricity, gas) and associated fees",
+    structuralJoin: "🔗 STRUCTURAL CONNECTION: Connection work to existing structure (lintels, anchors, foundation reinforcement)",
+    electricalConnection: "⚡ ELECTRICAL CONNECTION: Existing panel extension and possible code upgrade required",
+    plumbingConnection: "🔌 PLUMBING CONNECTION: Connection to existing systems (water, drainage, heating)",
+    waterproofing: "🏠 WATERPROOFING: Critical sealing joint between new and existing construction",
+    harmonization: "🎨 HARMONIZATION: Finishing work to match existing exterior materials",
+    fireSeparation: "🔥 FIRE SEPARATION: Verify fire separation requirements between garage and dwelling",
+  };
+
+  const isEnglish = lang.startsWith("en");
+  const w = isEnglish ? warningsEn : warningsFr;
+
   const warnings = [
-    ...(extraction.elements_manquants || []).map((e: string) => `⚠️ Élément manquant: ${e}`),
-    ...(extraction.ambiguites || []).map((e: string) => `❓ Ambiguïté: ${e}`),
-    ...(extraction.incoherences || []).map((e: string) => `⚡ Incohérence: ${e}`),
+    ...(extraction.elements_manquants || []).map((e: string) => `${w.missingElement} ${e}`),
+    ...(extraction.ambiguites || []).map((e: string) => `${w.ambiguity} ${e}`),
+    ...(extraction.incoherences || []).map((e: string) => `${w.inconsistency} ${e}`),
     ...(validation.alertes || [])
   ];
 
@@ -3111,18 +3145,27 @@ function transformToLegacyFormat(data: any, finishQuality: string): any {
                                  projectType.includes("JUMELE") ||
                                  projectType.includes("ANNEXE");
 
-  warnings.push("🏗️ PRÉPARATION DU SITE: Vérifier les coûts d'excavation, nivellement, et accès chantier");
-  warnings.push("🚧 PERMIS ET INSPECTIONS: Frais de permis de construction et inspections municipales à prévoir");
-  warnings.push("📋 SERVICES PUBLICS: Confirmer les raccordements (eau, égout, électricité, gaz) et frais associés");
+  warnings.push(w.sitePrep);
+  warnings.push(w.permits);
+  warnings.push(w.utilities);
 
   if (isAttachedOrExtension) {
-    warnings.push("🔗 JUMELAGE STRUCTUREL: Travaux de connexion à la structure existante (linteaux, ancrages, renfort fondation)");
-    warnings.push("⚡ RACCORDEMENT ÉLECTRIQUE: Extension du panneau existant et mise aux normes possiblement requise");
-    warnings.push("🔌 RACCORDEMENT PLOMBERIE: Connexion aux systèmes existants (eau, drainage, chauffage)");
-    warnings.push("🏠 IMPERMÉABILISATION: Joint d'étanchéité entre nouvelle et ancienne construction critique");
-    warnings.push("🎨 HARMONISATION: Travaux de finition pour raccorder les matériaux extérieurs existants");
-    warnings.push("🔥 COUPE-FEU: Vérifier les exigences de séparation coupe-feu entre garage et habitation");
+    warnings.push(w.structuralJoin);
+    warnings.push(w.electricalConnection);
+    warnings.push(w.plumbingConnection);
+    warnings.push(w.waterproofing);
+    warnings.push(w.harmonization);
+    warnings.push(w.fireSeparation);
   }
+
+  // Bilingual recommendations
+  const recsFr = data.recommandations || [];
+  const recsEn = recsFr.map((rec: string) => {
+    // Translate common recommendation patterns
+    if (rec.includes("Analyse multi-pages")) return rec.replace("Analyse multi-pages", "Multi-page analysis").replace("extraction séquentielle", "sequential extraction").replace("complétion automatique des catégories manquantes", "automatic completion of missing categories");
+    if (rec.includes("Analyse multi-lots")) return rec.replace("Analyse multi-lots", "Multi-batch analysis").replace("lot(s) fusionnés pour", "batch(es) merged for").replace("plan(s) total", "total plan(s)");
+    return rec;
+  });
 
   return {
     projectType: extraction.type_projet || "CONSTRUCTION_NEUVE",
@@ -3132,7 +3175,7 @@ function transformToLegacyFormat(data: any, finishQuality: string): any {
     plansAnalyzed: extraction.plans_analyses || 1,
     finishQuality: finishQuality,
     categories,
-    recommendations: data.recommandations || [],
+    recommendations: isEnglish ? recsEn : recsFr,
     warnings,
     validation: {
       surfacesCompletes: validation.surfaces_completes,
