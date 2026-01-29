@@ -38,7 +38,8 @@
     "download": "Télécharger",
     "upload": "Téléverser",
     "retry": "Réessayer",
-    "refresh": "Actualiser"
+    "refresh": "Actualiser",
+    "unknownDate": "Date inconnue"
   },
   "nav": {
     "myProjects": "Mes Projets",
@@ -254,9 +255,19 @@
     "startDate": "Date de début prévue",
     "status": "Statut",
     "statuses": {
+      "planning": "Planification",
+      "permit": "En attente de permis",
       "in_progress": "En cours",
       "completed": "Terminé",
-      "paused": "En pause"
+      "paused": "En pause",
+      "undefined": "Non défini"
+    },
+    "types": {
+      "newHome": "Maison neuve",
+      "extension": "Agrandissement",
+      "detachedGarage": "Garage détaché",
+      "majorRenovation": "Rénovation majeure",
+      "cabin": "Chalet"
     },
     "notFound": "Projet non trouvé",
     "backToProjects": "Retour à mes projets",
@@ -844,5 +855,12 @@
     "dateUnlockedDesc": "Cette date peut maintenant être ajustée automatiquement lors des recalculs.",
     "datesReset": "Dates réinitialisées",
     "datesResetDesc": "Les dates ont été recalculées automatiquement selon l'échéancier."
+  },
+  "myProjectSection": {
+    "title": "Mon projet",
+    "subtitle": "Continuez là où vous en étiez",
+    "viewAll": "Voir tous mes projets",
+    "deleteTitle": "Supprimer ce projet?",
+    "deleteDescription": "Cette action est irréversible. Toutes les données du projet \"{{name}}\" seront définitivement supprimées, y compris le budget et les pièces jointes."
   }
 }

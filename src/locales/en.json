@@ -38,7 +38,8 @@
     "download": "Download",
     "upload": "Upload",
     "retry": "Retry",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "unknownDate": "Unknown date"
   },
   "nav": {
     "myProjects": "My Projects",
@@ -254,9 +255,19 @@
     "startDate": "Expected start date",
     "status": "Status",
     "statuses": {
+      "planning": "Planning",
+      "permit": "Pending permit",
       "in_progress": "In progress",
       "completed": "Completed",
-      "paused": "Paused"
+      "paused": "Paused",
+      "undefined": "Undefined"
+    },
+    "types": {
+      "newHome": "New home",
+      "extension": "Extension",
+      "detachedGarage": "Detached garage",
+      "majorRenovation": "Major renovation",
+      "cabin": "Cabin"
     },
     "notFound": "Project not found",
     "backToProjects": "Back to my projects",
@@ -844,5 +855,12 @@
     "dateUnlockedDesc": "This date can now be automatically adjusted during recalculations.",
     "datesReset": "Dates reset",
     "datesResetDesc": "Dates have been automatically recalculated according to the schedule."
+  },
+  "myProjectSection": {
+    "title": "My project",
+    "subtitle": "Pick up where you left off",
+    "viewAll": "View all my projects",
+    "deleteTitle": "Delete this project?",
+    "deleteDescription": "This action is irreversible. All data for the project \"{{name}}\" will be permanently deleted, including budget and attachments."
   }
 }
