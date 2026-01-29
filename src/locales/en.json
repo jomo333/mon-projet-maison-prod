@@ -747,7 +747,8 @@
     "aiStatsError": "Error loading AI statistics",
     "updateError": "Error updating",
     "notesSaved": "Notes saved",
-    "saveError": "Error saving"
+    "saveError": "Error saving",
+    "taskUpdateError": "Error updating task"
   },
   "reportBug": {
     "title": "Report a bug",

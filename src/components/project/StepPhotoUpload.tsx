@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,6 +22,7 @@ interface StepPhotoUploadProps {
 }
 
 export const StepPhotoUpload = ({ projectId, stepId, stepTitle }: StepPhotoUploadProps) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -102,10 +104,10 @@ export const StepPhotoUpload = ({ projectId, stepId, stepTitle }: StepPhotoUploa
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["step-photos", projectId, stepId] });
       queryClient.invalidateQueries({ queryKey: ["all-project-photos", projectId] });
-      toast.success("Photo ajoutée avec succès!");
+      toast.success(t("toasts.photoAdded"));
     },
     onError: (error: Error) => {
-      toast.error("Erreur: " + error.message);
+      toast.error(t("toasts.photoError") + ": " + error.message);
     },
   });
 
@@ -136,10 +138,10 @@ export const StepPhotoUpload = ({ projectId, stepId, stepTitle }: StepPhotoUploa
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["step-photos", projectId, stepId] });
       queryClient.invalidateQueries({ queryKey: ["all-project-photos", projectId] });
-      toast.success("Photo supprimée");
+      toast.success(t("toasts.photoDeleted"));
     },
     onError: (error: Error) => {
-      toast.error("Erreur: " + error.message);
+      toast.error(t("toasts.photoError") + ": " + error.message);
     },
   });
 

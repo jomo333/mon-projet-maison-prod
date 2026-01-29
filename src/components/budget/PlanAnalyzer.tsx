@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -80,6 +81,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
   prefillFloors,
   prefillSquareFootage
 }, ref) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<BudgetAnalysis | null>(null);
@@ -340,7 +342,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
     if (!opts.silent) {
       queryClient.invalidateQueries({ queryKey: ["project-plans", projectId] });
       setSelectedPlanUrls((prev) => [...prev, signedUrl]);
-      toast.success("Plan téléversé avec succès!");
+      toast.success(t("toasts.planUploaded"));
     }
 
     return signedUrl;
@@ -352,7 +354,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
     },
     onError: (error) => {
       console.error("Upload error:", error);
-      toast.error("Erreur lors du téléversement du plan");
+      toast.error(t("toasts.planUploadError"));
     },
   });
 
@@ -375,11 +377,11 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["project-plans", projectId] });
       setSelectedPlanUrls(prev => prev.filter(url => url !== variables.file_url));
-      toast.success("Plan supprimé");
+      toast.success(t("toasts.planDeleted"));
     },
     onError: (error) => {
       console.error("Delete error:", error);
-      toast.error("Erreur lors de la suppression");
+      toast.error(t("toasts.planDeleteError"));
     },
   });
 
@@ -449,7 +451,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
         toast.success(`PDF converti en ${images.length} image(s) et ajouté à la sélection.`);
       } catch (error) {
         console.error("PDF import error:", error);
-        toast.error("Erreur lors de la conversion du PDF");
+        toast.error(t("toasts.pdfError"));
       } finally {
         setIsUploading(false);
       }
@@ -457,7 +459,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
       return;
     }
 
-    toast.error("Format non supporté (utilisez une image ou un PDF)");
+    toast.error(t("toasts.unsupportedFormat"));
   };
 
   // Auto-import: when user opens "Analyse de plan", preselect the most relevant file(s)
@@ -549,7 +551,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
       }
     } catch (error) {
       console.error("Upload/conversion error:", error);
-      toast.error("Erreur lors du traitement du fichier");
+      toast.error(t("toasts.uploadError"));
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -563,7 +565,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
 
   const handleAnalyze = async () => {
     if (analysisMode === "plan" && selectedPlanUrls.length === 0) {
-      toast.error("Veuillez sélectionner ou téléverser au moins un plan");
+      toast.error(t("toasts.selectOrUploadPlan"));
       return;
     }
 
@@ -622,7 +624,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
         if (error) throw error;
         if (data.success && data.data) {
           setAnalysis(data.data);
-          toast.success("Analyse terminée avec succès!");
+          toast.success(t("toasts.analysisDone"));
         } else {
           throw new Error(data.error || "Échec de l'analyse");
         }
@@ -687,7 +689,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
         if (changed) {
           // Update selection so next runs are faster and stable.
           setSelectedPlanUrls(planUrlsForAnalysis);
-          toast.success("Plans optimisés. Lancement de l'analyse...");
+          toast.success(t("toasts.plansOptimized"));
         }
 
         // Mode plan: analyse par lots de 1 image pour éviter timeout CPU (WORKER_LIMIT)
@@ -876,7 +878,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
       }
     } catch (error) {
       console.error("Analysis error:", error);
-      toast.error("Erreur lors de l'analyse du plan");
+      toast.error(t("toasts.analysisError"));
     } finally {
       setIsAnalyzing(false);
       setBatchProgress(null);
@@ -886,7 +888,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
   const handleApplyBudget = () => {
     if (analysis?.categories) {
       onBudgetGenerated(analysis.categories);
-      toast.success("Budget appliqué avec succès!");
+      toast.success(t("toasts.budgetApplied"));
       
       // Propose de générer l'échéancier si callback disponible
       if (onGenerateSchedule && projectId) {
@@ -1170,10 +1172,10 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
                           
                           setManualReferenceImages(prev => [...prev, urlData.publicUrl]);
                         }
-                        toast.success("Image(s) ajoutée(s) avec succès");
+                        toast.success(t("toasts.imagesAdded"));
                       } catch (error) {
                         console.error("Upload error:", error);
-                        toast.error("Erreur lors du téléchargement");
+                        toast.error(t("toasts.downloadError"));
                       } finally {
                         setIsUploadingManualImage(false);
                         if (manualImageInputRef.current) {
