@@ -1726,7 +1726,7 @@ const BuildingCode = () => {
               {/* Input */}
               <div className="flex gap-3 mt-4 pt-4 border-t">
                 <Input
-                  placeholder={askingLocation ? "Entrez votre municipalité..." : "Recherchez: garde-corps, escalier, marge avant..."}
+                  placeholder={askingLocation ? t("buildingCode.enterMunicipality") : t("buildingCode.searchPlaceholder")}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
