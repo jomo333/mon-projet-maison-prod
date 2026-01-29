@@ -891,18 +891,20 @@ const ProjectGallery = () => {
       </main>
       <Footer />
 
-      {/* Photo viewer dialog */}
+      {/* Photo viewer dialog - mobile optimized */}
       <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Photo</DialogTitle>
+        <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] p-2 sm:p-6 overflow-hidden">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="text-sm sm:text-base">Photo</DialogTitle>
           </DialogHeader>
           {selectedPhoto && (
-            <img
-              src={selectedPhoto}
-              alt="Photo agrandie"
-              className="w-full h-auto rounded-lg"
-            />
+            <div className="flex items-center justify-center overflow-auto max-h-[calc(90vh-80px)]">
+              <img
+                src={selectedPhoto}
+                alt="Photo agrandie"
+                className="max-w-full max-h-[calc(90vh-100px)] w-auto h-auto object-contain rounded-lg"
+              />
+            </div>
           )}
         </DialogContent>
       </Dialog>
