@@ -160,6 +160,33 @@ export function BudgetAnalysisResults({
     return translated === key ? name : translated;
   };
 
+  // Parse and translate project summary dynamically
+  const translateProjectSummary = (summary: string): string => {
+    // Match patterns like "Analyse fusionnée de X plan(s)" or "Merged analysis from X plan(s)"
+    const mergedMatch = summary.match(/(?:Analyse fusionnée de|Merged analysis from)\s*(\d+)\s*plan\(s\)/i);
+    // Match patterns like "Construction neuve de X pi²/sq ft sur Y étage(s)/floor(s)"
+    const constructionMatch = summary.match(/(?:Construction neuve de|New construction of)\s*([\d\s]+)\s*(?:pi²|sq ft)\s*(?:sur|on)\s*(\d+)\s*(?:étage\(s\)|floor\(s\))/i);
+    
+    let translatedSummary = "";
+    
+    if (mergedMatch) {
+      const planCount = parseInt(mergedMatch[1]);
+      translatedSummary += t("budgetAnalysis.mergedAnalysis", { count: planCount });
+    }
+    
+    if (constructionMatch) {
+      const sqft = constructionMatch[1].replace(/\s/g, '');
+      const floors = parseInt(constructionMatch[2]);
+      if (translatedSummary) translatedSummary += " - ";
+      translatedSummary += t("budgetAnalysis.newConstruction", { sqft, floors });
+    }
+    
+    // If no patterns matched, return original
+    return translatedSummary || summary;
+  };
+
+  const translatedProjectSummary = translateProjectSummary(analysis.projectSummary);
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("fr-CA", {
       style: "currency",
@@ -322,7 +349,7 @@ export function BudgetAnalysisResults({
                   </CardTitle>
                   <CardDescription className="flex items-center gap-2 mt-1">
                     <Badge variant="outline" className="text-xs">{t("budgetAnalysis.rangePlusMinus10")}</Badge>
-                    {t("budgetAnalysis.preliminaryEstimate")} • {t("budgetAnalysis.includesTaxesContingency")} • {analysis.projectSummary}
+                    {t("budgetAnalysis.preliminaryEstimate")} • {t("budgetAnalysis.includesTaxesContingency")} • {translatedProjectSummary}
                   </CardDescription>
                 </>
               ) : (
@@ -347,7 +374,7 @@ export function BudgetAnalysisResults({
                   </CardTitle>
                   <CardDescription className="flex items-center gap-1">
                     <Badge variant="outline" className="text-xs mr-1">{t("budgetAnalysis.ttc")}</Badge>
-                    {t("budgetAnalysis.includesTaxesContingency")} • {analysis.projectSummary}
+                    {t("budgetAnalysis.includesTaxesContingency")} • {translatedProjectSummary}
                   </CardDescription>
                 </>
               )}
