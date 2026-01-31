@@ -20,14 +20,14 @@ async function validateAuth(authHeader: string | null): Promise<{ userId: string
       global: { headers: { Authorization: authHeader } }
     });
     
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (claimsError || !claimsData?.claims?.sub) {
+    if (userError || !user) {
+      console.error('Auth validation failed:', userError);
       return { error: "Session invalide. Veuillez vous reconnecter.", status: 401 };
     }
     
-    return { userId: claimsData.claims.sub as string };
+    return { userId: user.id };
   } catch (err) {
     console.error('Auth validation error:', err);
     return { error: "Erreur de validation de l'authentification.", status: 500 };
@@ -46,21 +46,19 @@ async function incrementAiUsage(authHeader: string | null): Promise<void> {
       global: { headers: { Authorization: authHeader } }
     });
     
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (claimsError || !claimsData?.claims?.sub) {
-      console.log('Could not get user claims for AI usage tracking');
+    if (userError || !user) {
+      console.log('Could not get user for AI usage tracking');
       return;
     }
     
-    const userId = claimsData.claims.sub;
-    const { error } = await supabase.rpc('increment_ai_usage', { p_user_id: userId });
+    const { error } = await supabase.rpc('increment_ai_usage', { p_user_id: user.id });
     
     if (error) {
       console.error('Failed to increment AI usage:', error);
     } else {
-      console.log('AI usage incremented for user:', userId);
+      console.log('AI usage incremented for user:', user.id);
     }
   } catch (err) {
     console.error('Error tracking AI usage:', err);
@@ -78,26 +76,23 @@ async function trackAiAnalysisUsage(
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const serviceSupabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    const token = authHeader.replace('Bearer ', '');
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const userSupabase = createClient(supabaseUrl, anonKey, {
+    const userSupabase = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } }
     });
     
-    const { data: claimsData, error: claimsError } = await userSupabase.auth.getClaims(token);
+    const { data: { user }, error: userError } = await userSupabase.auth.getUser();
     
-    if (claimsError || !claimsData?.claims?.sub) {
-      console.log('Could not get user claims for AI analysis tracking');
+    if (userError || !user) {
+      console.log('Could not get user for AI analysis tracking');
       return;
     }
     
-    const userId = claimsData.claims.sub as string;
-    
-    const { error } = await supabase.from('ai_analysis_usage').insert({
-      user_id: userId,
+    const { error } = await serviceSupabase.from('ai_analysis_usage').insert({
+      user_id: user.id,
       analysis_type: analysisType,
       project_id: projectId || null,
     });
@@ -105,7 +100,7 @@ async function trackAiAnalysisUsage(
     if (error) {
       console.error('Failed to track AI analysis usage:', error);
     } else {
-      console.log('AI analysis usage tracked:', analysisType, 'for user:', userId);
+      console.log('AI analysis usage tracked:', analysisType, 'for user:', user.id);
     }
   } catch (err) {
     console.error('Error tracking AI analysis usage:', err);
