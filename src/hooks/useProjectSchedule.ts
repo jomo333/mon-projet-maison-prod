@@ -674,12 +674,19 @@ export const useProjectSchedule = (projectId: string | null) => {
     }
 
     // === Générer les alertes de mesure pour les étapes qui ont measurement_after_step_id ===
-    // Vérifier quelles étapes terminées déclenchent des alertes de mesure
+    // Vérifier quelles étapes sont terminées (incluant celle qu'on est en train de marquer comme terminée)
     const completedStepIds = new Set<string>();
+    const stepIdToSchedule = new Map<string, ScheduleItem>();
+    
     for (const s of sorted) {
+      stepIdToSchedule.set(s.step_id, s);
+      
+      // Étape déjà terminée dans la DB
       if (s.status === "completed") {
         completedStepIds.add(s.step_id);
-      } else if (s.id === focusScheduleId && focusUpdates?.status === "completed") {
+      }
+      // Étape en cours de mise à jour vers "completed" via focusUpdates
+      else if (s.id === focusScheduleId && focusUpdates?.status === "completed") {
         completedStepIds.add(s.step_id);
       }
     }
@@ -690,9 +697,14 @@ export const useProjectSchedule = (projectId: string | null) => {
         const prerequisiteCompleted = completedStepIds.has(s.measurement_after_step_id);
         
         if (prerequisiteCompleted) {
-          // Trouver la date de fin de l'étape prérequise
-          const prerequisiteSchedule = sorted.find(ps => ps.step_id === s.measurement_after_step_id);
-          const prerequisiteEndDate = prerequisiteSchedule?.end_date || format(new Date(), "yyyy-MM-dd");
+          // Trouver la date de fin de l'étape prérequise (utiliser la date mise à jour si c'est l'étape focus)
+          const prerequisiteSchedule = stepIdToSchedule.get(s.measurement_after_step_id);
+          let prerequisiteEndDate = prerequisiteSchedule?.end_date || format(new Date(), "yyyy-MM-dd");
+          
+          // Si l'étape prérequise est celle qu'on met à jour, utiliser la date de fin des focusUpdates
+          if (prerequisiteSchedule?.id === focusScheduleId && focusUpdates?.end_date) {
+            prerequisiteEndDate = focusUpdates.end_date;
+          }
           
           // Vérifier si une alerte de mesure existe déjà pour cette étape
           const { data: existingMeasurementAlerts } = await supabase
@@ -713,6 +725,14 @@ export const useProjectSchedule = (projectId: string | null) => {
               is_dismissed: false,
             });
           }
+        } else {
+          // Si le prérequis n'est PAS terminé, supprimer les alertes de mesure existantes
+          // (cas où on a annulé la complétion du prérequis)
+          await supabase
+            .from("schedule_alerts")
+            .delete()
+            .eq("schedule_id", s.id)
+            .eq("alert_type", "measurement");
         }
       }
     }
