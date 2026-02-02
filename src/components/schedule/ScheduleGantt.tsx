@@ -296,9 +296,9 @@ export const ScheduleGantt = ({ schedules, conflicts, onRegenerateSchedule, isUp
                   className="flex items-center border-b"
                   style={{ height: rowHeight }}
                 >
-                  {/* Nom de l'étape */}
+                  {/* Nom de l'étape - z-30 pour passer au-dessus des barres (z-20) */}
                   <div
-                    className="sticky left-0 z-10 bg-background px-2 flex items-center gap-2 border-r"
+                    className="sticky left-0 z-30 bg-background px-2 flex items-center gap-2 border-r shadow-sm"
                     style={{ width: 250, minWidth: 250 }}
                   >
                     <div
