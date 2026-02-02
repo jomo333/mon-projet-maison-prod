@@ -47,9 +47,6 @@ export function CTA() {
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <p className="text-sm text-white/60">
-                Aucune carte de crédit requise
-              </p>
             </div>
           </div>
         </div>

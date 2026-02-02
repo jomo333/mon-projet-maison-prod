@@ -441,8 +441,7 @@
   "cta": {
     "title": "Prêt à commencer votre projet ?",
     "subtitle": "Rejoignez les autoconstructeurs qui gèrent leur projet avec confiance.",
-    "button": "Démarrer mon projet gratuitement",
-    "noCreditCard": "Aucune carte de crédit requise"
+    "button": "Démarrer mon projet gratuitement"
   },
   "ctaBenefits": {
     "planning": "Planification étape par étape",

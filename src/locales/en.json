@@ -441,8 +441,7 @@
   "cta": {
     "title": "Ready to start your project?",
     "subtitle": "Join owner-builders who manage their projects with confidence.",
-    "button": "Start my project for free",
-    "noCreditCard": "No credit card required"
+    "button": "Start my project for free"
   },
   "ctaBenefits": {
     "planning": "Step-by-step planning",

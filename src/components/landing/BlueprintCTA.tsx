@@ -66,9 +66,6 @@ export function BlueprintCTA() {
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <p className="text-sm text-slate-400">
-                {t("cta.noCreditCard", "Aucune carte de crédit requise")}
-              </p>
             </div>
           </div>
         </div>
