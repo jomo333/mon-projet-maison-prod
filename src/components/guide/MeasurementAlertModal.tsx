@@ -70,7 +70,11 @@ const reminderOptions: ReminderOption[] = [
   { labelKey: "2weeks", getValue: () => addWeeks(new Date(), 2).getTime() },
 ];
 
+const getAlertFingerprint = (alert: ScheduleAlert) =>
+  `${alert.alert_type}|${alert.schedule_id}|${alert.alert_date}`;
+
 // Helper to load acknowledged alerts from localStorage synchronously
+// NOTE: We store both alert.id and a stable fingerprint so regenerated alerts don't reappear.
 const getStoredAcknowledgedAlerts = (projectId: string | undefined): Set<string> => {
   if (!projectId) return new Set();
   const acknowledgedKey = `acknowledged_alerts_${projectId}`;
@@ -100,14 +104,29 @@ export const MeasurementAlertModal = ({ alerts, projectId }: MeasurementAlertMod
     setAcknowledgedAlerts(getStoredAcknowledgedAlerts(projectId));
   }, [projectId]);
 
+  const isAcknowledged = (alert: ScheduleAlert) => {
+    const fingerprint = getAlertFingerprint(alert);
+    return acknowledgedAlerts.has(alert.id) || acknowledgedAlerts.has(fingerprint);
+  };
+
   // Filter alerts: not dismissed in DB, and not already acknowledged by user
   const activeAlerts = alerts.filter(
-    (alert) => !alert.is_dismissed && !acknowledgedAlerts.has(alert.id)
+    (alert) => !alert.is_dismissed && !isAcknowledged(alert)
   );
+
+  // Deduplicate alerts (some sync paths can create duplicates).
+  const visibleAlerts: ScheduleAlert[] = [];
+  const seenFingerprints = new Set<string>();
+  for (const alert of activeAlerts) {
+    const fingerprint = getAlertFingerprint(alert);
+    if (seenFingerprints.has(fingerprint)) continue;
+    seenFingerprints.add(fingerprint);
+    visibleAlerts.push(alert);
+  }
 
   // Check if we should show the modal
   useEffect(() => {
-    if (activeAlerts.length > 0 && projectId) {
+    if (visibleAlerts.length > 0 && projectId) {
       // Check localStorage to see if we've snoozed
       const snoozeKey = `alert_modal_snooze_${projectId}`;
       const snoozeUntil = localStorage.getItem(snoozeKey);
@@ -121,7 +140,7 @@ export const MeasurementAlertModal = ({ alerts, projectId }: MeasurementAlertMod
       // Show modal immediately if there are new alerts
       setIsOpen(true);
     }
-  }, [activeAlerts.length, projectId]);
+  }, [visibleAlerts.length, projectId]);
 
   const getAlertUrgency = (alertDate: string) => {
     const date = parseISO(alertDate);
@@ -134,7 +153,7 @@ export const MeasurementAlertModal = ({ alerts, projectId }: MeasurementAlertMod
     return { level: "upcoming", labelKey: "upcoming", variant: "secondary" as const };
   };
 
-  if (activeAlerts.length === 0) {
+  if (visibleAlerts.length === 0) {
     return null;
   }
 
@@ -142,7 +161,10 @@ export const MeasurementAlertModal = ({ alerts, projectId }: MeasurementAlertMod
     // Permanently acknowledge all currently shown alerts
     if (projectId) {
       const newAcknowledged = new Set(acknowledgedAlerts);
-      activeAlerts.forEach((alert) => newAcknowledged.add(alert.id));
+      visibleAlerts.forEach((alert) => {
+        newAcknowledged.add(alert.id);
+        newAcknowledged.add(getAlertFingerprint(alert));
+      });
       setAcknowledgedAlerts(newAcknowledged);
       
       // Persist to localStorage
@@ -169,7 +191,7 @@ export const MeasurementAlertModal = ({ alerts, projectId }: MeasurementAlertMod
               <Bell className="h-6 w-6" />
             </div>
             <span className="text-amber-800 dark:text-amber-300">
-              {t("schedule.alertsTitle")} ({activeAlerts.length})
+              {t("schedule.alertsTitle")} ({visibleAlerts.length})
             </span>
           </AlertDialogTitle>
           <AlertDialogDescription className="text-amber-700 dark:text-amber-400 text-base">
@@ -178,7 +200,7 @@ export const MeasurementAlertModal = ({ alerts, projectId }: MeasurementAlertMod
         </AlertDialogHeader>
 
         <div className="space-y-3 my-4 max-h-[50vh] overflow-y-auto">
-          {activeAlerts.map((alert) => {
+          {visibleAlerts.map((alert) => {
             const config = alertTypeConfig[alert.alert_type];
             const urgency = getAlertUrgency(alert.alert_date);
             const Icon = config?.icon || Bell;
