@@ -673,7 +673,9 @@
       "confirmed": "Confirmé",
       "supplier": "Fournisseur",
       "amount": "Montant",
-      "leadDays": "Préavis"
+      "leadDays": "Préavis",
+      "singleMode": "Soumission unique",
+      "singleModeDescription": "Un seul sous-traitant exécute toutes les tâches de cette étape. Téléchargez la soumission et sélectionnez le fournisseur retenu ci-dessous."
     }
   },
   "analysisFullView": {

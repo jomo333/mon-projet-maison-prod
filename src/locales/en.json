@@ -673,7 +673,9 @@
       "confirmed": "Confirmed",
       "supplier": "Supplier",
       "amount": "Amount",
-      "leadDays": "Lead time"
+      "leadDays": "Lead time",
+      "singleMode": "Single submission",
+      "singleModeDescription": "A single subcontractor performs all tasks for this step. Upload the quote and select the retained supplier below."
     }
   },
   "analysisFullView": {

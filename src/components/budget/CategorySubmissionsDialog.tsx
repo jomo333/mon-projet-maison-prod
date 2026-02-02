@@ -149,7 +149,8 @@ export function CategorySubmissionsDialog({
   const [viewingSubCategory, setViewingSubCategory] = useState(false);
   
   // Task-based organization state
-  const [viewMode, setViewMode] = useState<'subcategories' | 'tasks'>('tasks');
+  // 'single' = one submission for all tasks, 'tasks' = per-task, 'subcategories' = custom sub-categories
+  const [viewMode, setViewMode] = useState<'single' | 'subcategories' | 'tasks'>('single');
   const [activeTaskTitle, setActiveTaskTitle] = useState<string | null>(null);
   const categoryTasks = getTasksForCategory(categoryName);
 
@@ -159,7 +160,11 @@ export function CategorySubmissionsDialog({
 
   // Get the current task ID (main category, sub-category, or task-based)
   const getCurrentTaskId = () => {
-    if (activeTaskTitle) {
+    // In 'single' mode, always use the main category task ID
+    if (viewMode === 'single') {
+      return `soumission-${tradeId}`;
+    }
+    if (activeTaskTitle && viewMode === 'tasks') {
       // Sanitize task title for use as ID
       const sanitizedTaskTitle = activeTaskTitle
         .toLowerCase()
@@ -191,16 +196,13 @@ export function CategorySubmissionsDialog({
       setViewingSubCategory(false);
       setDiyAnalysisResult(null);
       setShowDIYAnalysis(false);
-      // Set default active task if tasks exist
-      if (categoryTasks.length > 0) {
-        setActiveTaskTitle(categoryTasks[0].taskTitle);
-        setViewMode('tasks');
-      } else {
-        setActiveTaskTitle(null);
-        setViewMode('subcategories');
-      }
+      // Default to 'single' mode (one submission for all tasks)
+      // User can switch to 'tasks' mode if they want per-task submissions
+      setViewMode('single');
+      setActiveTaskTitle(null);
+      setActiveSubCategoryId(null);
     }
-  }, [open, currentBudget, currentSpent, categoryTasks]);
+  }, [open, currentBudget, currentSpent]);
   
   // Fetch sub-categories for this category
   const { data: savedSubCategories = [] } = useQuery({
@@ -1150,8 +1152,53 @@ export function CategorySubmissionsDialog({
     const budgetValue = parseFloat(budget) || 0;
     let finalSpentValue = parseFloat(spent) || parseFloat(selectedAmount) || 0;
     
+    // If we're in 'single' mode or have a supplier set for the main category
+    if (viewMode === 'single' && supplierName) {
+      // Save main category supplier info
+      const notes = JSON.stringify({
+        supplierName,
+        supplierPhone,
+        contactPerson,
+        contactPersonPhone,
+        supplierLeadDays,
+        amount: selectedAmount,
+        hasAnalysis: !!analysisResult,
+        isCompleted: true,
+        mode: 'single',
+      });
+
+      const { data: existing } = await supabase
+        .from('task_dates')
+        .select('id')
+        .eq('project_id', projectId)
+        .eq('step_id', 'soumissions')
+        .eq('task_id', currentTaskId)
+        .maybeSingle();
+
+      if (existing) {
+        await supabase
+          .from('task_dates')
+          .update({ notes })
+          .eq('id', existing.id);
+      } else {
+        await supabase
+          .from('task_dates')
+          .insert({
+            project_id: projectId,
+            step_id: 'soumissions',
+            task_id: currentTaskId,
+            notes,
+          });
+      }
+      
+      finalSpentValue = parseFloat(selectedAmount) || finalSpentValue;
+      setSpent(finalSpentValue.toString());
+      
+      // Invalidate supplier status query
+      queryClient.invalidateQueries({ queryKey: ['supplier-status', projectId, currentTaskId] });
+    }
     // If we're in task-based mode with an active task
-    if (activeTaskTitle && supplierName) {
+    else if (viewMode === 'tasks' && activeTaskTitle && supplierName) {
       const taskAmount = parseFloat(selectedAmount) || 0;
       
       // Save task-based supplier info
@@ -1429,58 +1476,69 @@ export function CategorySubmissionsDialog({
               </div>
             )}
             
-            {/* Task-based or Sub-Categories Section - Only show on main view */}
+            {/* Submission Mode Section - Only show on main view */}
             {!viewingSubCategory && (
               <div className="space-y-4">
-                {/* View mode tabs when tasks are available */}
-                {categoryTasks.length > 0 && (
-                  <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'tasks' | 'subcategories')} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
+                {/* View mode selector */}
+                <Tabs value={viewMode} onValueChange={(v) => {
+                  setViewMode(v as 'single' | 'tasks' | 'subcategories');
+                  // Reset active selections when switching modes
+                  if (v === 'single') {
+                    setActiveTaskTitle(null);
+                    setActiveSubCategoryId(null);
+                  } else if (v === 'tasks' && categoryTasks.length > 0) {
+                    setActiveTaskTitle(categoryTasks[0].taskTitle);
+                    setActiveSubCategoryId(null);
+                  } else if (v === 'subcategories') {
+                    setActiveTaskTitle(null);
+                  }
+                }} className="w-full">
+                  <TabsList className={`grid w-full ${categoryTasks.length > 0 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                    <TabsTrigger value="single" className="text-xs sm:text-sm">
+                      {t("categorySubmissions.taskSubmissions.singleMode")}
+                    </TabsTrigger>
+                    {categoryTasks.length > 0 && (
                       <TabsTrigger value="tasks" className="text-xs sm:text-sm">
-                        Par tâche ({categoryTasks.length})
+                        {t("categorySubmissions.taskSubmissions.byTask")} ({categoryTasks.length})
                       </TabsTrigger>
-                      <TabsTrigger value="subcategories" className="text-xs sm:text-sm">
-                        Sous-catégories ({subCategories.length})
-                      </TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="tasks" className="mt-4">
-                      <TaskSubmissionsTabs
-                        categoryName={categoryName}
-                        tasks={categoryTasks}
-                        taskSubmissions={taskSubmissionsData}
-                        activeTaskTitle={activeTaskTitle}
-                        onSelectTask={(title) => {
-                          setActiveTaskTitle(title);
-                          setActiveSubCategoryId(null);
-                        }}
-                      />
-                    </TabsContent>
-                    
-                    <TabsContent value="subcategories" className="mt-4">
-                      <SubCategoryManager
-                        subCategories={subCategories}
-                        onAddSubCategory={handleAddSubCategory}
-                        onRemoveSubCategory={handleRemoveSubCategory}
-                        onSelectSubCategory={handleSelectSubCategory}
-                        activeSubCategoryId={activeSubCategoryId}
-                        categoryName={categoryName}
-                      />
-                    </TabsContent>
-                  </Tabs>
-                )}
-                
-                {/* Only show SubCategoryManager if no tasks available */}
-                {categoryTasks.length === 0 && (
-                  <SubCategoryManager
-                    subCategories={subCategories}
-                    onAddSubCategory={handleAddSubCategory}
-                    onRemoveSubCategory={handleRemoveSubCategory}
-                    onSelectSubCategory={handleSelectSubCategory}
-                    activeSubCategoryId={activeSubCategoryId}
-                    categoryName={categoryName}
-                  />
-                )}
+                    )}
+                    <TabsTrigger value="subcategories" className="text-xs sm:text-sm">
+                      {t("categorySubmissions.taskSubmissions.bySubcategory")} ({subCategories.length})
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="single" className="mt-4">
+                    <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+                      <p className="text-sm text-muted-foreground">
+                        {t("categorySubmissions.taskSubmissions.singleModeDescription")}
+                      </p>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="tasks" className="mt-4">
+                    <TaskSubmissionsTabs
+                      categoryName={categoryName}
+                      tasks={categoryTasks}
+                      taskSubmissions={taskSubmissionsData}
+                      activeTaskTitle={activeTaskTitle}
+                      onSelectTask={(title) => {
+                        setActiveTaskTitle(title);
+                        setActiveSubCategoryId(null);
+                      }}
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="subcategories" className="mt-4">
+                    <SubCategoryManager
+                      subCategories={subCategories}
+                      onAddSubCategory={handleAddSubCategory}
+                      onRemoveSubCategory={handleRemoveSubCategory}
+                      onSelectSubCategory={handleSelectSubCategory}
+                      activeSubCategoryId={activeSubCategoryId}
+                      categoryName={categoryName}
+                    />
+                  </TabsContent>
+                </Tabs>
               </div>
             )}
 
