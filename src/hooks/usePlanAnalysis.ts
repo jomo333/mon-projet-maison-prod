@@ -105,6 +105,23 @@ async function uploadPlanFile(
   file: File,
   projectId: string | null | undefined
 ): Promise<string> {
+  // Check if a file with the same name already exists for this project
+  if (projectId) {
+    const { data: existingFile } = await supabase
+      .from("task_attachments")
+      .select("file_url")
+      .eq("project_id", projectId)
+      .eq("step_id", "budget")
+      .eq("file_name", file.name)
+      .eq("category", "plan")
+      .maybeSingle();
+
+    if (existingFile) {
+      // File already exists, return existing URL instead of creating duplicate
+      return existingFile.file_url;
+    }
+  }
+
   const fileExt = file.name.split(".").pop();
   const fileName = `budget-plans/${Date.now()}.${fileExt}`;
 
