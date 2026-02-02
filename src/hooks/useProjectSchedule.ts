@@ -502,24 +502,21 @@ export const useProjectSchedule = (projectId: string | null) => {
           const manualStart = parseISO(s.start_date);
           
           // Vérifier s'il y a conflit avec le cursor (juste pour avertir)
-          // N'afficher l'avertissement que si le chevauchement est > 1 jour
-          // (1 jour de chevauchement est toléré pour configuration manuelle)
+          // Afficher l'avertissement seulement si la date est verrouillée (is_manual_date)
           if (cursor && manualStart < cursor) {
             const daysConflict = Math.ceil((cursor.getTime() - manualStart.getTime()) / (1000 * 60 * 60 * 24));
-            if (daysConflict > 1 && directConflictWarning.length === 0) {
+            if (directConflictWarning.length === 0) {
               directConflictWarning.push(
                 `"${s.step_name}" a une date verrouillée (${format(manualStart, "d MMM yyyy", { locale: fr })}) ` +
                 `qui chevauche l'étape précédente (${daysConflict} jour(s) de conflit).`
               );
             }
-            // Collecter pour créer une alerte de contact sous-traitant (retard) seulement si > 1 jour
-            if (daysConflict > 1) {
-              subcontractorsToContact.push({
-                schedule: s,
-                reason: "delay",
-                daysDiff: daysConflict,
-              });
-            }
+            // Collecter pour créer une alerte de contact sous-traitant (retard)
+            subcontractorsToContact.push({
+              schedule: s,
+              reason: "delay",
+              daysDiff: daysConflict,
+            });
           } else if (cursor && manualStart > cursor) {
             // L'échéancier est en avance - le sous-traitant pourrait commencer plus tôt
             const daysAdvance = Math.ceil((manualStart.getTime() - cursor.getTime()) / (1000 * 60 * 60 * 24));
