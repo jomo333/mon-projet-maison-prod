@@ -114,18 +114,20 @@ export const translateAlertMessage = (message: string, lang: string): string => 
 
   // Supplier call alerts - New format with full details
   if (message.includes("📞 Contacter") && message.includes("pour planifier")) {
-    // Pattern: 📞 Contacter X pour planifier "Y" - Début des travaux prévu le Z (préavis de N jours)
+    // Pattern: 📞 Contacter X pour planifier "Y" - Début des travaux prévu le Z (préavis de N jours) (Contact: Person - Phone)
     const supplierMatch = message.match(/📞 Contacter (.+?) pour planifier/);
     const stepMatch = message.match(/pour planifier "([^"]+)"/);
     const dateMatch = message.match(/prévu le (.+?) \(préavis/);
     const leadDaysMatch = message.match(/\(préavis de (\d+) jours\)/);
+    const contactMatch = message.match(/\(Contact: ([^)]+)\)/);
     
     const supplierName = supplierMatch ? supplierMatch[1] : "the supplier";
     const stepName = stepMatch ? translateScheduleStepName(stepMatch[1]) : "";
     const startDate = dateMatch ? translateFrenchDate(dateMatch[1]) : "";
     const leadDays = leadDaysMatch ? leadDaysMatch[1] : "";
+    const contactInfo = contactMatch ? ` (Contact: ${contactMatch[1]})` : "";
     
-    return `📞 Contact ${supplierName} to schedule "${stepName}" - Work starts on ${startDate} (${leadDays}-day notice)`;
+    return `📞 Contact ${supplierName} to schedule "${stepName}" - Work starts on ${startDate} (${leadDays}-day notice)${contactInfo}`;
   }
 
   // Supplier call alerts - Legacy format "Appeler le fournisseur pour X"

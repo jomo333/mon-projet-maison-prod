@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { getSignedUrl } from "@/hooks/useSignedUrl";
 import { useTranslation } from "react-i18next";
+import { useProjectSchedule } from "@/hooks/useProjectSchedule";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -103,6 +104,9 @@ export function CategorySubmissionsDialog({
   onSave,
 }: CategorySubmissionsDialogProps) {
   const { t } = useTranslation();
+  
+  // Get syncAlertsFromSoumissions from useProjectSchedule
+  const { syncAlertsFromSoumissions } = useProjectSchedule(projectId);
   
   // Helper function to translate budget category names
   const translateCategoryName = (name: string): string => {
@@ -1155,8 +1159,17 @@ export function CategorySubmissionsDialog({
     queryClient.invalidateQueries({ queryKey: ['category-docs', projectId, currentTaskId] });
     queryClient.invalidateQueries({ queryKey: ['sub-categories', projectId, tradeId] });
     
+    // Sync alerts from soumissions if we have lead days configured
+    if (supplierLeadDays && supplierLeadDays > 0) {
+      try {
+        await syncAlertsFromSoumissions();
+      } catch (e) {
+        console.error("Error syncing alerts:", e);
+      }
+    }
+    
     if (!saveAnalysis) {
-      toast.success(activeSubCategoryId ? "Sous-catégorie mise à jour" : "Catégorie mise à jour");
+      toast.success(activeSubCategoryId ? t("toasts.subCategoryUpdated") : t("toasts.categoryUpdated"));
     }
     
     // Only close dialog if not keeping it open

@@ -80,6 +80,7 @@ const Schedule = () => {
     deleteSchedule,
     dismissAlert,
     generateAlerts,
+    syncAlertsFromSoumissions,
     calculateEndDate,
     checkConflicts,
     completeStep,
@@ -87,6 +88,20 @@ const Schedule = () => {
     updateScheduleAndRecalculate,
     regenerateSchedule,
   } = useProjectSchedule(selectedProjectId);
+
+  // Auto-sync alerts from soumissions when schedules are loaded
+  const [hasSyncedAlerts, setHasSyncedAlerts] = useState(false);
+  useEffect(() => {
+    if (selectedProjectId && schedules.length > 0 && !hasSyncedAlerts && !isLoading) {
+      setHasSyncedAlerts(true);
+      syncAlertsFromSoumissions().catch(console.error);
+    }
+  }, [selectedProjectId, schedules.length, hasSyncedAlerts, isLoading, syncAlertsFromSoumissions]);
+  
+  // Reset sync flag when project changes
+  useEffect(() => {
+    setHasSyncedAlerts(false);
+  }, [selectedProjectId]);
 
   const conflicts = checkConflicts(schedules);
 

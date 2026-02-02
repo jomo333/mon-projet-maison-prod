@@ -64,6 +64,35 @@ const minimumDelayAfterStep: Record<string, { afterStep: string; days: number; r
 // Ces étapes commencent après leur étape prérequise mais n'affectent pas la séquence des travaux intérieurs
 const parallelSteps: Set<string> = new Set(["exterieur"]);
 
+// Mapping soumission trade ID -> schedule step_id
+const soumissionTradeToStepId: Record<string, string> = {
+  "chauffage-et-ventilation": "hvac",
+  "hvac": "hvac",
+  "plomberie": "plomberie-roughin",
+  "electricite": "electricite-roughin",
+  "toiture": "toiture",
+  "fenetres-et-portes": "fenetre",
+  "charpente": "structure",
+  "excavation": "fondation",
+  "fondation": "fondation",
+  "isolation-et-pare-vapeur": "isolation",
+  "isolation": "isolation",
+  "revetement-exterieur": "exterieur",
+  "exterieur": "exterieur",
+  "gypse-et-peinture": "gypse",
+  "gypse": "gypse",
+  "peinture": "gypse",
+  "revetements-de-sol": "plancher",
+  "plancher": "plancher",
+  "travaux-ebenisterie-(cuisine/sdb)": "cuisine-sdb",
+  "armoires": "cuisine-sdb",
+  "finitions-interieures": "finitions",
+  "finitions": "finitions",
+  "ceramique": "finitions",
+  "comptoirs": "cuisine-sdb",
+  "amenagement": "finitions",
+};
+
 export const useProjectSchedule = (projectId: string | null) => {
   const queryClient = useQueryClient();
 
@@ -284,6 +313,117 @@ export const useProjectSchedule = (projectId: string | null) => {
     for (const alert of alerts) {
       await createAlertMutation.mutateAsync(alert);
     }
+  };
+
+  /**
+   * Synchronize supplier call alerts from soumissions (task_dates) data.
+   * This reads all soumissions with supplierLeadDays and creates alerts for each.
+   */
+  const syncAlertsFromSoumissions = async () => {
+    if (!projectId) return;
+
+    // 1. Fetch all soumission task_dates with notes
+    const { data: soumissions, error: soumissionsError } = await supabase
+      .from("task_dates")
+      .select("task_id, notes")
+      .eq("project_id", projectId)
+      .eq("step_id", "soumissions")
+      .like("task_id", "soumission-%");
+
+    if (soumissionsError) {
+      console.error("Error fetching soumissions:", soumissionsError);
+      return;
+    }
+
+    // 2. Get current schedules
+    const schedules = schedulesQuery.data || [];
+
+    // 3. Process each soumission
+    const alertsToCreate: Omit<ScheduleAlert, 'id' | 'created_at'>[] = [];
+
+    for (const soumission of soumissions || []) {
+      if (!soumission.notes) continue;
+
+      let notes: {
+        supplierName?: string;
+        supplierPhone?: string;
+        contactPerson?: string;
+        supplierLeadDays?: number;
+        isCompleted?: boolean;
+      };
+
+      try {
+        notes = JSON.parse(soumission.notes);
+      } catch {
+        continue;
+      }
+
+      // Skip if no supplier selected or no lead days
+      if (!notes.supplierName || !notes.supplierLeadDays || notes.supplierLeadDays <= 0) {
+        continue;
+      }
+
+      // Extract trade ID from task_id (e.g., "soumission-chauffage-et-ventilation" -> "chauffage-et-ventilation")
+      const tradeId = soumission.task_id.replace("soumission-", "");
+      
+      // Skip sub-categories
+      if (tradeId.includes("-sub-")) continue;
+
+      // Map to schedule step_id
+      const stepId = soumissionTradeToStepId[tradeId];
+      if (!stepId) {
+        console.log(`No step mapping for trade: ${tradeId}`);
+        continue;
+      }
+
+      // Find the corresponding schedule
+      const schedule = schedules.find(s => s.step_id === stepId);
+      if (!schedule || !schedule.start_date) {
+        continue;
+      }
+
+      // Calculate alert date
+      const startDate = parseISO(schedule.start_date);
+      const alertDate = subBusinessDays(startDate, notes.supplierLeadDays);
+      const formattedStartDate = format(startDate, "d MMMM yyyy", { locale: fr });
+
+      // Build contact info string
+      const contactInfo = notes.contactPerson 
+        ? ` (Contact: ${notes.contactPerson}${notes.supplierPhone ? ` - ${notes.supplierPhone}` : ""})`
+        : notes.supplierPhone 
+          ? ` (${notes.supplierPhone})`
+          : "";
+
+      alertsToCreate.push({
+        project_id: projectId,
+        schedule_id: schedule.id,
+        alert_type: "supplier_call",
+        alert_date: format(alertDate, "yyyy-MM-dd"),
+        message: `📞 Contacter ${notes.supplierName} pour planifier "${schedule.step_name}" - Début des travaux prévu le ${formattedStartDate} (préavis de ${notes.supplierLeadDays} jours)${contactInfo}`,
+        is_dismissed: false,
+      });
+    }
+
+    // 4. Delete existing supplier_call alerts and recreate
+    const scheduleIds = schedules.map(s => s.id);
+    if (scheduleIds.length > 0) {
+      await supabase
+        .from("schedule_alerts")
+        .delete()
+        .eq("project_id", projectId)
+        .eq("alert_type", "supplier_call")
+        .in("schedule_id", scheduleIds);
+    }
+
+    // 5. Create new alerts
+    for (const alert of alertsToCreate) {
+      await createAlertMutation.mutateAsync(alert);
+    }
+
+    // Invalidate alerts query to refresh UI
+    queryClient.invalidateQueries({ queryKey: ["schedule-alerts", projectId] });
+
+    return alertsToCreate.length;
   };
 
   const calculateEndDate = (startDate: string, days: number): string => {
@@ -1419,6 +1559,7 @@ export const useProjectSchedule = (projectId: string | null) => {
     deleteSchedule: deleteScheduleMutation.mutate,
     dismissAlert: dismissAlertMutation.mutate,
     generateAlerts,
+    syncAlertsFromSoumissions,
     calculateEndDate,
     checkConflicts,
     recalculateScheduleFromCompleted,
