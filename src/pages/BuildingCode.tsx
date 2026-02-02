@@ -919,7 +919,7 @@ const BuildingCode = () => {
                                         {result.consultPro.map((condition, i) => (
                                           <li key={i} className="flex items-start gap-2">
                                             <span className="text-accent-foreground mt-0.5">→</span>
-                                            <span>{t("buildingCode.results.ifCondition")} {condition.toLowerCase()}</span>
+                                            <span>{condition}</span>
                                           </li>
                                         ))}
                                       </ul>
