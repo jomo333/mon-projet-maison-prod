@@ -935,57 +935,62 @@ const Budget = () => {
                         onOpenChange={() => toggleCategory(category.name)}
                       >
                         <div className="rounded-lg border hover:bg-muted/50 transition-colors">
-                          <CollapsibleTrigger asChild>
-                            <div className="flex items-center gap-4 p-3 cursor-pointer">
-                              <div
-                                className="w-4 h-4 rounded shrink-0"
-                                style={{ backgroundColor: category.color }}
-                              />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium truncate">{translateCategoryName(category.name)}</span>
-                                  {isOverBudget && (
-                                    <Badge variant="destructive" className="text-xs">
-                                      <AlertTriangle className="h-3 w-3 mr-1" />
-                                      {t("budget.exceeded")}
-                                    </Badge>
-                                  )}
-                                  {isNearLimit && (
-                                    <Badge variant="secondary" className="text-xs bg-warning/10 text-warning">
-                                      {t("common.warning")}
-                                    </Badge>
-                                  )}
-                                </div>
-                                <Progress
-                                  value={Math.min(percent, 100)}
-                                  className="mt-2 h-1.5"
+                          <div className="flex items-center gap-4 p-3">
+                            <CollapsibleTrigger asChild>
+                              <div className="flex items-center gap-4 flex-1 min-w-0 cursor-pointer">
+                                <div
+                                  className="w-4 h-4 rounded shrink-0"
+                                  style={{ backgroundColor: category.color }}
                                 />
-                              </div>
-                              <div className="text-right shrink-0">
-                                <div className="text-sm font-medium">
-                                  {category.spent.toLocaleString()} $
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium truncate">{translateCategoryName(category.name)}</span>
+                                    {isOverBudget && (
+                                      <Badge variant="destructive" className="text-xs">
+                                        <AlertTriangle className="h-3 w-3 mr-1" />
+                                        {t("budget.exceeded")}
+                                      </Badge>
+                                    )}
+                                    {isNearLimit && (
+                                      <Badge variant="secondary" className="text-xs bg-warning/10 text-warning">
+                                        {t("common.warning")}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <Progress
+                                    value={Math.min(percent, 100)}
+                                    className="mt-2 h-1.5"
+                                  />
                                 </div>
-                                <div className="text-xs text-muted-foreground">
-                                  / {Math.round(category.budget * 0.90).toLocaleString()} - {Math.round(category.budget * 1.10).toLocaleString()} $
+                                <div className="text-right shrink-0">
+                                  <div className="text-sm font-medium">
+                                    {category.spent.toLocaleString()} $
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    / {Math.round(category.budget * 0.90).toLocaleString()} - {Math.round(category.budget * 1.10).toLocaleString()} $
+                                  </div>
+                                </div>
+                                <div className="shrink-0">
+                                  {isExpanded ? (
+                                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                                  ) : (
+                                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                  )}
                                 </div>
                               </div>
-                              <div className="flex items-center gap-1 shrink-0">
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon" 
-                                  onClick={(e) => handleEditCategory(category, e)}
-                                  title={t("budget.manageBudgetSubmissions")}
-                                >
-                                  <Edit2 className="h-4 w-4" />
-                                </Button>
-                                {isExpanded ? (
-                                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                                ) : (
-                                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                                )}
-                              </div>
-                            </div>
-                          </CollapsibleTrigger>
+                            </CollapsibleTrigger>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditCategory(category, e);
+                              }}
+                              title={t("budget.manageBudgetSubmissions")}
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                           
                           <CollapsibleContent>
                             <div className="px-4 pb-3 pt-3 border-t bg-muted/30 space-y-4">
