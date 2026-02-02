@@ -1,5 +1,6 @@
 {
   "common": {
+    "understood": "J'ai compris",
     "locale": "fr-CA",
     "loading": "Chargement...",
     "save": "Enregistrer",
@@ -1090,7 +1091,9 @@
     "delayReasons": {
       "concreteCuring": "Cure du béton des fondations (minimum 3 semaines)",
       "exteriorAfterElectrical": "Le revêtement extérieur peut commencer après l'électricité rough-in"
-    }
+    },
+    "alertsTitle": "Rappels importants",
+    "alertsModalDescription": "Ces rappels vous aident à coordonner vos sous-traitants. Contactez-les dès que possible pour confirmer les dates."
   },
   "guide": {
     "title": "Guide de construction",

@@ -1,5 +1,6 @@
 {
   "common": {
+    "understood": "Got it",
     "locale": "en-CA",
     "loading": "Loading...",
     "save": "Save",
@@ -1090,7 +1091,9 @@
     "delayReasons": {
       "concreteCuring": "Foundation concrete curing (minimum 3 weeks)",
       "exteriorAfterElectrical": "Exterior cladding can begin after electrical rough-in"
-    }
+    },
+    "alertsTitle": "Important Reminders",
+    "alertsModalDescription": "These reminders help you coordinate your subcontractors. Contact them as soon as possible to confirm dates."
   },
   "guide": {
     "title": "Construction Guide",

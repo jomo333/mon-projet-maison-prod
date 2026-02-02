@@ -8,6 +8,7 @@ import { useConstructionSteps, usePhases } from "@/hooks/useConstructionSteps";
 import { StepCard } from "@/components/guide/StepCard";
 import { StepDetail } from "@/components/guide/StepDetail";
 import { ScheduleDatesBanner } from "@/components/guide/ScheduleDatesBanner";
+import { MeasurementAlertModal } from "@/components/guide/MeasurementAlertModal";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -73,8 +74,8 @@ const ConstructionGuide = () => {
     enabled: !!projectId,
   });
 
-  // Hook pour recalculer l'échéancier
-  const { regenerateSchedule, isUpdating } = useProjectSchedule(projectId);
+  // Hook pour recalculer l'échéancier et récupérer les alertes
+  const { regenerateSchedule, isUpdating, alerts } = useProjectSchedule(projectId);
 
   // Set initial step from URL if provided
   useEffect(() => {
@@ -153,6 +154,10 @@ const ConstructionGuide = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
+      
+      {/* Alert Modal - visible au centre de l'écran */}
+      <MeasurementAlertModal alerts={alerts} projectId={projectId || undefined} />
+      
       <main className="flex-1 py-8">
         <div className="container">
           <div className="mb-8 flex items-start justify-between">
