@@ -14,7 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ArrowLeft, Home, Calendar, ChevronRight, AlertTriangle, X, Camera, FileText, HelpCircle, Phone, Bell } from "lucide-react";
+import { ArrowLeft, Home, Calendar, ChevronRight, AlertTriangle, X, Camera, FileText, HelpCircle, Phone, Bell, Lock, Info } from "lucide-react";
 import { format, parseISO, isPast, isToday, isBefore, addDays } from "date-fns";
 import { Link } from "react-router-dom";
 import {
@@ -626,6 +626,8 @@ const Dashboard = () => {
                           ? `tel:${supplierPhone.replace(/[^0-9+]/g, "")}`
                           : undefined;
                         
+                        const isDateLocked = schedule?.is_manual_date === true;
+                        
                         return (
                           <div
                             key={alert.id}
@@ -652,6 +654,12 @@ const Dashboard = () => {
                                 <span className="text-xs text-muted-foreground">
                                   {format(alertDate, "EEEE d MMMM", { locale: dateLocale })}
                                 </span>
+                                {isDateLocked && (
+                                  <Badge variant="outline" className="text-xs gap-1 border-primary/50 text-primary">
+                                    <Lock className="h-3 w-3" />
+                                    {t("dashboard.supplierAlerts.dateLocked")}
+                                  </Badge>
+                                )}
                               </div>
                               <p className="text-sm font-medium">
                                 {translateAlertMessage(alert.message, i18n.language)}
@@ -700,6 +708,26 @@ const Dashboard = () => {
                         );
                       })}
                     </div>
+                    
+                    {/* Note to lock dates - only show if at least one alert has an unlocked date */}
+                    {(() => {
+                      const hasUnlockedAlerts = urgentAlerts.some(alert => {
+                        const schedule = scheduleById.get(alert.schedule_id);
+                        return schedule && !schedule.is_manual_date;
+                      });
+                      
+                      if (!hasUnlockedAlerts) return null;
+                      
+                      return (
+                        <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-muted flex items-start gap-2">
+                          <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                          <p className="text-xs text-muted-foreground">
+                            {t("dashboard.supplierAlerts.lockDateNote")}
+                          </p>
+                        </div>
+                      );
+                    })()}
+                    
                     <div className="mt-4 pt-3 border-t">
                       <Button variant="outline" size="sm" asChild className="gap-2">
                         <Link to={`/echeancier?project=${effectiveProjectId}`}>

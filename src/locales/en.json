@@ -1265,7 +1265,9 @@
       "upcoming": "Upcoming",
       "viewSchedule": "View schedule",
       "noName": "Unidentified supplier",
-      "dismiss": "Dismiss alert"
+      "dismiss": "Dismiss alert",
+      "lockDateNote": "After confirming with the supplier, lock the date in the step card to keep the alert up to date.",
+      "dateLocked": "Date locked"
     }
   },
   "gallery": {

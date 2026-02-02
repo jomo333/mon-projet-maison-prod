@@ -1265,7 +1265,9 @@
       "upcoming": "À venir",
       "viewSchedule": "Voir l'échéancier",
       "noName": "Fournisseur non identifié",
-      "dismiss": "Fermer l'alerte"
+      "dismiss": "Fermer l'alerte",
+      "lockDateNote": "Après confirmation avec le fournisseur, verrouillez la date dans la fiche de l'étape pour maintenir l'alerte à jour.",
+      "dateLocked": "Date verrouillée"
     }
   },
   "gallery": {
