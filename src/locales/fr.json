@@ -1137,6 +1137,11 @@
     "tryDifferent": "Essayez avec d'autres mots-clés",
     "disclaimer": {
       "title": "Avis important",
+      "intro": "Les informations présentées sur cette page, y compris celles générées par l'assistant IA, sont fournies à titre informatif et éducatif seulement. Elles visent à aider à la compréhension générale des principes du Code du bâtiment applicables aux projets de construction et d'autoconstruction résidentielle.",
+      "notOfficial": "Ce contenu ne reproduit pas et ne remplace pas les textes officiels du Code national du bâtiment du Canada ni du Code de construction du Québec, lesquels demeurent la seule référence légale et réglementaire.",
+      "noAdvice": "MonProjetMaison.ca ne fournit aucun avis juridique, réglementaire ou professionnel. Les exigences applicables peuvent varier selon la municipalité, le type de projet et les conditions spécifiques du chantier.",
+      "recommendation": "Avant d'entreprendre des travaux ou de prendre une décision technique, il est recommandé de consulter les textes officiels et de valider votre projet auprès des autorités compétentes ou de professionnels qualifiés (inspecteur en bâtiment, ingénieur, architecte, entrepreneur licencié).",
+      "liability": "MonProjetMaison.ca décline toute responsabilité quant à l'utilisation, l'interprétation ou l'application des informations fournies sur cette page.",
       "text": "Les informations fournies sont à titre indicatif seulement. Consultez toujours un professionnel qualifié et les autorités locales."
     },
     "selectedProject": "Projet sélectionné",

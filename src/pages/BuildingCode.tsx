@@ -658,29 +658,29 @@ const BuildingCode = () => {
             </p>
           </div>
 
-          {/* Disclaimer */}
+          {/* Disclaimer - Full Legal Notice */}
           <Card className="mb-6 border-amber-500/30 bg-amber-500/5">
-            <CardContent className="flex items-start gap-3 py-4">
-              <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-muted-foreground">
-                <p>
-                  <strong className="text-foreground">{t("buildingCode.disclaimer.title", "Important notice")}:</strong>{" "}
-                  {t(
-                    "buildingCode.disclaimer.text",
-                    "The information provided is for reference only. Always consult a qualified professional and local authorities."
-                  )}
-                </p>
-                <a
-                  href="https://www.rbq.gouv.qc.ca/domaines-dintervention/batiment/les-codes-et-les-normes.html"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-block mt-2 underline underline-offset-4 text-primary"
-                >
-                  {t(
-                    "buildingCode.officialLinkLabel",
-                    "Consulter le texte officiel du Code du bâtiment"
-                  )}
-                </a>
+            <CardContent className="py-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-muted-foreground space-y-3">
+                  <p>
+                    <strong className="text-foreground">{t("buildingCode.disclaimer.title", "Avis important")}</strong>
+                  </p>
+                  <p>{t("buildingCode.disclaimer.intro")}</p>
+                  <p>{t("buildingCode.disclaimer.notOfficial")}</p>
+                  <p>{t("buildingCode.disclaimer.noAdvice")}</p>
+                  <p>{t("buildingCode.disclaimer.recommendation")}</p>
+                  <p className="font-medium">{t("buildingCode.disclaimer.liability")}</p>
+                  <a
+                    href="https://www.rbq.gouv.qc.ca/domaines-dintervention/batiment/les-codes-et-les-normes.html"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-block mt-2 underline underline-offset-4 text-primary"
+                  >
+                    {t("buildingCode.officialLinkLabel", "Consulter le texte officiel du Code du bâtiment")}
+                  </a>
+                </div>
               </div>
             </CardContent>
           </Card>
