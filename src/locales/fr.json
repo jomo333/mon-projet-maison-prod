@@ -1797,26 +1797,7 @@
     "generate": "Générer l'échéancier",
     "pleaseSelectDate": "Veuillez sélectionner une date visée pour le début des travaux"
   },
-  "stepDetail": {
-    "tasks": "tâches",
-    "stepPlanning": "Planification de l'étape",
-    "synchronizing": "synchronisation...",
-    "startDate": "Date de début",
-    "endDate": "Date de fin",
-    "reset": "Réinitialiser",
-    "locked": "Verrouillée",
-    "lock": "Verrouiller",
-    "lockedNote": "Cette date est verrouillée (engagement sous-traitant). Elle ne sera pas modifiée automatiquement lors des recalculs.",
-    "notInSchedule": "Cette étape n'est pas encore dans l'échéancier. Générez l'échéancier depuis la page Échéancier.",
-    "conflictTitle": "CONFLIT DE PLANIFICATION",
-    "conflictNote": "La date entrée manuellement a été conservée. Si ce conflit est intentionnel, vous pouvez fermer cet avertissement.",
-    "dateLocked": "Date verrouillée",
-    "dateUnlocked": "Date déverrouillée",
-    "dateLockedDesc": "Cette date représente maintenant un engagement et ne sera pas modifiée automatiquement.",
-    "dateUnlockedDesc": "Cette date peut maintenant être ajustée automatiquement lors des recalculs.",
-    "datesReset": "Dates réinitialisées",
-    "datesResetDesc": "Les dates ont été recalculées automatiquement selon l'échéancier."
-  },
+  "_stepDetail_duplicate_removed": true,
   "myProjectSection": {
     "title": "Mon projet",
     "subtitle": "Continuez là où vous en étiez",

@@ -1797,26 +1797,7 @@
     "generate": "Generate schedule",
     "pleaseSelectDate": "Please select a target date for the start of construction"
   },
-  "stepDetail": {
-    "tasks": "tasks",
-    "stepPlanning": "Step planning",
-    "synchronizing": "synchronizing...",
-    "startDate": "Start date",
-    "endDate": "End date",
-    "reset": "Reset",
-    "locked": "Locked",
-    "lock": "Lock",
-    "lockedNote": "This date is locked (subcontractor commitment). It will not be automatically modified during recalculations.",
-    "notInSchedule": "This step is not yet in the schedule. Generate the schedule from the Schedule page.",
-    "conflictTitle": "PLANNING CONFLICT",
-    "conflictNote": "The manually entered date has been preserved. If this conflict is intentional, you can close this warning.",
-    "dateLocked": "Date locked",
-    "dateUnlocked": "Date unlocked",
-    "dateLockedDesc": "This date now represents a commitment and will not be automatically modified.",
-    "dateUnlockedDesc": "This date can now be automatically adjusted during recalculations.",
-    "datesReset": "Dates reset",
-    "datesResetDesc": "Dates have been automatically recalculated according to the schedule."
-  },
+  "_stepDetail_duplicate_removed": true,
   "myProjectSection": {
     "title": "My project",
     "subtitle": "Pick up where you left off",
