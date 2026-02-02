@@ -1173,8 +1173,14 @@
       "disclaimer": "This information is provided for informational purposes only and does not replace official texts or the advice of a qualified professional.",
       "noResultsFound": "I couldn't find any results matching your search. Try other terms like: guardrail, staircase, insulation, ventilation, front setback...",
       "clarificationPrompt": "To refine my answer, could you clarify:",
-      "ifCondition": "If"
-    }
+      "ifCondition": "If",
+      "errorOccurred": "An error occurred. Please try again.",
+      "principle": "Principle",
+      "practicalTips": "Practical tips"
+    },
+    "municipalitySet": "Municipality set: {{municipality}}. {{extra}}",
+    "hasData": "I have specific data for this city. Ask your question.",
+    "noMunicipalData": "This municipality is not in our database. I will provide references from the Quebec Construction Code, but please verify specific requirements with your municipality."
   },
   "dashboard": {
     "title": "Dashboard",

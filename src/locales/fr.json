@@ -1173,8 +1173,14 @@
       "disclaimer": "Ces informations sont à titre informatif et ne remplacent pas les textes officiels ni l'avis d'un professionnel qualifié.",
       "noResultsFound": "Je n'ai pas trouvé de résultat correspondant à votre recherche. Essayez avec d'autres termes comme: garde-corps, escalier, isolation, ventilation, marge avant...",
       "clarificationPrompt": "Pour affiner ma réponse, pourriez-vous préciser:",
-      "ifCondition": "Si"
-    }
+      "ifCondition": "Si",
+      "errorOccurred": "Une erreur s'est produite. Veuillez réessayer.",
+      "principle": "Principe",
+      "practicalTips": "Conseils pratiques"
+    },
+    "municipalitySet": "Municipalité définie: {{municipality}}. {{extra}}",
+    "hasData": "J'ai des données spécifiques pour cette ville. Posez votre question.",
+    "noMunicipalData": "Cette municipalité n'est pas dans notre base de données. Je vous fournirai les références du Code de construction du Québec, mais veuillez vérifier les exigences spécifiques auprès de votre municipalité."
   },
   "dashboard": {
     "title": "Tableau de bord",

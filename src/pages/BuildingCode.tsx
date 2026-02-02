@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/landing/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -216,6 +217,27 @@ interface SearchSummary {
   municipalityNotice?: string;
 }
 
+// AI response structure from edge function
+interface AIResult {
+  principle: string;
+  keyPoints: string[];
+  commonMistakes: string[];
+  whenToConsult: string;
+  practicalTips: string;
+}
+
+interface AIResponse {
+  type: "answer" | "clarification";
+  message: string;
+  result?: AIResult;
+  officialReferences?: {
+    primary: string;
+    informational: string;
+  };
+  disclaimer?: string;
+  officialLinks?: Array<{ label: string; url: string }>;
+}
+
 interface Message {
   id: string;
   role: "user" | "assistant" | "clarification";
@@ -226,6 +248,7 @@ interface Message {
   summary?: SearchSummary;
   clarificationOptions?: string[];
   municipalNotice?: string;
+  aiResponse?: AIResponse;
 }
 
 interface UserProject {
@@ -468,20 +491,15 @@ const BuildingCode = () => {
       };
       setMessages(prev => [...prev, locationMessage]);
 
-      // Vérifier si on a des données pour cette municipalité
       const hasData = hasMunicipalData(municipality);
-      let confirmContent = `Parfait! Municipalité définie: **${municipality}**. `;
-      
-      if (hasData) {
-        confirmContent += `J'ai des données spécifiques pour cette ville. Posez votre question.`;
-      } else {
-        confirmContent += `⚠️ Cette municipalité n'est pas dans notre base de données. Je vous fournirai les références du Code national du bâtiment 2015, mais **veuillez vérifier les exigences spécifiques auprès de votre municipalité**.`;
-      }
+      const confirmContent = hasData 
+        ? t("buildingCode.municipalitySet", { municipality, extra: t("buildingCode.hasData") })
+        : t("buildingCode.municipalitySet", { municipality, extra: t("buildingCode.noMunicipalData") });
 
       const confirmMessage: Message = {
         id: crypto.randomUUID(),
         role: "assistant",
-        content: confirmContent,
+        content: `✅ **${municipality}** - ${confirmContent || municipality}`,
       };
       setMessages(prev => [...prev, confirmMessage]);
       setInput("");
@@ -499,102 +517,61 @@ const BuildingCode = () => {
     setInput("");
     setIsSearching(true);
 
-    await new Promise(resolve => setTimeout(resolve, 400));
+    // Build conversation history for AI context
+    const conversationHistory = messages
+      .filter(m => m.role === "user" || m.role === "assistant")
+      .map(m => ({ role: m.role, content: m.content }));
 
-    // Toujours chercher les codes du CNB
-    const results = searchBuildingCode(query);
-    
-    // Chercher les codes municipaux
-    let municipalResults: { codes: MunicipalCode[], name: string } | null = null;
-    let allMunicipalResults: { codes: MunicipalCode[], municipalities: string[] } | null = null;
-    let municipalNotice: string | undefined;
+    try {
+      // Call the AI edge function
+      const { data, error } = await supabase.functions.invoke('search-building-code', {
+        body: {
+          query,
+          conversationHistory,
+          lang: i18n.language === 'en' ? 'en' : 'fr',
+        },
+      });
 
-    if (userMunicipality) {
-      // Chercher d'abord dans la municipalité spécifiée
-      municipalResults = searchMunicipalCodes(query, userMunicipality);
-      
-      if (!municipalResults || municipalResults.codes.length === 0) {
-        // Si pas de résultats spécifiques, chercher dans toutes les municipalités pour référence
-        allMunicipalResults = searchAllMunicipalities(query);
-        
-        if (allMunicipalResults.codes.length > 0) {
-          municipalNotice = `⚠️ Aucune donnée spécifique trouvée pour **${userMunicipality}**. Voici des exemples d'autres municipalités pour référence. **Veuillez contacter votre municipalité pour confirmer les exigences applicables.**`;
-          municipalResults = {
-            codes: allMunicipalResults.codes.slice(0, 5),
-            name: `Exemples: ${allMunicipalResults.municipalities.slice(0, 3).join(', ')}`
-          };
-        } else {
-          municipalNotice = `⚠️ **${userMunicipality}** n'est pas dans notre base de données. Veuillez contacter votre service d'urbanisme municipal pour les exigences locales.`;
-        }
-      }
-    } else {
-      // Si pas de municipalité définie, demander
-      if (category === 'municipal' || ['marge', 'recul', 'zonage', 'clôture', 'stationnement'].some(t => query.toLowerCase().includes(t))) {
-        const askLocationMessage: Message = {
+      if (error) {
+        console.error('Edge function error:', error);
+        const errorMessage: Message = {
           id: crypto.randomUUID(),
           role: "assistant",
-          content: "Pour rechercher les codes municipaux, j'ai besoin de connaître la municipalité de votre projet. Dans quelle ville/municipalité se situe votre construction?",
+          content: t("buildingCode.results.errorOccurred", "Une erreur s'est produite. Veuillez réessayer."),
         };
-        setMessages(prev => [...prev, askLocationMessage]);
-        setAskingLocation(true);
+        setMessages(prev => [...prev, errorMessage]);
         setIsSearching(false);
         return;
       }
-    }
 
-    // Chercher des questions de clarification
-    const clarifications = findClarificationQuestions(query);
+      const aiResponse = data as AIResponse;
 
-    // Générer le résumé
-    const hasMunicipal = municipalResults ? hasMunicipalData(userMunicipality || '') : false;
-    const summary = results.length > 0 ? generateSummary(results, municipalResults?.codes, hasMunicipal, municipalNotice) : undefined;
-
-    // Construire le message de réponse
-    let responseContent = "";
-    
-    if (results.length > 0 || (municipalResults && municipalResults.codes.length > 0)) {
-      const totalCNB = results.length;
-      const totalMunicipal = municipalResults?.codes.length || 0;
-      
-      const resultWord = (count: number) => count > 1 ? t("buildingCode.results.results") : t("buildingCode.results.result");
-      
-      responseContent = `📋 **${t("buildingCode.results.searchSummary")}**\n\n`;
-      responseContent += `**📖 ${t("buildingCode.results.buildingCodeSummary")}:** ${totalCNB} ${resultWord(totalCNB)}\n`;
-      responseContent += `**🏛️ ${t("buildingCode.results.municipalCodes")}:** ${totalMunicipal} ${resultWord(totalMunicipal)}\n\n`;
-      
-      if (summary && summary.keyPoints.length > 0) {
-        responseContent += `**${t("buildingCode.results.keyPoints")}:**\n`;
-        summary.keyPoints.forEach((point) => {
-          responseContent += `• ${point}\n`;
-        });
+      if (aiResponse.type === "clarification") {
+        // AI needs more information
+        const clarificationMessage: Message = {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: aiResponse.message,
+        };
+        setMessages(prev => [...prev, clarificationMessage]);
+      } else {
+        // AI has an answer
+        const assistantMessage: Message = {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: aiResponse.message,
+          aiResponse,
+        };
+        setMessages(prev => [...prev, assistantMessage]);
       }
-    } else {
-      responseContent = t("buildingCode.results.noResultsFound");
-    }
-
-    const assistantMessage: Message = {
-      id: crypto.randomUUID(),
-      role: "assistant",
-      content: responseContent,
-      results: results.length > 0 ? results : undefined,
-      municipalResults: municipalResults?.codes,
-      municipalityName: municipalResults?.name,
-      summary,
-      municipalNotice,
-    };
-
-    setMessages(prev => [...prev, assistantMessage]);
-
-    // Ajouter des questions de clarification si pertinent
-    if (clarifications && results.length > 0) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const clarificationMessage: Message = {
+    } catch (err) {
+      console.error('Search error:', err);
+      const errorMessage: Message = {
         id: crypto.randomUUID(),
-        role: "clarification",
-        content: `💡 ${t("buildingCode.results.clarificationPrompt")}`,
-        clarificationOptions: clarifications,
+        role: "assistant",
+        content: t("buildingCode.results.errorOccurred", "Une erreur s'est produite. Veuillez réessayer."),
       };
-      setMessages(prev => [...prev, clarificationMessage]);
+      setMessages(prev => [...prev, errorMessage]);
     }
 
     setIsSearching(false);
@@ -976,7 +953,7 @@ const BuildingCode = () => {
                         {message.municipalResults && message.municipalResults.length > 0 && (
                           <div className="ml-11 space-y-3">
                             <div className="text-sm font-medium text-muted-foreground mb-2">
-                              🏛️ Codes municipaux - {message.municipalityName}:
+                              🏛️ {t("buildingCode.results.municipalCodes")} - {message.municipalityName}:
                             </div>
                             {message.municipalResults.map((result) => (
                               <Card key={result.id} className="border-l-4 border-l-orange-500">
@@ -999,6 +976,112 @@ const BuildingCode = () => {
                                 </CardContent>
                               </Card>
                             ))}
+                          </div>
+                        )}
+
+                        {/* AI Response Results */}
+                        {message.aiResponse?.result && (
+                          <div className="ml-11 space-y-4">
+                            <Card className="border-l-4 border-l-primary">
+                              <CardContent className="py-4 space-y-4">
+                                {/* Principle */}
+                                <div>
+                                  <h4 className="text-sm font-semibold text-foreground mb-2">
+                                    📖 {t("buildingCode.results.principle", "Principle")}
+                                  </h4>
+                                  <p className="text-sm text-muted-foreground leading-relaxed">
+                                    {message.aiResponse.result.principle}
+                                  </p>
+                                </div>
+
+                                {/* Key Points */}
+                                {message.aiResponse.result.keyPoints && message.aiResponse.result.keyPoints.length > 0 && (
+                                  <div className="bg-muted/50 rounded-lg p-3">
+                                    <h4 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1">
+                                      ✅ {t("buildingCode.results.technicalChecks")}
+                                    </h4>
+                                    <ul className="text-xs text-muted-foreground space-y-1">
+                                      {message.aiResponse.result.keyPoints.map((point, i) => (
+                                        <li key={i} className="flex items-start gap-2">
+                                          <span className="text-primary mt-0.5">•</span>
+                                          <span>{point}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+
+                                {/* Common Mistakes */}
+                                {message.aiResponse.result.commonMistakes && message.aiResponse.result.commonMistakes.length > 0 && (
+                                  <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3">
+                                    <h4 className="text-xs font-semibold text-destructive mb-2 flex items-center gap-1">
+                                      ⚠️ {t("buildingCode.results.commonMistakes")}
+                                    </h4>
+                                    <ul className="text-xs text-muted-foreground space-y-1">
+                                      {message.aiResponse.result.commonMistakes.map((mistake, i) => (
+                                        <li key={i} className="flex items-start gap-2">
+                                          <span className="text-destructive mt-0.5">•</span>
+                                          <span>{mistake}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+
+                                {/* When to Consult */}
+                                {message.aiResponse.result.whenToConsult && (
+                                  <div className="bg-accent/50 rounded-lg p-3">
+                                    <h4 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1">
+                                      👷 {t("buildingCode.results.consultProfessional")}
+                                    </h4>
+                                    <p className="text-xs text-muted-foreground">
+                                      {message.aiResponse.result.whenToConsult}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Practical Tips */}
+                                {message.aiResponse.result.practicalTips && (
+                                  <div className="bg-primary/5 rounded-lg p-3">
+                                    <h4 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1">
+                                      💡 {t("buildingCode.results.practicalTips", "Practical tips")}
+                                    </h4>
+                                    <p className="text-xs text-muted-foreground">
+                                      {message.aiResponse.result.practicalTips}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Official Links */}
+                                {message.aiResponse.officialLinks && message.aiResponse.officialLinks.length > 0 && (
+                                  <div className="pt-2 border-t">
+                                    <h4 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1">
+                                      🔗 {t("buildingCode.results.suggestedLinks")}
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                      {message.aiResponse.officialLinks.map((link, i) => (
+                                        <a
+                                          key={i}
+                                          href={link.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-xs px-2 py-1 bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors"
+                                        >
+                                          {link.label}
+                                        </a>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Disclaimer */}
+                                {message.aiResponse.disclaimer && (
+                                  <p className="text-[10px] text-muted-foreground/70 italic pt-2 border-t">
+                                    ⚖️ {message.aiResponse.disclaimer}
+                                  </p>
+                                )}
+                              </CardContent>
+                            </Card>
                           </div>
                         )}
                       </div>
