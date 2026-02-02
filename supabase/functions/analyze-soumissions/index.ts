@@ -397,13 +397,31 @@ Selon le type de travaux, voici les subventions potentielles:
 
 ## EXTRACTION DES DONNÉES
 
-Cherche dans CHAQUE document:
-- **NUMÉRO DE LICENCE RBQ** (format: XXXX-XXXX-XX) - PRIORITAIRE! Chercher en-tête, pied de page, signature
+⚠️ **RÈGLE CRITIQUE - DISTINCTION FOURNISSEUR vs CLIENT:**
+Les soumissions contiennent DEUX types d'informations de contact:
+1. **FOURNISSEUR/ENTREPRISE** (EN-TÊTE/LOGO) = Ce que tu dois extraire
+2. **CLIENT/DESTINATAIRE** (souvent après "Soumission pour:", "À:", "Client:") = À IGNORER COMPLÈTEMENT
+
+**Comment identifier le FOURNISSEUR:**
+- Logo ou en-tête de la page (généralement en haut à gauche ou centré)
+- Section "De:", "From:", "Entreprise:"
+- Pied de page avec coordonnées
+- À côté du numéro de licence RBQ
+- À côté des numéros de taxes TPS/TVQ
+
+**Comment identifier le CLIENT (à IGNORER):**
+- Après "Soumission pour:", "À:", "Client:", "Destinataire:", "Facturer à:", "Bill to:"
+- Adresse de chantier ou adresse de projet
+- Nom de personne (prénom + nom) sans nom d'entreprise
+
+**EXTRAIRE UNIQUEMENT les infos du FOURNISSEUR:**
+- Nom de l'entreprise du FOURNISSEUR (dans le logo/en-tête, PAS le nom du client)
+- Téléphone du FOURNISSEUR (en-tête, pied de page, signature de l'entreprise)
+- Courriel du FOURNISSEUR
+- **NUMÉRO DE LICENCE RBQ** (format: XXXX-XXXX-XX) - PRIORITAIRE! Chercher en-tête, pied de page
 - **NUMÉROS DE TAXES TPS/TVQ** - Chercher près des montants de taxes ou en pied de page
   - TPS: format 123456789RT0001
   - TVQ: format 1234567890TQ0001
-- Nom de l'entreprise (souvent en haut ou dans le logo)
-- Téléphone et courriel (en-tête, pied de page, signature)
 - Montant total AVANT TAXES (chercher "sous-total" ou montant avant TPS/TVQ)
 - **SPÉCIFICATIONS TECHNIQUES: BTU, kW, SEER, HSPF, tonnes, CFM, HP, voltage, etc.**
 - **TOUTES LES GARANTIES: pièces, main-d'œuvre, compresseur, échangeur, etc.**
