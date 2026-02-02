@@ -643,7 +643,14 @@
   },
   "categorySubmissions": {
     "manageSubmissionsFor": "Gérez les soumissions pour \"{{name}}\"",
-    "manageBudgetAndSubmissions": "Gérez le budget, les soumissions et les sous-catégories"
+    "manageBudgetAndSubmissions": "Gérez le budget, les soumissions et les sous-catégories",
+    "supplierNotice": {
+      "title": "Préavis fournisseur",
+      "description": "Indique le délai requis pour aviser le fournisseur avant le début de cette étape. Le système utilisera cette information pour créer automatiquement une alerte et te rappeler de contacter le fournisseur au bon moment afin de planifier son intervention sans retard.",
+      "label": "Délai de préavis requis (en jours)",
+      "placeholder": "Ex: 14 jours",
+      "tooltip": "Exemple : 14 jours – contacter le fournisseur 2 semaines avant le début de l'étape."
+    }
   },
   "analysisFullView": {
     "quoteAnalysis": "Analyse des soumissions"

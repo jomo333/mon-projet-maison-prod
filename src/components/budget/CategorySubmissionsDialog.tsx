@@ -125,6 +125,7 @@ export function CategorySubmissionsDialog({
   const [supplierPhone, setSupplierPhone] = useState("");
   const [contactPerson, setContactPerson] = useState("");
   const [contactPersonPhone, setContactPersonPhone] = useState("");
+  const [supplierLeadDays, setSupplierLeadDays] = useState<number | null>(null);
   const [selectedAmount, setSelectedAmount] = useState("");
   const [showFullAnalysis, setShowFullAnalysis] = useState(false);
   
@@ -317,6 +318,7 @@ export function CategorySubmissionsDialog({
       setSupplierPhone(supplierStatus.supplierPhone || "");
       setContactPerson(supplierStatus.contactPerson || "");
       setContactPersonPhone(supplierStatus.contactPersonPhone || "");
+      setSupplierLeadDays(supplierStatus.supplierLeadDays ?? null);
       setSelectedAmount(supplierStatus.amount || "");
     } else {
       // Reset if no supplier status
@@ -324,6 +326,7 @@ export function CategorySubmissionsDialog({
       setSupplierPhone("");
       setContactPerson("");
       setContactPersonPhone("");
+      setSupplierLeadDays(null);
       setSelectedAmount("");
     }
     // Reset analysis state when changing sub-category
@@ -1041,6 +1044,7 @@ export function CategorySubmissionsDialog({
         supplierPhone,
         contactPerson,
         contactPersonPhone,
+        supplierLeadDays,
         amount: selectedAmount,
         hasAnalysis: !!analysisResult,
         isCompleted: true,
@@ -1093,6 +1097,7 @@ export function CategorySubmissionsDialog({
         supplierPhone,
         contactPerson,
         contactPersonPhone,
+        supplierLeadDays,
         amount: selectedAmount,
         isCompleted: true,
       });
@@ -1826,6 +1831,37 @@ export function CategorySubmissionsDialog({
                     </div>
                   </div>
                 </div>
+
+                {/* Supplier Notice Section - Only show when supplier is selected */}
+                {supplierName && (
+                  <div className="pt-3 border-t">
+                    <h4 className="font-medium text-foreground mb-2">
+                      {t("categorySubmissions.supplierNotice.title")}
+                    </h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t("categorySubmissions.supplierNotice.description")}
+                    </p>
+                    <div className="space-y-2">
+                      <Label htmlFor="supplier-lead-days">
+                        {t("categorySubmissions.supplierNotice.label")}
+                      </Label>
+                      <div className="relative max-w-xs">
+                        <Input
+                          id="supplier-lead-days"
+                          type="number"
+                          min={0}
+                          value={supplierLeadDays ?? ""}
+                          onChange={(e) => setSupplierLeadDays(e.target.value ? parseInt(e.target.value) : null)}
+                          placeholder={t("categorySubmissions.supplierNotice.placeholder")}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {t("categorySubmissions.supplierNotice.tooltip")}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {supplierStatus?.isCompleted && (
                   <Badge variant="secondary" className="w-fit bg-success/10 text-success">
                     <CheckCircle2 className="h-3 w-3 mr-1" />

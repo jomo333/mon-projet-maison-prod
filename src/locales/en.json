@@ -643,7 +643,14 @@
   },
   "categorySubmissions": {
     "manageSubmissionsFor": "Manage quotes for \"{{name}}\"",
-    "manageBudgetAndSubmissions": "Manage budget, quotes and sub-categories"
+    "manageBudgetAndSubmissions": "Manage budget, quotes and sub-categories",
+    "supplierNotice": {
+      "title": "Supplier Notice",
+      "description": "Specify the lead time required to notify the supplier before this step begins. The system will use this information to automatically create an alert reminding you to contact the supplier at the right time to schedule their work without delays.",
+      "label": "Required notice period (in days)",
+      "placeholder": "E.g. 14 days",
+      "tooltip": "Example: 14 days – contact the supplier 2 weeks before the step starts."
+    }
   },
   "analysisFullView": {
     "quoteAnalysis": "Quote Analysis"
