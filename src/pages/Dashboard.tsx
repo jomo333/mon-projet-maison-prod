@@ -100,6 +100,7 @@ const Dashboard = () => {
     completeStep,
     completeStepByStepId,
     uncompleteStep,
+    dismissAlert,
   } = useProjectSchedule(effectiveProjectId);
 
   // Fetch completed tasks
@@ -581,6 +582,15 @@ const Dashboard = () => {
                                 </div>
                               )}
                             </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => dismissAlert(alert.id)}
+                              className="shrink-0 h-8 w-8 p-0 hover:bg-destructive/10"
+                              title={t("dashboard.supplierAlerts.dismiss")}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
                           </div>
                         );
                       })}

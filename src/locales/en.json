@@ -1262,7 +1262,8 @@
       "today": "Today",
       "upcoming": "Upcoming",
       "viewSchedule": "View schedule",
-      "noName": "Unidentified supplier"
+      "noName": "Unidentified supplier",
+      "dismiss": "Dismiss alert"
     }
   },
   "gallery": {

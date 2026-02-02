@@ -1262,7 +1262,8 @@
       "today": "Aujourd'hui",
       "upcoming": "À venir",
       "viewSchedule": "Voir l'échéancier",
-      "noName": "Fournisseur non identifié"
+      "noName": "Fournisseur non identifié",
+      "dismiss": "Fermer l'alerte"
     }
   },
   "gallery": {
