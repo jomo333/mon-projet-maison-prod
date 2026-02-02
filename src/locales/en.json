@@ -41,6 +41,7 @@
     "retry": "Retry",
     "refresh": "Refresh",
     "unknownDate": "Unknown date",
+    "saving": "Saving...",
     "placeholder": {
       "amount": "0.00"
     }
@@ -1272,7 +1273,14 @@
     "downloadSuccessCount": "{{count}} files downloaded!",
     "downloadError": "Error downloading files",
     "noFilesToDownload": "No files to download",
-    "browserNotSupported": "Your browser doesn't support this feature. Use Chrome or Edge."
+    "browserNotSupported": "Your browser doesn't support this feature. Use Chrome or Edge.",
+    "saveToGallery": "Save to My Files",
+    "analysisSaved": "Analysis saved",
+    "analysisSavedDesc": "The AI analysis has been saved to your files",
+    "analysisSavedShort": "Saved",
+    "analysisSaveError": "Unable to save the analysis",
+    "aiAnalyses": "AI Analyses",
+    "noAnalyses": "No AI analysis"
   },
   "startProject": {
     "title": "Create a new project",

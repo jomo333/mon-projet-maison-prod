@@ -41,6 +41,7 @@
     "retry": "Réessayer",
     "refresh": "Actualiser",
     "unknownDate": "Date inconnue",
+    "saving": "Enregistrement...",
     "placeholder": {
       "amount": "0.00"
     }
@@ -1272,7 +1273,14 @@
     "downloadSuccessCount": "{{count}} fichiers téléchargés !",
     "downloadError": "Erreur lors du téléchargement",
     "noFilesToDownload": "Aucun fichier à télécharger",
-    "browserNotSupported": "Votre navigateur ne supporte pas cette fonctionnalité. Utilisez Chrome ou Edge."
+    "browserNotSupported": "Votre navigateur ne supporte pas cette fonctionnalité. Utilisez Chrome ou Edge.",
+    "saveToGallery": "Enregistrer dans Mes Dossiers",
+    "analysisSaved": "Analyse enregistrée",
+    "analysisSavedDesc": "L'analyse IA a été enregistrée dans vos dossiers",
+    "analysisSavedShort": "Enregistré",
+    "analysisSaveError": "Impossible d'enregistrer l'analyse",
+    "aiAnalyses": "Analyses IA",
+    "noAnalyses": "Aucune analyse IA"
   },
   "startProject": {
     "title": "Créer un nouveau projet",

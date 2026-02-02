@@ -24,7 +24,8 @@ import {
   Phone,
   Sparkles,
   X,
-  UserCheck
+  UserCheck,
+  Save
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -464,6 +465,64 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
       delete newState[tradeId];
       return newState;
     });
+  };
+
+  // State for tracking saved analyses and saving state
+  const [savedAnalyses, setSavedAnalyses] = useState<Record<string, boolean>>({});
+  const [savingAnalysis, setSavingAnalysis] = useState<string | null>(null);
+
+  // Save analysis result to task_attachments for project gallery
+  const saveAnalysisToGallery = async (tradeId: string, tradeName: string, analysisContent: string) => {
+    if (!analysisContent || !session?.user?.id) return;
+    
+    setSavingAnalysis(tradeId);
+    try {
+      const blob = new Blob([analysisContent], { type: 'text/markdown' });
+      const fileName = `Analyse_IA_${tradeName.replace(/[^a-zA-Z0-9àâäéèêëïîôùûüç]/g, '_')}_${new Date().toISOString().split('T')[0]}.md`;
+      const storagePath = `${session.user.id}/${projectId}/soumissions/${tradeId}/analyses/${Date.now()}_${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('task-attachments')
+        .upload(storagePath, blob);
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('task-attachments')
+        .getPublicUrl(storagePath);
+
+      const { error: dbError } = await supabase
+        .from('task_attachments')
+        .insert({
+          project_id: projectId,
+          step_id: 'soumissions',
+          task_id: `soumission-${tradeId}`,
+          file_name: `Analyse IA - ${tradeName}`,
+          file_url: urlData.publicUrl,
+          file_type: 'text/markdown',
+          file_size: blob.size,
+          category: 'analyse',
+        });
+
+      if (dbError) throw dbError;
+
+      setSavedAnalyses(prev => ({ ...prev, [tradeId]: true }));
+      queryClient.invalidateQueries({ queryKey: ['soumission-docs', projectId] });
+      
+      toast({
+        title: t("gallery.analysisSaved"),
+        description: t("gallery.analysisSavedDesc"),
+      });
+    } catch (error) {
+      console.error("Error saving analysis:", error);
+      toast({
+        title: t("common.error"),
+        description: t("gallery.analysisSaveError"),
+        variant: "destructive",
+      });
+    } finally {
+      setSavingAnalysis(null);
+    }
   };
 
   // Parser les contacts extraits de l'analyse IA
@@ -987,8 +1046,35 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
                             </div>
                           </ScrollArea>
                           
-                          {/* Bouton pour choisir le fournisseur */}
-                          <div className="mt-4 pt-4 border-t">
+                          {/* Boutons d'action */}
+                          <div className="mt-4 pt-4 border-t flex flex-col gap-2">
+                            {/* Bouton pour enregistrer l'analyse */}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full gap-2"
+                              disabled={savingAnalysis === trade.id || savedAnalyses[trade.id]}
+                              onClick={() => saveAnalysisToGallery(trade.id, trade.name, analysisStates[trade.id].result!)}
+                            >
+                              {savingAnalysis === trade.id ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                  {t("common.saving")}
+                                </>
+                              ) : savedAnalyses[trade.id] ? (
+                                <>
+                                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                  {t("gallery.analysisSavedShort")}
+                                </>
+                              ) : (
+                                <>
+                                  <Save className="h-4 w-4" />
+                                  {t("gallery.saveToGallery")}
+                                </>
+                              )}
+                            </Button>
+                            
+                            {/* Bouton pour choisir le fournisseur */}
                             <Button
                               variant="default"
                               size="sm"

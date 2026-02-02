@@ -43,7 +43,8 @@ import {
   User,
   Eye,
   X,
-  FolderArchive
+  FolderArchive,
+  Sparkles
 } from "lucide-react";
 import { PDFViewer } from "@/components/ui/pdf-viewer";
 import { toast } from "sonner";
@@ -485,6 +486,9 @@ const ProjectGallery = () => {
   const soumissionsData = getSoumissionsByTrade();
   const retenuCount = soumissionsData.filter(s => s.isRetenu).length;
   const totalDocsCount = soumissionDocs.length;
+  
+  // Filter AI analyses documents
+  const analysisDocs = documents.filter(d => d.category === 'analyse' && d.step_id === 'soumissions');
 
   const getStepTitle = (stepId: string) => {
     const step = constructionSteps.find(s => s.id === stepId);
@@ -937,6 +941,70 @@ const ProjectGallery = () => {
                       </div>
                     )}
                   </div>
+
+                  {/* Analyses IA */}
+                  {analysisDocs.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-4 flex items-center gap-2">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        {t("gallery.aiAnalyses")} ({analysisDocs.length})
+                      </h3>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        {analysisDocs.map((doc) => {
+                          const isPreviewable = canPreview(doc.file_type);
+                          // Extract trade name from task_id (e.g., "soumission-excavation" -> "excavation")
+                          const tradeId = doc.task_id.replace('soumission-', '');
+                          const trade = soumissionTrades.find(t => t.id === tradeId);
+                          return (
+                            <Card key={doc.id} className="border-primary/20 bg-primary/5">
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <h4 className="font-medium flex items-center gap-2">
+                                      <Sparkles className="h-4 w-4 text-primary" />
+                                      {doc.file_name}
+                                    </h4>
+                                    {trade && (
+                                      <p className="text-sm text-muted-foreground mt-1">
+                                        {trade.name}
+                                      </p>
+                                    )}
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {new Date(doc.created_at).toLocaleDateString(i18n.language)}
+                                    </p>
+                                  </div>
+                                  <div className="flex gap-1">
+                                    {isPreviewable && (
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        title={t("common.view")}
+                                        onClick={() => setPreviewDocument({
+                                          url: doc.file_url,
+                                          name: doc.file_name,
+                                          type: doc.file_type
+                                        })}
+                                      >
+                                        <Eye className="h-4 w-4" />
+                                      </Button>
+                                    )}
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      title={t("common.download")}
+                                      onClick={() => downloadFile(doc.file_url, doc.file_name)}
+                                    >
+                                      <Download className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   {/* En attente */}
                   <div>
