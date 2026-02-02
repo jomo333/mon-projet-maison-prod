@@ -281,7 +281,8 @@
     "subcontractorDatesDescription": "Définissez les dates prévues pour ce sous-traitant. Ces dates seront utilisées pour synchroniser l'échéancier global.",
     "startDate": "Début",
     "endDate": "Fin",
-    "datesWillSync": "Les dates sont synchronisées avec l'échéancier du projet"
+    "datesWillSync": "Les dates sont synchronisées avec l'échéancier du projet",
+    "addDates": "Planifier"
   },
   "footer": {
     "description": "Votre assistant intelligent pour la construction résidentielle au Québec. Planifiez, budgétisez et construisez en toute confiance.",

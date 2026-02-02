@@ -281,7 +281,8 @@
     "subcontractorDatesDescription": "Set the expected dates for this subcontractor. These dates will be used to synchronize the overall schedule.",
     "startDate": "Start",
     "endDate": "End",
-    "datesWillSync": "Dates are synced with the project schedule"
+    "datesWillSync": "Dates are synced with the project schedule",
+    "addDates": "Schedule"
   },
   "footer": {
     "description": "Your intelligent assistant for residential construction in Quebec. Plan, budget, and build with confidence.",

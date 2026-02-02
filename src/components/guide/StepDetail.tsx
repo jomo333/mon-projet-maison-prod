@@ -13,6 +13,7 @@ import { Clock, ChevronLeft, ChevronRight, Lightbulb, FileText, CheckCircle2, Cl
 import type { LucideIcon } from "lucide-react";
 import { TaskAttachments } from "./TaskAttachments";
 import { TaskSubcontractorDates } from "./TaskSubcontractorDates";
+import { TaskSubcontractorDatesButton } from "./TaskSubcontractorDatesButton";
 import { SoumissionsManager } from "./SoumissionsManager";
 import { StepPhotoUpload } from "@/components/project/StepPhotoUpload";
 import { StylePhotosUpload } from "./StylePhotosUpload";
@@ -539,6 +540,15 @@ export function StepDetail({
                         )}
                       </div>
                     </AccordionTrigger>
+                    
+                    {/* Bouton rapide pour les dates du sous-traitant - visible sauf étapes préparatoires */}
+                    {projectId && !['soumissions', 'planification', 'plans-permis', 'financement'].includes(step.id) && (
+                      <TaskSubcontractorDatesButton 
+                        stepId={step.id} 
+                        taskId={task.id} 
+                        projectId={projectId}
+                      />
+                    )}
                     
                     {/* Bouton Analyse de budget visible à côté du titre */}
                     {task.id === 'budget-initial' && (
