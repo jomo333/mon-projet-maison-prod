@@ -673,72 +673,9 @@ export const useProjectSchedule = (projectId: string | null) => {
       queryClient.invalidateQueries({ queryKey: ["schedule-alerts", projectId] });
     }
 
-    // === Générer les alertes de mesure pour les étapes qui ont measurement_after_step_id ===
-    // Vérifier quelles étapes sont terminées (incluant celle qu'on est en train de marquer comme terminée)
-    const completedStepIds = new Set<string>();
-    const stepIdToSchedule = new Map<string, ScheduleItem>();
-    
-    for (const s of sorted) {
-      stepIdToSchedule.set(s.step_id, s);
-      
-      // Étape déjà terminée dans la DB
-      if (s.status === "completed") {
-        completedStepIds.add(s.step_id);
-      }
-      // Étape en cours de mise à jour vers "completed" via focusUpdates
-      else if (s.id === focusScheduleId && focusUpdates?.status === "completed") {
-        completedStepIds.add(s.step_id);
-      }
-    }
-
-    // Pour chaque étape qui nécessite des mesures, vérifier si l'étape prérequise est terminée
-    for (const s of sorted) {
-      if (s.measurement_required && s.measurement_after_step_id) {
-        const prerequisiteCompleted = completedStepIds.has(s.measurement_after_step_id);
-        
-        if (prerequisiteCompleted) {
-          // Trouver la date de fin de l'étape prérequise (utiliser la date mise à jour si c'est l'étape focus)
-          const prerequisiteSchedule = stepIdToSchedule.get(s.measurement_after_step_id);
-          let prerequisiteEndDate = prerequisiteSchedule?.end_date || format(new Date(), "yyyy-MM-dd");
-          
-          // Si l'étape prérequise est celle qu'on met à jour, utiliser la date de fin des focusUpdates
-          if (prerequisiteSchedule?.id === focusScheduleId && focusUpdates?.end_date) {
-            prerequisiteEndDate = focusUpdates.end_date;
-          }
-          
-          // Vérifier si une alerte de mesure existe déjà pour cette étape
-          const { data: existingMeasurementAlerts } = await supabase
-            .from("schedule_alerts")
-            .select("id")
-            .eq("schedule_id", s.id)
-            .eq("alert_type", "measurement")
-            .eq("is_dismissed", false);
-          
-          // Créer l'alerte seulement si elle n'existe pas
-          if (!existingMeasurementAlerts || existingMeasurementAlerts.length === 0) {
-            await supabase.from("schedule_alerts").insert({
-              project_id: projectId,
-              schedule_id: s.id,
-              alert_type: "measurement",
-              alert_date: prerequisiteEndDate,
-              message: `📏 Prendre les mesures en chantier pour "${s.step_name}"${s.measurement_notes ? ` - ${s.measurement_notes}` : ""}`,
-              is_dismissed: false,
-            });
-          }
-        } else {
-          // Si le prérequis n'est PAS terminé, supprimer les alertes de mesure existantes
-          // (cas où on a annulé la complétion du prérequis)
-          await supabase
-            .from("schedule_alerts")
-            .delete()
-            .eq("schedule_id", s.id)
-            .eq("alert_type", "measurement");
-        }
-      }
-    }
-
-    // Invalider les alertes après génération des alertes de mesure
-    queryClient.invalidateQueries({ queryKey: ["schedule-alerts", projectId] });
+    // Note: Les alertes de mesure sont maintenant gérées par useCompletedTasks
+    // basées sur la complétion de tâches spécifiques (ex: "tirage-joints")
+    // plutôt que sur le statut de l'étape complète
 
     // Vérifier les conflits de métiers après recalcul
     const recalculatedSchedules = sorted.map((s) => {
