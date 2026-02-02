@@ -235,12 +235,13 @@ export const useProjectSchedule = (projectId: string | null) => {
     // Alerte appel fournisseur
     if (schedule.supplier_schedule_lead_days > 0) {
       const alertDate = subBusinessDays(startDate, schedule.supplier_schedule_lead_days);
+      const formattedStartDate = format(startDate, "d MMMM yyyy", { locale: fr });
       alerts.push({
         project_id: projectId,
         schedule_id: schedule.id,
         alert_type: "supplier_call",
         alert_date: format(alertDate, "yyyy-MM-dd"),
-        message: `Appeler ${schedule.supplier_name || "le fournisseur"} pour ${schedule.step_name}`,
+        message: `📞 Contacter ${schedule.supplier_name || "le fournisseur"} pour planifier "${schedule.step_name}" - Début des travaux prévu le ${formattedStartDate} (préavis de ${schedule.supplier_schedule_lead_days} jours)`,
         is_dismissed: false,
       });
     }

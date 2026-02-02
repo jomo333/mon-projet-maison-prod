@@ -112,7 +112,23 @@ export const translateAlertMessage = (message: string, lang: string): string => 
       .replace("Possibilité d'avancer les travaux ?", "Possibility to advance the work?");
   }
 
-  // Supplier call alerts - "Appeler le fournisseur pour X"
+  // Supplier call alerts - New format with full details
+  if (message.includes("📞 Contacter") && message.includes("pour planifier")) {
+    // Pattern: 📞 Contacter X pour planifier "Y" - Début des travaux prévu le Z (préavis de N jours)
+    const supplierMatch = message.match(/📞 Contacter (.+?) pour planifier/);
+    const stepMatch = message.match(/pour planifier "([^"]+)"/);
+    const dateMatch = message.match(/prévu le (.+?) \(préavis/);
+    const leadDaysMatch = message.match(/\(préavis de (\d+) jours\)/);
+    
+    const supplierName = supplierMatch ? supplierMatch[1] : "the supplier";
+    const stepName = stepMatch ? translateScheduleStepName(stepMatch[1]) : "";
+    const startDate = dateMatch ? translateFrenchDate(dateMatch[1]) : "";
+    const leadDays = leadDaysMatch ? leadDaysMatch[1] : "";
+    
+    return `📞 Contact ${supplierName} to schedule "${stepName}" - Work starts on ${startDate} (${leadDays}-day notice)`;
+  }
+
+  // Supplier call alerts - Legacy format "Appeler le fournisseur pour X"
   if (message.includes("Appeler") && message.includes("pour")) {
     const stepMatch = message.match(/pour (.+)$/);
     const stepName = stepMatch ? stepMatch[1] : "";
@@ -176,4 +192,34 @@ const translateMeasurementNotes = (notes: string, lang: string): string => {
   };
 
   return notesMap[notes] || notes;
+};
+
+// Translate French date format to English (e.g., "9 février 2026" -> "February 9, 2026")
+const translateFrenchDate = (frenchDate: string): string => {
+  const frenchMonths: Record<string, string> = {
+    "janvier": "January",
+    "février": "February",
+    "mars": "March",
+    "avril": "April",
+    "mai": "May",
+    "juin": "June",
+    "juillet": "July",
+    "août": "August",
+    "septembre": "September",
+    "octobre": "October",
+    "novembre": "November",
+    "décembre": "December",
+  };
+
+  // Pattern: "9 février 2026"
+  const match = frenchDate.match(/(\d+)\s+(\w+)\s+(\d{4})/);
+  if (match) {
+    const day = match[1];
+    const frenchMonth = match[2].toLowerCase();
+    const year = match[3];
+    const englishMonth = frenchMonths[frenchMonth] || frenchMonth;
+    return `${englishMonth} ${day}, ${year}`;
+  }
+  
+  return frenchDate;
 };

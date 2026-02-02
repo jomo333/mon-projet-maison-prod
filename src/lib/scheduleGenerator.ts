@@ -440,12 +440,13 @@ async function generateScheduleAlerts(projectId: string, schedules: any[]): Prom
     if (schedule.supplier_schedule_lead_days > 0) {
       const callDate = addDays(startDate, -schedule.supplier_schedule_lead_days);
       if (callDate >= new Date()) {
+        const formattedStartDate = format(startDate, "d MMMM yyyy", { locale: fr });
         alertsToInsert.push({
           project_id: projectId,
           schedule_id: schedule.id || crypto.randomUUID(),
           alert_type: "supplier_call",
           alert_date: format(callDate, "yyyy-MM-dd"),
-          message: `Appeler le fournisseur pour ${schedule.step_name}`,
+          message: `📞 Contacter ${schedule.supplier_name || "le fournisseur"} pour planifier "${schedule.step_name}" - Début des travaux prévu le ${formattedStartDate} (préavis de ${schedule.supplier_schedule_lead_days} jours)`,
           is_dismissed: false,
         });
       }
