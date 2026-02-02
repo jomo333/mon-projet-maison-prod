@@ -171,7 +171,22 @@ const Dashboard = () => {
     completeStepByStepId,
     uncompleteStep,
     dismissAlert,
+    syncAlertsFromSoumissions,
   } = useProjectSchedule(effectiveProjectId);
+
+  // Auto-sync alerts from soumissions when schedules are loaded
+  const [hasSyncedAlerts, setHasSyncedAlerts] = useState(false);
+  useEffect(() => {
+    if (effectiveProjectId && schedules.length > 0 && !hasSyncedAlerts && !isLoadingSchedules) {
+      setHasSyncedAlerts(true);
+      syncAlertsFromSoumissions().catch(console.error);
+    }
+  }, [effectiveProjectId, schedules.length, hasSyncedAlerts, isLoadingSchedules, syncAlertsFromSoumissions]);
+  
+  // Reset sync flag when project changes
+  useEffect(() => {
+    setHasSyncedAlerts(false);
+  }, [effectiveProjectId]);
 
   // Fetch completed tasks
   const { isTaskCompleted, toggleTask } = useCompletedTasks(effectiveProjectId);

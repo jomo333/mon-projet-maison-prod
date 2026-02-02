@@ -1682,7 +1682,10 @@
     "pdfConvertedSuccess": "PDF converted to {{count}} image(s) successfully!",
     "pdfConvertedAdded": "PDF converted to {{count}} image(s) and added to selection.",
     "pdfTooManyPages": "The PDF contains {{count}} pages. Only the first 20 were converted.",
-    "analysisCompleteCount": "Complete analysis of {{count}} plan(s) finished!"
+    "analysisCompleteCount": "Complete analysis of {{count}} plan(s) finished!",
+    "categoryUpdated": "Category updated",
+    "subCategoryUpdated": "Subcategory updated",
+    "alertsSynced": "Supplier alerts synchronized"
   },
   "reportBug": {
     "title": "Report a bug",
