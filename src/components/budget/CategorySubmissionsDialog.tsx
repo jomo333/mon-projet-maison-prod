@@ -1528,7 +1528,12 @@ export function CategorySubmissionsDialog({
                     />
                   </TabsContent>
                   
-                  <TabsContent value="subcategories" className="mt-4">
+                  <TabsContent value="subcategories" className="mt-4 space-y-4">
+                    <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 p-4">
+                      <p className="text-sm text-muted-foreground">
+                        {t("categorySubmissions.taskSubmissions.diyModeDescription")}
+                      </p>
+                    </div>
                     <SubCategoryManager
                       subCategories={subCategories}
                       onAddSubCategory={handleAddSubCategory}
@@ -1536,6 +1541,9 @@ export function CategorySubmissionsDialog({
                       onSelectSubCategory={handleSelectSubCategory}
                       activeSubCategoryId={activeSubCategoryId}
                       categoryName={categoryName}
+                      projectPlans={projectPlans}
+                      onAnalyzeDIY={analyzeDIYMaterials}
+                      analyzingDIY={analyzingDIY}
                     />
                   </TabsContent>
                 </Tabs>

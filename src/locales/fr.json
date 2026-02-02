@@ -669,7 +669,8 @@
       "summary": "Résumé des fournisseurs",
       "total": "Total",
       "byTask": "Par tâche",
-      "bySubcategory": "Sous-catégories",
+      "bySubcategory": "Fait par moi-même",
+      "diyModeDescription": "Créez des sous-catégories pour les travaux que vous faites vous-même. L'IA analysera vos plans pour estimer le coût des matériaux seulement (sans main-d'œuvre).",
       "confirmed": "Confirmé",
       "supplier": "Fournisseur",
       "amount": "Montant",
@@ -683,6 +684,19 @@
   },
   "diyAnalysisView": {
     "materialAnalysis": "Analyse des matériaux DIY"
+  },
+  "subCategoryManager": {
+    "diyItems": "Travaux fait par moi-même",
+    "noDiyItems": "Aucun travail DIY",
+    "addDiyHint": "Ajoutez les travaux que vous faites vous-même pour calculer le coût des matériaux (ex: Luminaires, Peinture...)",
+    "addDiyTitle": "Ajouter un travail DIY",
+    "diyInfoBanner": "L'IA analysera vos plans pour estimer le coût des matériaux nécessaires (sans main-d'œuvre).",
+    "diyItemName": "Nom du travail",
+    "diyItemPlaceholder": "Ex: Luminaires, Peinture chambre...",
+    "suggestions": "Suggestions",
+    "totalDiyItems": "Total travaux DIY",
+    "analyzed": "Analysé",
+    "materials": "Matériaux"
   },
   "budgetAnalysis": {
     "analysisResult": "Résultat de l'analyse",

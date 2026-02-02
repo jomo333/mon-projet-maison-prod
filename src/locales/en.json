@@ -669,7 +669,8 @@
       "summary": "Supplier summary",
       "total": "Total",
       "byTask": "By task",
-      "bySubcategory": "Sub-categories",
+      "bySubcategory": "DIY (Do it myself)",
+      "diyModeDescription": "Create sub-categories for work you do yourself. The AI will analyze your plans to estimate material costs only (no labor).",
       "confirmed": "Confirmed",
       "supplier": "Supplier",
       "amount": "Amount",
@@ -683,6 +684,19 @@
   },
   "diyAnalysisView": {
     "materialAnalysis": "DIY Material Analysis"
+  },
+  "subCategoryManager": {
+    "diyItems": "DIY work (do it myself)",
+    "noDiyItems": "No DIY work",
+    "addDiyHint": "Add work you do yourself to calculate material costs (e.g., Light fixtures, Painting...)",
+    "addDiyTitle": "Add DIY work",
+    "diyInfoBanner": "The AI will analyze your plans to estimate the required material costs (no labor).",
+    "diyItemName": "Work name",
+    "diyItemPlaceholder": "E.g.: Light fixtures, Bedroom painting...",
+    "suggestions": "Suggestions",
+    "totalDiyItems": "Total DIY work",
+    "analyzed": "Analyzed",
+    "materials": "Materials"
   },
   "budgetAnalysis": {
     "analysisResult": "Analysis result",

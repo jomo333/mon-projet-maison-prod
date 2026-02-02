@@ -1,9 +1,9 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -15,8 +15,6 @@ import {
   Plus,
   Trash2,
   ChevronRight,
-  FileText,
-  CheckCircle2,
   Sparkles,
   DollarSign,
   Hammer,
@@ -41,6 +39,9 @@ interface SubCategoryManagerProps {
   onSelectSubCategory: (id: string) => void;
   activeSubCategoryId: string | null;
   categoryName: string;
+  projectPlans?: string[];
+  onAnalyzeDIY?: () => void;
+  analyzingDIY?: boolean;
 }
 
 // Default sub-categories suggestions based on category
@@ -62,19 +63,22 @@ export function SubCategoryManager({
   onSelectSubCategory,
   activeSubCategoryId,
   categoryName,
+  projectPlans = [],
+  onAnalyzeDIY,
+  analyzingDIY = false,
 }: SubCategoryManagerProps) {
+  const { t } = useTranslation();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newSubCategoryName, setNewSubCategoryName] = useState("");
-  const [isDIYMode, setIsDIYMode] = useState(false);
 
   const suggestions = defaultSubCategorySuggestions[categoryName] || [];
   const totalAmount = subCategories.reduce((sum, sc) => sum + (sc.amount || 0), 0);
 
-  const handleAdd = (name: string, diy?: boolean) => {
+  // Always add as DIY since this mode is specifically for DIY work
+  const handleAdd = (name: string) => {
     if (name.trim()) {
-      onAddSubCategory(name.trim(), diy ?? isDIYMode);
+      onAddSubCategory(name.trim(), true); // Always DIY
       setNewSubCategoryName("");
-      setIsDIYMode(false);
       setShowAddDialog(false);
     }
   };
@@ -82,26 +86,29 @@ export function SubCategoryManager({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="font-medium flex items-center gap-2 text-sm">
-          <FileText className="h-4 w-4" />
-          Sous-catégories
+        <h4 className="font-medium flex items-center gap-2 text-sm text-amber-700 dark:text-amber-400">
+          <Hammer className="h-4 w-4" />
+          {t("subCategoryManager.diyItems", "Travaux fait par moi-même")}
         </h4>
         <Button
           variant="outline"
           size="sm"
           onClick={() => setShowAddDialog(true)}
-          className="gap-1"
+          className="gap-1 border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400 dark:hover:bg-amber-950/50"
         >
           <Plus className="h-3 w-3" />
-          Ajouter
+          {t("common.add")}
         </Button>
       </div>
 
       {subCategories.length === 0 ? (
-        <div className="text-center py-4 text-muted-foreground border rounded-lg border-dashed bg-muted/20">
-          <p className="text-sm">Aucune sous-catégorie</p>
-          <p className="text-xs mt-1">
-            Ajoutez des sous-catégories pour gérer plusieurs soumissions (ex: Luminaires, Filage...)
+        <div className="text-center py-6 text-muted-foreground border-2 border-dashed border-amber-200 dark:border-amber-800 rounded-lg bg-amber-50/30 dark:bg-amber-950/20">
+          <Hammer className="h-8 w-8 mx-auto mb-2 text-amber-400" />
+          <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+            {t("subCategoryManager.noDiyItems", "Aucun travail DIY")}
+          </p>
+          <p className="text-xs mt-1 max-w-xs mx-auto">
+            {t("subCategoryManager.addDiyHint", "Ajoutez les travaux que vous faites vous-même pour calculer le coût des matériaux (ex: Luminaires, Peinture...)")}
           </p>
         </div>
       ) : (
@@ -118,35 +125,20 @@ export function SubCategoryManager({
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="flex flex-col min-w-0">
-                  <span className="font-medium text-sm truncate">{subCat.name}</span>
+                  <span className="font-medium text-sm truncate flex items-center gap-2">
+                    <Hammer className="h-3 w-3 text-amber-600 dark:text-amber-400 shrink-0" />
+                    {subCat.name}
+                  </span>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    {subCat.isDIY && (
-                      <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700 border-amber-300">
-                        <Hammer className="h-3 w-3 mr-1" />
-                        Fait par moi-même
-                      </Badge>
-                    )}
-                    {subCat.supplierName && !subCat.isDIY && (
-                      <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                        <CheckCircle2 className="h-3 w-3 mr-1" />
-                        {subCat.supplierName}
-                      </Badge>
-                    )}
-                    {subCat.hasDocuments && !subCat.supplierName && !subCat.isDIY && (
-                      <Badge variant="outline" className="text-xs">
-                        <FileText className="h-3 w-3 mr-1" />
-                        Documents
-                      </Badge>
-                    )}
                     {subCat.hasAnalysis && (
-                      <Badge variant="outline" className="text-xs text-primary border-primary/30">
+                      <Badge variant="outline" className="text-xs text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700">
                         <Sparkles className="h-3 w-3 mr-1" />
-                        Analysé
+                        {t("subCategoryManager.analyzed", "Analysé")}
                       </Badge>
                     )}
-                    {subCat.isDIY && subCat.materialCostOnly !== undefined && subCat.materialCostOnly > 0 && (
+                    {subCat.amount > 0 && (
                       <Badge variant="outline" className="text-xs text-muted-foreground">
-                        Matériaux: {subCat.materialCostOnly.toLocaleString("fr-CA")} $
+                        {t("subCategoryManager.materials", "Matériaux")}: {subCat.amount.toLocaleString("fr-CA")} $
                       </Badge>
                     )}
                   </div>
@@ -176,11 +168,11 @@ export function SubCategoryManager({
 
           {/* Total */}
           {subCategories.length > 1 && (
-            <div className="flex items-center justify-between pt-2 border-t mt-2">
-              <span className="text-sm font-medium text-muted-foreground">
-                Total sous-catégories:
+            <div className="flex items-center justify-between pt-2 border-t border-amber-200 dark:border-amber-800 mt-2">
+              <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                {t("subCategoryManager.totalDiyItems", "Total travaux DIY")}:
               </span>
-              <span className="font-bold text-lg text-primary flex items-center gap-1">
+              <span className="font-bold text-lg text-amber-600 dark:text-amber-400 flex items-center gap-1">
                 <DollarSign className="h-4 w-4" />
                 {totalAmount.toLocaleString("fr-CA")} $
               </span>
@@ -189,20 +181,30 @@ export function SubCategoryManager({
         </div>
       )}
 
-      {/* Add Sub-Category Dialog */}
+      {/* Add DIY Item Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Ajouter une sous-catégorie</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Hammer className="h-5 w-5 text-amber-600" />
+              {t("subCategoryManager.addDiyTitle", "Ajouter un travail DIY")}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            {/* Info banner */}
+            <div className="p-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/30">
+              <p className="text-xs text-muted-foreground">
+                {t("subCategoryManager.diyInfoBanner", "L'IA analysera vos plans pour estimer le coût des matériaux nécessaires (sans main-d'œuvre).")}
+              </p>
+            </div>
+            
             <div className="space-y-2">
-              <Label htmlFor="subcat-name">Nom de la sous-catégorie</Label>
+              <Label htmlFor="subcat-name">{t("subCategoryManager.diyItemName", "Nom du travail")}</Label>
               <Input
                 id="subcat-name"
                 value={newSubCategoryName}
                 onChange={(e) => setNewSubCategoryName(e.target.value)}
-                placeholder="Ex: Luminaires, Panneau électrique..."
+                placeholder={t("subCategoryManager.diyItemPlaceholder", "Ex: Luminaires, Peinture chambre...")}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     handleAdd(newSubCategoryName);
@@ -211,30 +213,9 @@ export function SubCategoryManager({
               />
             </div>
 
-            {/* DIY Option */}
-            <div className="flex items-center space-x-3 p-3 rounded-lg border border-amber-200 bg-amber-50/50">
-              <Checkbox
-                id="diy-mode"
-                checked={isDIYMode}
-                onCheckedChange={(checked) => setIsDIYMode(checked === true)}
-              />
-              <div className="flex-1">
-                <Label 
-                  htmlFor="diy-mode" 
-                  className="text-sm font-medium cursor-pointer flex items-center gap-2"
-                >
-                  <Hammer className="h-4 w-4 text-amber-600" />
-                  Fait par moi-même
-                </Label>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Analyse du coût des matériaux seulement (sans main-d'œuvre)
-                </p>
-              </div>
-            </div>
-
             {suggestions.length > 0 && (
               <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Suggestions:</Label>
+                <Label className="text-sm text-muted-foreground">{t("subCategoryManager.suggestions", "Suggestions")}:</Label>
                 <div className="flex flex-wrap gap-2">
                   {suggestions
                     .filter((s) => !subCategories.some((sc) => sc.name === s))
@@ -242,8 +223,8 @@ export function SubCategoryManager({
                       <Badge
                         key={suggestion}
                         variant="outline"
-                        className="cursor-pointer hover:bg-primary/10 hover:border-primary transition-colors"
-                        onClick={() => handleAdd(suggestion, isDIYMode)}
+                        className="cursor-pointer hover:bg-amber-100 hover:border-amber-400 dark:hover:bg-amber-950/50 dark:hover:border-amber-600 transition-colors"
+                        onClick={() => handleAdd(suggestion)}
                       >
                         <Plus className="h-3 w-3 mr-1" />
                         {suggestion}
@@ -255,10 +236,15 @@ export function SubCategoryManager({
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-              Annuler
+              {t("common.cancel")}
             </Button>
-            <Button onClick={() => handleAdd(newSubCategoryName)} disabled={!newSubCategoryName.trim()}>
-              Ajouter
+            <Button 
+              onClick={() => handleAdd(newSubCategoryName)} 
+              disabled={!newSubCategoryName.trim()}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              {t("common.add")}
             </Button>
           </DialogFooter>
         </DialogContent>
