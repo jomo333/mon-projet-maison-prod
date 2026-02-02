@@ -70,27 +70,34 @@ const reminderOptions: ReminderOption[] = [
   { labelKey: "2weeks", getValue: () => addWeeks(new Date(), 2).getTime() },
 ];
 
+// Helper to load acknowledged alerts from localStorage synchronously
+const getStoredAcknowledgedAlerts = (projectId: string | undefined): Set<string> => {
+  if (!projectId) return new Set();
+  const acknowledgedKey = `acknowledged_alerts_${projectId}`;
+  const stored = localStorage.getItem(acknowledgedKey);
+  if (stored) {
+    try {
+      return new Set(JSON.parse(stored));
+    } catch {
+      localStorage.removeItem(acknowledgedKey);
+    }
+  }
+  return new Set();
+};
+
 export const MeasurementAlertModal = ({ alerts, projectId }: MeasurementAlertModalProps) => {
   const { t, i18n } = useTranslation();
   const dateLocale = getDateLocale();
   const [isOpen, setIsOpen] = useState(false);
-  const [acknowledgedAlerts, setAcknowledgedAlerts] = useState<Set<string>>(new Set());
+  
+  // Initialize acknowledged alerts synchronously from localStorage
+  const [acknowledgedAlerts, setAcknowledgedAlerts] = useState<Set<string>>(
+    () => getStoredAcknowledgedAlerts(projectId)
+  );
 
-  // Load acknowledged alerts from localStorage on mount
+  // Update acknowledged alerts if projectId changes
   useEffect(() => {
-    if (projectId) {
-      const acknowledgedKey = `acknowledged_alerts_${projectId}`;
-      const stored = localStorage.getItem(acknowledgedKey);
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          setAcknowledgedAlerts(new Set(parsed));
-        } catch {
-          // Invalid JSON, reset
-          localStorage.removeItem(acknowledgedKey);
-        }
-      }
-    }
+    setAcknowledgedAlerts(getStoredAcknowledgedAlerts(projectId));
   }, [projectId]);
 
   // Filter alerts: not dismissed in DB, and not already acknowledged by user
