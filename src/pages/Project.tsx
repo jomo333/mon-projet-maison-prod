@@ -341,7 +341,7 @@ const Project = () => {
                   {project.project_type && (
                     <div className="flex items-center gap-1">
                       <Home className="h-4 w-4" />
-                      <span>{project.project_type}</span>
+                      <span>{t(`projects.types.${project.project_type === 'maison-neuve' ? 'newHome' : project.project_type === 'agrandissement' ? 'extension' : project.project_type === 'garage-detache' ? 'detachedGarage' : project.project_type === 'chalet' ? 'cottage' : 'newHome'}`)}</span>
                     </div>
                   )}
                   {project.square_footage && (
