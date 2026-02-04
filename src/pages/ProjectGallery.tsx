@@ -1226,103 +1226,39 @@ const ProjectGallery = () => {
                     )}
                   </div>
 
-                  {/* Analyses IA */}
-                  {analysisDocs.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold mb-4 flex items-center gap-2">
-                        <Sparkles className="h-5 w-5 text-primary" />
-                        {t("gallery.aiAnalyses")} ({analysisDocs.length})
-                      </h3>
-                      <div className="grid gap-3 md:grid-cols-2">
-                        {analysisDocs.map((doc) => {
-                          const isPreviewable = canPreview(doc.file_type);
-                          // Extract category name from task_id (e.g., "soumission-chauffage-et-ventilation" -> "Chauffage Et Ventilation")
-                          const categoryId = doc.task_id.replace('soumission-', '');
-                          const formatCategoryName = (id: string) => {
-                            return id.split('-').map(word => 
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                            ).join(' ');
-                          };
-                          return (
-                            <Card key={doc.id} className="border-primary/20 bg-primary/5">
-                              <CardContent className="p-4">
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1">
-                                    <h4 className="font-medium flex items-center gap-2">
-                                      <Sparkles className="h-4 w-4 text-primary" />
-                                      {doc.file_name}
-                                    </h4>
-                                    <p className="text-sm text-muted-foreground mt-1">
-                                      {formatCategoryName(categoryId)}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      {new Date(doc.created_at).toLocaleDateString(i18n.language)}
-                                    </p>
-                                  </div>
-                                  <div className="flex gap-1">
-                                    {isPreviewable && (
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        title={t("common.view")}
-                                        onClick={() => openDocumentPreview(doc)}
-                                      >
-                                        <Eye className="h-4 w-4" />
-                                      </Button>
-                                    )}
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      title={t("common.download")}
-                                      onClick={() => downloadFile(doc.file_url, doc.file_name)}
-                                    >
-                                      <Download className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* En attente - only show categories with documents but not retained */}
-                  {soumissionsData.filter(s => !s.isRetenu && s.docs.length > 0).length > 0 && (
+                  {/* Fournisseurs manquants - show all categories not retained */}
+                  {soumissionsData.filter(s => !s.isRetenu).length > 0 && (
                   <div>
                     <h3 className="font-semibold mb-4 flex items-center gap-2">
                       <Clock className="h-5 w-5 text-amber-600" />
-                      En attente ({soumissionsData.filter(s => !s.isRetenu && s.docs.length > 0).length})
+                      Fournisseurs manquants ({soumissionsData.filter(s => !s.isRetenu).length})
                     </h3>
                     <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-                      {soumissionsData.filter(s => !s.isRetenu && s.docs.length > 0).map((trade) => (
-                        <Card key={trade.id} className="border-dashed">
+                      {soumissionsData.filter(s => !s.isRetenu).map((trade) => (
+                        <Card key={trade.id} className="border-dashed border-amber-300 dark:border-amber-700">
                           <CardContent className="p-3 space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-sm">{trade.name}</span>
+                              <span className="text-sm font-medium">{trade.name}</span>
                               {trade.docs.length > 0 && (
                                 <Badge variant="outline" className="text-xs">
                                   {trade.docs.length} doc(s)
                                 </Badge>
                               )}
                             </div>
-                            {trade.docs.length > 0 && (
+                            {trade.docs.length > 0 ? (
                               <div className="space-y-1">
                                 {trade.docs.map((doc) => {
                                   const isPreviewable = canPreview(doc.file_type);
                                   return (
                                     <div key={doc.id} className="flex items-center gap-2 rounded-md bg-muted/40 px-2 py-1">
                                       <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                                      <a
-                                        href={doc.file_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-sm truncate flex-1 hover:underline"
+                                      <span
+                                        className="text-sm truncate flex-1 cursor-pointer hover:underline"
                                         title={doc.file_name}
+                                        onClick={() => openDocumentPreview(doc)}
                                       >
                                         {doc.file_name}
-                                      </a>
+                                      </span>
                                       {isPreviewable && (
                                         <Button
                                           variant="ghost"
@@ -1347,6 +1283,10 @@ const ProjectGallery = () => {
                                   );
                                 })}
                               </div>
+                            ) : (
+                              <p className="text-xs text-muted-foreground">
+                                Aucune soumission téléchargée
+                              </p>
                             )}
                           </CardContent>
                         </Card>
