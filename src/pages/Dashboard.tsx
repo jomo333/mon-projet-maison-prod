@@ -480,7 +480,7 @@ const Dashboard = () => {
                 <div className="flex flex-wrap items-center gap-4 mt-2 text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <Home className="h-4 w-4" />
-                    <span>{projectDisplay.type || t("common.project")}</span>
+                    <span>{projectDisplay.type ? t(`projects.types.${projectDisplay.type === 'maison-neuve' ? 'newHome' : projectDisplay.type === 'agrandissement' ? 'extension' : projectDisplay.type === 'garage-detache' ? 'detachedGarage' : projectDisplay.type === 'chalet' ? 'cottage' : projectDisplay.type === 'garage' ? 'detachedGarage' : 'newHome'}`) : t("common.project")}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
