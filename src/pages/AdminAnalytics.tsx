@@ -27,6 +27,8 @@ import {
   FileSearch,
   Hammer,
   RefreshCw,
+  HardDrive,
+  Calendar,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -75,12 +77,32 @@ interface AIAnalysisTypeBreakdown {
   count: number;
 }
 
+interface StorageUsageStats {
+  user_id: string;
+  email: string;
+  display_name: string | null;
+  bytes_used: number;
+  gb_used: number;
+}
+
+interface MonthlyAIBreakdown {
+  month: string;
+  plan_count: number;
+  soumissions_count: number;
+  diy_count: number;
+  building_code_count: number;
+  chat_count: number;
+  total: number;
+}
+
 export default function AdminAnalytics() {
   const [loading, setLoading] = useState(true);
   const [sessionStats, setSessionStats] = useState<UserSessionStats[]>([]);
   const [bugReports, setBugReports] = useState<BugReport[]>([]);
   const [aiUsageStats, setAiUsageStats] = useState<AIUsageStats[]>([]);
   const [aiTypeBreakdown, setAiTypeBreakdown] = useState<AIAnalysisTypeBreakdown[]>([]);
+  const [storageStats, setStorageStats] = useState<StorageUsageStats[]>([]);
+  const [monthlyAIStats, setMonthlyAIStats] = useState<MonthlyAIBreakdown[]>([]);
   
   // Filters
   const [bugFilter, setBugFilter] = useState<string>("all");
@@ -102,6 +124,8 @@ export default function AdminAnalytics() {
       fetchSessionStats(),
       fetchBugReports(),
       fetchAIUsageStats(),
+      fetchStorageStats(),
+      fetchMonthlyAIStats(),
     ]);
     setLoading(false);
   };
@@ -277,6 +301,95 @@ export default function AdminAnalytics() {
     }
   };
 
+  const fetchStorageStats = async () => {
+    try {
+      const { data: storage, error: storageError } = await supabase
+        .from("user_storage_usage")
+        .select("*");
+
+      if (storageError) throw storageError;
+
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("user_id, display_name");
+
+      if (profilesError) throw profilesError;
+
+      const profilesMap = new Map<string, string | null>();
+      (profiles || []).forEach(p => profilesMap.set(p.user_id, p.display_name));
+
+      const stats: StorageUsageStats[] = (storage || []).map(s => ({
+        user_id: s.user_id,
+        email: profilesMap.get(s.user_id) || s.user_id,
+        display_name: profilesMap.get(s.user_id) || null,
+        bytes_used: s.bytes_used,
+        gb_used: s.bytes_used / (1024 * 1024 * 1024),
+      })).filter(s => s.bytes_used > 0).sort((a, b) => b.bytes_used - a.bytes_used);
+
+      setStorageStats(stats);
+    } catch (error) {
+      console.error("Error fetching storage stats:", error);
+      toast.error("Erreur lors du chargement des statistiques de stockage");
+    }
+  };
+
+  const fetchMonthlyAIStats = async () => {
+    try {
+      // Get all AI usage with dates
+      const { data: usage, error: usageError } = await supabase
+        .from("ai_analysis_usage")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (usageError) throw usageError;
+
+      // Group by month
+      const monthlyMap = new Map<string, MonthlyAIBreakdown>();
+
+      for (const u of usage || []) {
+        const month = format(new Date(u.created_at), "yyyy-MM");
+        
+        if (!monthlyMap.has(month)) {
+          monthlyMap.set(month, {
+            month,
+            plan_count: 0,
+            soumissions_count: 0,
+            diy_count: 0,
+            building_code_count: 0,
+            chat_count: 0,
+            total: 0,
+          });
+        }
+
+        const stats = monthlyMap.get(month)!;
+        stats.total++;
+
+        switch (u.analysis_type) {
+          case "analyze-plan":
+            stats.plan_count++;
+            break;
+          case "analyze-soumissions":
+            stats.soumissions_count++;
+            break;
+          case "analyze-diy-materials":
+            stats.diy_count++;
+            break;
+          case "search-building-code":
+            stats.building_code_count++;
+            break;
+          case "chat-assistant":
+            stats.chat_count++;
+            break;
+        }
+      }
+
+      setMonthlyAIStats(Array.from(monthlyMap.values()).sort((a, b) => b.month.localeCompare(a.month)));
+    } catch (error) {
+      console.error("Error fetching monthly AI stats:", error);
+      toast.error("Erreur lors du chargement des statistiques mensuelles");
+    }
+  };
+
   const handleToggleResolved = async (bugId: string, currentResolved: boolean) => {
     try {
       const { error } = await supabase
@@ -379,6 +492,8 @@ export default function AdminAnalytics() {
   }).length;
   const totalAIAnalyses = aiUsageStats.reduce((acc, s) => acc + s.total_analyses, 0);
   const unresolvedBugs = bugReports.filter(b => !b.resolved).length;
+  const totalStorageGB = storageStats.reduce((acc, s) => acc + s.gb_used, 0);
+  const totalAllTimeAIAnalyses = monthlyAIStats.reduce((acc, m) => acc + m.total, 0);
 
   return (
     <AdminGuard>
@@ -398,7 +513,7 @@ export default function AdminAnalytics() {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-5">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Utilisateurs actifs</CardTitle>
@@ -419,6 +534,16 @@ export default function AdminAnalytics() {
                 <p className="text-xs text-muted-foreground">
                   {aiMonthFilter === "current" ? "ce mois" : aiMonthFilter === "last" ? "mois dernier" : "total"}
                 </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Stockage utilisé</CardTitle>
+                <HardDrive className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{totalStorageGB.toFixed(2)} Go</div>
+                <p className="text-xs text-muted-foreground">par {storageStats.length} utilisateurs</p>
               </CardContent>
             </Card>
             <Card>
@@ -450,7 +575,7 @@ export default function AdminAnalytics() {
           </div>
 
           <Tabs defaultValue="sessions" className="space-y-4">
-            <TabsList>
+            <TabsList className="flex flex-wrap">
               <TabsTrigger value="sessions" className="gap-2">
                 <Users className="h-4 w-4" />
                 Sessions
@@ -462,6 +587,14 @@ export default function AdminAnalytics() {
               <TabsTrigger value="ai" className="gap-2">
                 <Brain className="h-4 w-4" />
                 Analyses IA
+              </TabsTrigger>
+              <TabsTrigger value="storage" className="gap-2">
+                <HardDrive className="h-4 w-4" />
+                Stockage
+              </TabsTrigger>
+              <TabsTrigger value="monthly" className="gap-2">
+                <Calendar className="h-4 w-4" />
+                Mensuel
               </TabsTrigger>
             </TabsList>
 
@@ -756,6 +889,144 @@ export default function AdminAnalytics() {
                             <TableCell className="text-right">{user.chat_count || "—"}</TableCell>
                           </TableRow>
                         ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Storage Tab */}
+            <TabsContent value="storage" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Utilisation du stockage par utilisateur</CardTitle>
+                  <CardDescription>
+                    Espace de téléchargement utilisé (fichiers, plans, photos)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loading ? (
+                    <p className="text-muted-foreground">Chargement...</p>
+                  ) : storageStats.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-8">Aucun stockage utilisé</p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Utilisateur</TableHead>
+                          <TableHead className="text-right">Stockage utilisé (Go)</TableHead>
+                          <TableHead className="text-right">Stockage utilisé (Mo)</TableHead>
+                          <TableHead className="text-right">Octets bruts</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {storageStats.map((user) => (
+                          <TableRow key={user.user_id}>
+                            <TableCell className="font-medium">
+                              {user.display_name || user.email}
+                            </TableCell>
+                            <TableCell className="text-right font-bold">
+                              {user.gb_used.toFixed(3)} Go
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {(user.bytes_used / (1024 * 1024)).toFixed(2)} Mo
+                            </TableCell>
+                            <TableCell className="text-right text-muted-foreground text-xs">
+                              {user.bytes_used.toLocaleString()} octets
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+
+                  {/* Storage Summary */}
+                  <div className="mt-6 p-4 bg-muted rounded-lg">
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Total utilisé</p>
+                        <p className="text-xl font-bold">{totalStorageGB.toFixed(2)} Go</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Utilisateurs avec stockage</p>
+                        <p className="text-xl font-bold">{storageStats.length}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Moyenne par utilisateur</p>
+                        <p className="text-xl font-bold">
+                          {storageStats.length > 0 
+                            ? ((totalStorageGB / storageStats.length) * 1024).toFixed(2) 
+                            : "0"} Mo
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Monthly AI Stats Tab */}
+            <TabsContent value="monthly" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Analyses IA par mois</CardTitle>
+                  <CardDescription>
+                    Répartition mensuelle des analyses par catégorie
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loading ? (
+                    <p className="text-muted-foreground">Chargement...</p>
+                  ) : monthlyAIStats.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-8">Aucune analyse enregistrée</p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Mois</TableHead>
+                          <TableHead className="text-right">Total</TableHead>
+                          <TableHead className="text-right">Plans</TableHead>
+                          <TableHead className="text-right">Soumissions</TableHead>
+                          <TableHead className="text-right">DIY</TableHead>
+                          <TableHead className="text-right">Code bât.</TableHead>
+                          <TableHead className="text-right">Chat</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {monthlyAIStats.map((month) => (
+                          <TableRow key={month.month}>
+                            <TableCell className="font-medium">
+                              {format(new Date(month.month + "-01"), "MMMM yyyy", { locale: fr })}
+                            </TableCell>
+                            <TableCell className="text-right font-bold">{month.total}</TableCell>
+                            <TableCell className="text-right">{month.plan_count || "—"}</TableCell>
+                            <TableCell className="text-right">{month.soumissions_count || "—"}</TableCell>
+                            <TableCell className="text-right">{month.diy_count || "—"}</TableCell>
+                            <TableCell className="text-right">{month.building_code_count || "—"}</TableCell>
+                            <TableCell className="text-right">{month.chat_count || "—"}</TableCell>
+                          </TableRow>
+                        ))}
+                        {/* Total Row */}
+                        <TableRow className="bg-muted/50 font-bold">
+                          <TableCell>TOTAL</TableCell>
+                          <TableCell className="text-right">{totalAllTimeAIAnalyses}</TableCell>
+                          <TableCell className="text-right">
+                            {monthlyAIStats.reduce((acc, m) => acc + m.plan_count, 0) || "—"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {monthlyAIStats.reduce((acc, m) => acc + m.soumissions_count, 0) || "—"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {monthlyAIStats.reduce((acc, m) => acc + m.diy_count, 0) || "—"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {monthlyAIStats.reduce((acc, m) => acc + m.building_code_count, 0) || "—"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {monthlyAIStats.reduce((acc, m) => acc + m.chat_count, 0) || "—"}
+                          </TableCell>
+                        </TableRow>
                       </TableBody>
                     </Table>
                   )}
