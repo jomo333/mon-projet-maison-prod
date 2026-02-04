@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/landing/Footer";
@@ -19,6 +19,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
@@ -44,7 +55,8 @@ import {
   Eye,
   X,
   FolderArchive,
-  Sparkles
+  Sparkles,
+  Trash2
 } from "lucide-react";
 import { PDFViewer } from "@/components/ui/pdf-viewer";
 import { toast } from "sonner";
@@ -52,6 +64,7 @@ import JSZip from "jszip";
 
 const ProjectGallery = () => {
   const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
 
   const documentCategories = [
     { value: "all", label: t("gallery.allDocuments") },
@@ -348,6 +361,62 @@ const ProjectGallery = () => {
       return data;
     },
     enabled: !!projectId && !!user,
+  });
+
+  // Delete photo mutation
+  const deletePhotoMutation = useMutation({
+    mutationFn: async (photo: { id: string; file_url: string }) => {
+      if (!user) throw new Error("Non authentifié");
+      
+      // Delete from storage
+      await supabase.storage.from("project-photos").remove([photo.file_url]);
+
+      // Delete from database
+      const { error } = await supabase
+        .from("project_photos")
+        .delete()
+        .eq("id", photo.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-project-photos", projectId] });
+      toast.success(t("toasts.photoDeleted", "Photo supprimée"));
+    },
+    onError: (error: Error) => {
+      toast.error(t("toasts.photoError", "Erreur") + ": " + error.message);
+    },
+  });
+
+  // Delete document mutation
+  const deleteDocumentMutation = useMutation({
+    mutationFn: async (doc: { id: string; file_url: string }) => {
+      if (!user) throw new Error("Non authentifié");
+      
+      // Extract path from file_url
+      const bucketMarker = "/task-attachments/";
+      const markerIndex = doc.file_url.indexOf(bucketMarker);
+      if (markerIndex >= 0) {
+        const path = doc.file_url.slice(markerIndex + bucketMarker.length).split("?")[0];
+        await supabase.storage.from("task-attachments").remove([path]);
+      }
+
+      // Delete from database
+      const { error } = await supabase
+        .from("task_attachments")
+        .delete()
+        .eq("id", doc.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project-documents", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["soumission-docs-gallery", projectId] });
+      toast.success(t("attachments.deleteSuccess", "Document supprimé"));
+    },
+    onError: (error: Error) => {
+      toast.error(t("attachments.deleteError", "Erreur de suppression") + ": " + error.message);
+    },
   });
 
   // Fetch soumission statuses (fournisseurs retenus)
@@ -705,6 +774,36 @@ const ProjectGallery = () => {
                                     alt={photo.file_name}
                                     className="w-full h-full object-cover"
                                   />
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <button
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="absolute top-1 right-1 p-1.5 bg-destructive/90 rounded-full opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                                      >
+                                        <Trash2 className="h-3 w-3 text-destructive-foreground" />
+                                      </button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>{t("common.confirmDelete", "Confirmer la suppression")}</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          {t("gallery.deletePhotoConfirm", "Êtes-vous sûr de vouloir supprimer cette photo ? Cette action est irréversible.")}
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>{t("common.cancel", "Annuler")}</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            deletePhotoMutation.mutate({ id: photo.id, file_url: photo.file_url });
+                                          }}
+                                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        >
+                                          {t("common.delete", "Supprimer")}
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
                                 </div>
                               );
                             })}
@@ -728,6 +827,36 @@ const ProjectGallery = () => {
                               alt={photo.file_name}
                               className="w-full h-full object-cover"
                             />
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="absolute top-1 right-1 p-1.5 bg-destructive/90 rounded-full opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                                >
+                                  <Trash2 className="h-3 w-3 text-destructive-foreground" />
+                                </button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>{t("common.confirmDelete", "Confirmer la suppression")}</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    {t("gallery.deletePhotoConfirm", "Êtes-vous sûr de vouloir supprimer cette photo ? Cette action est irréversible.")}
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>{t("common.cancel", "Annuler")}</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      deletePhotoMutation.mutate({ id: photo.id, file_url: photo.file_url });
+                                    }}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    {t("common.delete", "Supprimer")}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </div>
                         );
                       })}
@@ -821,6 +950,35 @@ const ProjectGallery = () => {
                             >
                               <Download className="h-4 w-4" />
                             </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  title={t("common.delete", "Supprimer")}
+                                  className="text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>{t("common.confirmDelete", "Confirmer la suppression")}</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    {t("gallery.deleteDocConfirm", "Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible.")}
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>{t("common.cancel", "Annuler")}</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => deleteDocumentMutation.mutate({ id: doc.id, file_url: doc.file_url })}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    {t("common.delete", "Supprimer")}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </div>
                         </CardContent>
                       </Card>
