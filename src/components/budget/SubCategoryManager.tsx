@@ -148,7 +148,7 @@ export function SubCategoryManager({
               <div className="flex items-center gap-2 shrink-0">
                 {subCat.amount > 0 && (
                   <span className="font-semibold text-primary">
-                    {subCat.amount.toLocaleString("fr-CA")} $
+                    {formatCurrency(subCat.amount)}
                   </span>
                 )}
                 <Button
