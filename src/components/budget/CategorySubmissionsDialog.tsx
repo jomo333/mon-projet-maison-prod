@@ -214,8 +214,8 @@ export function CategorySubmissionsDialog({
   // Reset state when dialog opens
   useEffect(() => {
     if (open) {
-      setBudget(currentBudget.toString());
-      setSpent(currentSpent.toString());
+      setBudget((Math.round(currentBudget * 100) / 100).toString());
+      setSpent((Math.round(currentSpent * 100) / 100).toString());
       setAnalysisResult(null);
       setExtractedSuppliers([]);
       setSelectedSupplierIndex(null);
