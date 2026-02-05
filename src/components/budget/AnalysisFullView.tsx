@@ -184,7 +184,7 @@ export function AnalysisFullView({
                         </div>
                         <div className="text-right shrink-0">
                           <div className="font-bold text-xl text-primary">
-                            {parseAmount(supplier.amount).toLocaleString('fr-CA')} $
+                            {formatCurrency(parseAmount(supplier.amount))}
                           </div>
                           <div className="text-xs text-muted-foreground">avant taxes</div>
                         </div>
