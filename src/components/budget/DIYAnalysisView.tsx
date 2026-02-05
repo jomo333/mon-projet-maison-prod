@@ -159,7 +159,7 @@ export function DIYAnalysisView({
                       Coût total estimé des matériaux:
                     </p>
                     <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">
-                      {estimatedTotal.toLocaleString('fr-CA')} $
+                      {formatCurrency(estimatedTotal)}
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">
                       Taxes incluses (TPS + TVQ)
