@@ -139,7 +139,7 @@ export function SubCategoryManager({
                     )}
                     {subCat.amount > 0 && (
                       <Badge variant="outline" className="text-xs text-muted-foreground">
-                        {t("subCategoryManager.materials", "Matériaux")}: {subCat.amount.toLocaleString("fr-CA")} $
+                        {t("subCategoryManager.materials", "Matériaux")}: {formatCurrency(subCat.amount)}
                       </Badge>
                     )}
                   </div>
