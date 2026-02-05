@@ -2201,7 +2201,7 @@ export function CategorySubmissionsDialog({
                                 <div className="flex justify-between items-center">
                                   <span className="font-medium">{option.name}</span>
                                   <span className="font-bold text-primary">
-                                    {parseInt(option.amount).toLocaleString('fr-CA')} $
+                                    {formatCurrency(parseInt(option.amount))}
                                   </span>
                                 </div>
                                 {option.description && (
