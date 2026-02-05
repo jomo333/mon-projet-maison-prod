@@ -714,7 +714,7 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
         
         toast({
           title: "Fournisseur et budget enregistrés",
-          description: `${inputs.name} sélectionné. Montant de ${amountValue.toLocaleString('fr-CA')} $ ajouté au budget.`,
+          description: `${inputs.name} sélectionné. Montant de ${formatCurrency(amountValue)} ajouté au budget.`,
         });
       } else {
         toast({
