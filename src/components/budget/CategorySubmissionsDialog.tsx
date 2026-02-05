@@ -2449,7 +2449,7 @@ export function CategorySubmissionsDialog({
               .reduce((sum, amt) => sum + (amt || 0), 0);
             setSpent(newTotalSpent.toString());
             
-            toast.success(`Coût appliqué: ${amount.toLocaleString('fr-CA')} $`);
+            toast.success(`Coût appliqué: ${formatCurrency(amount)}`);
           }
           setShowDIYAnalysis(false);
         }}
