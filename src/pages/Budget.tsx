@@ -1240,7 +1240,7 @@ const Budget = () => {
                         </div>
                         <div className="flex items-center gap-2 shrink-0 text-sm">
                           <span className="text-muted-foreground">{percentage}%</span>
-                          <span className="font-medium">{entry.value.toLocaleString()} $</span>
+                          <span className="font-medium">{formatCurrency(entry.value)}</span>
                         </div>
                       </div>
                     );
