@@ -940,10 +940,10 @@ const Budget = () => {
                                 </div>
                                 <div className="text-right shrink-0 min-w-[140px]">
                                   <div className="text-base font-bold text-foreground">
-                                    {category.spent.toLocaleString()} $
+                                    {formatCurrency(category.spent)}
                                   </div>
                                   <div className="text-xs text-muted-foreground">
-                                    / {Math.round(category.budget * 0.90).toLocaleString()} - {Math.round(category.budget * 1.10).toLocaleString()} $
+                                    / {formatCurrency(Math.round(category.budget * 0.90))} - {formatCurrency(Math.round(category.budget * 1.10))}
                                   </div>
                                 </div>
                                 <div className="shrink-0 p-1">
@@ -1126,7 +1126,7 @@ const Budget = () => {
                                       {supplier.amount && (
                                         <div className="flex items-center gap-2 font-medium">
                                           <DollarSign className="h-4 w-4 text-muted-foreground" />
-                                          <span>{parseFloat(supplier.amount).toLocaleString("fr-CA")} $</span>
+                                          <span>{formatCurrency(parseFloat(supplier.amount))}</span>
                                         </div>
                                       )}
                                     </div>
@@ -1156,7 +1156,7 @@ const Budget = () => {
                           </div>
                           <div className="text-right shrink-0 min-w-[140px]">
                             <div className="text-base font-bold">
-                              {Math.round(contingence * 0.90).toLocaleString()} $ - {Math.round(contingence * 1.10).toLocaleString()} $
+                              {formatCurrency(Math.round(contingence * 0.90))} - {formatCurrency(Math.round(contingence * 1.10))}
                             </div>
                           </div>
                         </div>
@@ -1171,7 +1171,7 @@ const Budget = () => {
                           </div>
                           <div className="text-right shrink-0 min-w-[140px]">
                             <div className="text-base font-bold">
-                              {Math.round(taxes * 0.90).toLocaleString()} $ - {Math.round(taxes * 1.10).toLocaleString()} $
+                              {formatCurrency(Math.round(taxes * 0.90))} - {formatCurrency(Math.round(taxes * 1.10))}
                             </div>
                           </div>
                         </div>
@@ -1208,7 +1208,7 @@ const Budget = () => {
                         ))}
                       </Pie>
                       <Tooltip
-                        formatter={(value: number, name: string) => [`${value.toLocaleString()} $`, name]}
+                        formatter={(value: number, name: string) => [formatCurrency(value), name]}
                         labelFormatter={() => ''}
                         contentStyle={{
                           backgroundColor: 'hsl(var(--card))',
@@ -1240,7 +1240,7 @@ const Budget = () => {
                         </div>
                         <div className="flex items-center gap-2 shrink-0 text-sm">
                           <span className="text-muted-foreground">{percentage}%</span>
-                          <span className="font-medium">{entry.value.toLocaleString()} $</span>
+                          <span className="font-medium">{formatCurrency(entry.value)}</span>
                         </div>
                       </div>
                     );

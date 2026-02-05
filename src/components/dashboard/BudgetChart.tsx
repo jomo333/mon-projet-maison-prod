@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { formatCurrency } from "@/lib/i18n";
 
 const data = [
   { name: "Permis", prevu: 5000, reel: 4800 },
@@ -40,7 +41,7 @@ export function BudgetChart() {
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
                 }}
-                formatter={(value: number) => [`${value.toLocaleString()} $`, '']}
+                formatter={(value: number) => [formatCurrency(value), '']}
               />
               <Bar dataKey="prevu" name="Budget prévu" radius={[4, 4, 0, 0]}>
                 {data.map((_, index) => (

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -183,7 +184,7 @@ export function AnalysisFullView({
                         </div>
                         <div className="text-right shrink-0">
                           <div className="font-bold text-xl text-primary">
-                            {parseAmount(supplier.amount).toLocaleString('fr-CA')} $
+                            {formatCurrency(parseAmount(supplier.amount))}
                           </div>
                           <div className="text-xs text-muted-foreground">avant taxes</div>
                         </div>
@@ -210,7 +211,7 @@ export function AnalysisFullView({
                                 <div className="flex justify-between items-center">
                                   <span className="font-medium text-sm">{option.name}</span>
                                   <span className="font-bold text-primary">
-                                    {parseAmount(option.amount).toLocaleString('fr-CA')} $
+                                    {formatCurrency(parseAmount(option.amount))}
                                   </span>
                                 </div>
                                 {option.description && (
@@ -236,11 +237,11 @@ export function AnalysisFullView({
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-sm text-muted-foreground">Montant retenu:</span>
                       <span className="font-bold text-xl text-primary">
-                        {parseAmount(
+                        {formatCurrency(parseAmount(
                           selectedOptionIndex !== null && selectedSupplier.options?.[selectedOptionIndex]
                             ? selectedSupplier.options[selectedOptionIndex].amount
                             : selectedSupplier.amount
-                        ).toLocaleString('fr-CA')} $
+                        ))}
                       </span>
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { formatCurrency } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
@@ -877,7 +878,7 @@ export function CategorySubmissionsDialog({
       if (costMatch) {
         const estimatedCost = parseFloat(costMatch[1].replace(/[\s,]/g, '')) || 0;
         if (estimatedCost > 0) {
-          toast.info(t("toasts.estimatedMaterialCost", { amount: Math.round(estimatedCost).toLocaleString('fr-CA') }), {
+          toast.info(t("toasts.estimatedMaterialCost", { amount: formatCurrency(Math.round(estimatedCost)) }), {
             duration: 5000,
           });
         }
@@ -2059,7 +2060,7 @@ export function CategorySubmissionsDialog({
                     <div className="text-right">
                       <div className="text-sm text-muted-foreground">Coût retenu</div>
                       <div className="font-bold text-2xl text-primary">
-                        {parseInt(spent || selectedAmount || '0').toLocaleString('fr-CA')} $
+                        {formatCurrency(parseInt(spent || selectedAmount || '0'))}
                       </div>
                     </div>
                   </div>
@@ -2125,7 +2126,7 @@ export function CategorySubmissionsDialog({
                           const total = extractedSuppliers.reduce((sum, s) => sum + parseInt(s.amount || '0'), 0);
                           const average = Math.round(total / extractedSuppliers.length);
                           setBudget(average.toString());
-                          toast.success(`Budget estimé mis à jour: ${average.toLocaleString('fr-CA')} $`);
+                          toast.success(`Budget estimé mis à jour: ${formatCurrency(average)}`);
                         }}
                         className="gap-2 shrink-0"
                       >
@@ -2173,7 +2174,7 @@ export function CategorySubmissionsDialog({
                         </div>
                         <div className="text-right">
                           <div className="font-bold text-lg text-primary">
-                            {parseInt(supplier.amount).toLocaleString('fr-CA')} $
+                            {formatCurrency(parseInt(supplier.amount))}
                           </div>
                           <div className="text-xs text-muted-foreground">avant taxes</div>
                         </div>
@@ -2200,7 +2201,7 @@ export function CategorySubmissionsDialog({
                                 <div className="flex justify-between items-center">
                                   <span className="font-medium">{option.name}</span>
                                   <span className="font-bold text-primary">
-                                    {parseInt(option.amount).toLocaleString('fr-CA')} $
+                                    {formatCurrency(parseInt(option.amount))}
                                   </span>
                                 </div>
                                 {option.description && (
@@ -2448,7 +2449,7 @@ export function CategorySubmissionsDialog({
               .reduce((sum, amt) => sum + (amt || 0), 0);
             setSpent(newTotalSpent.toString());
             
-            toast.success(`Coût appliqué: ${amount.toLocaleString('fr-CA')} $`);
+            toast.success(`Coût appliqué: ${formatCurrency(amount)}`);
           }
           setShowDIYAnalysis(false);
         }}

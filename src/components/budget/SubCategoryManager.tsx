@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatCurrency } from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -138,7 +139,7 @@ export function SubCategoryManager({
                     )}
                     {subCat.amount > 0 && (
                       <Badge variant="outline" className="text-xs text-muted-foreground">
-                        {t("subCategoryManager.materials", "Matériaux")}: {subCat.amount.toLocaleString("fr-CA")} $
+                        {t("subCategoryManager.materials", "Matériaux")}: {formatCurrency(subCat.amount)}
                       </Badge>
                     )}
                   </div>
@@ -147,7 +148,7 @@ export function SubCategoryManager({
               <div className="flex items-center gap-2 shrink-0">
                 {subCat.amount > 0 && (
                   <span className="font-semibold text-primary">
-                    {subCat.amount.toLocaleString("fr-CA")} $
+                    {formatCurrency(subCat.amount)}
                   </span>
                 )}
                 <Button
@@ -174,7 +175,7 @@ export function SubCategoryManager({
               </span>
               <span className="font-bold text-lg text-amber-600 dark:text-amber-400 flex items-center gap-1">
                 <DollarSign className="h-4 w-4" />
-                {totalAmount.toLocaleString("fr-CA")} $
+                {formatCurrency(totalAmount)}
               </span>
             </div>
           )}

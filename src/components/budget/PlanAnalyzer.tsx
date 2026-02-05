@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -1736,7 +1737,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
               <div className="flex flex-col items-end">
                 <Badge variant="secondary" className="text-lg px-4 py-1">
                   <DollarSign className="h-4 w-4 mr-1" />
-                  {Math.round(analysis.estimatedTotal * 0.90).toLocaleString()} $ à {Math.round(analysis.estimatedTotal * 1.10).toLocaleString()} $
+                  {formatCurrency(Math.round(analysis.estimatedTotal * 0.90))} à {formatCurrency(Math.round(analysis.estimatedTotal * 1.10))}
                 </Badge>
                 <span className="text-xs text-muted-foreground mt-1">{t("planAnalyzer.rangeNote")}</span>
               </div>
@@ -1766,7 +1767,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
                         <span className="font-medium">{getCategoryLabel(t, cat.name)}</span>
                       </div>
                       <span className="text-muted-foreground font-medium text-sm">
-                        {Math.round(cat.budget * 0.90).toLocaleString()} $ - {Math.round(cat.budget * 1.10).toLocaleString()} $
+                        {formatCurrency(Math.round(cat.budget * 0.90))} - {formatCurrency(Math.round(cat.budget * 1.10))}
                       </span>
                     </div>
                   ))}
@@ -1780,7 +1781,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
                       <span className="font-medium text-amber-700 dark:text-amber-400">{t("planAnalyzer.contingencyBudget")}</span>
                     </div>
                     <span className="text-amber-700 dark:text-amber-400 font-medium text-sm">
-                      {Math.round(contingence * 0.90).toLocaleString()} $ - {Math.round(contingence * 1.10).toLocaleString()} $
+                      {formatCurrency(Math.round(contingence * 0.90))} - {formatCurrency(Math.round(contingence * 1.10))}
                     </span>
                   </div>
 
@@ -1793,7 +1794,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
                       <span className="font-medium text-blue-700 dark:text-blue-400">{t("planAnalyzer.taxesLabel")}</span>
                     </div>
                     <span className="text-blue-700 dark:text-blue-400 font-medium text-sm">
-                      {Math.round(taxes * 0.90).toLocaleString()} $ - {Math.round(taxes * 1.10).toLocaleString()} $
+                      {formatCurrency(Math.round(taxes * 0.90))} - {formatCurrency(Math.round(taxes * 1.10))}
                     </span>
                   </div>
                 </div>

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -158,7 +159,7 @@ export function DIYAnalysisView({
                       Coût total estimé des matériaux:
                     </p>
                     <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">
-                      {estimatedTotal.toLocaleString('fr-CA')} $
+                      {formatCurrency(estimatedTotal)}
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">
                       Taxes incluses (TPS + TVQ)
@@ -224,7 +225,7 @@ export function DIYAnalysisView({
                   onClick={() => onApplyEstimate(estimatedTotal)}
                 >
                   <DollarSign className="h-5 w-5 mr-2" />
-                  Appliquer: {estimatedTotal.toLocaleString('fr-CA')} $
+                  Appliquer: {formatCurrency(estimatedTotal)}
                 </Button>
               </div>
             )}

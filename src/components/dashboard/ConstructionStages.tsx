@@ -1,5 +1,6 @@
 import { CheckCircle2, Circle, Clock, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/i18n";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -111,7 +112,7 @@ export function ConstructionStages() {
 
                 <div className="text-right shrink-0 hidden sm:block">
                   <div className="text-sm font-medium">
-                    {stage.spent.toLocaleString()} $ / {stage.budget.toLocaleString()} $
+                    {formatCurrency(stage.spent)} / {formatCurrency(stage.budget)}
                   </div>
                   <div className="text-xs text-muted-foreground">
                     Échéance: {stage.dueDate}
