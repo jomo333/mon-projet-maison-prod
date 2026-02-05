@@ -1601,9 +1601,9 @@ export function CategorySubmissionsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="relative flex-1 min-h-0">
-          <ScrollArea className="h-[60vh] pr-4">
-            <div className="space-y-6">
+        <div className="relative flex-1 min-h-0 flex flex-col">
+          <ScrollArea className="flex-1 pr-4">
+            <div className="space-y-6 pb-4">
             {/* Budget Section - Only show on main view */}
             {!viewingSubCategory && (
               <div className="space-y-3">
@@ -2060,7 +2060,42 @@ export function CategorySubmissionsDialog({
                     <div className="text-right">
                       <div className="text-sm text-muted-foreground">Coût retenu</div>
                       <div className="font-bold text-2xl text-primary">
-                        {formatCurrency(parseInt(spent || selectedAmount || '0'))}
+                        {formatCurrency(parseFloat(spent || selectedAmount || '0') || 0)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Supplier Notice Section - Integrated in supplier card */}
+                <div className="pt-3 mt-3 border-t border-primary/20">
+                  <div className="p-3 bg-amber-500/10 border border-amber-500/40 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <div className="p-1.5 bg-amber-500/20 rounded-full shrink-0">
+                        <Phone className="h-4 w-4 text-amber-600" />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h5 className="font-medium text-amber-700 dark:text-amber-400 text-sm">
+                            {t("categorySubmissions.supplierNotice.title")}
+                          </h5>
+                          <Badge variant="outline" className="text-xs border-amber-500/50 text-amber-600 dark:text-amber-400">
+                            Important
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-amber-700/70 dark:text-amber-300/70">
+                          {t("categorySubmissions.supplierNotice.description")}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            min={0}
+                            value={supplierLeadDays ?? ""}
+                            onChange={(e) => setSupplierLeadDays(e.target.value ? parseInt(e.target.value) : null)}
+                            placeholder={t("categorySubmissions.supplierNotice.placeholder")}
+                            className="max-w-[120px] h-8 text-sm border-amber-500/50 focus:border-amber-500"
+                          />
+                          <span className="text-xs text-muted-foreground">{t("categorySubmissions.supplierNotice.label")}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2314,46 +2349,6 @@ export function CategorySubmissionsDialog({
                   </div>
                 </div>
 
-                {/* Supplier Notice Section - Only show when supplier is selected */}
-                {supplierName && (
-                  <div className="mt-4 p-4 bg-amber-500/10 border-2 border-amber-500/50 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-amber-500/20 rounded-full shrink-0">
-                        <Phone className="h-5 w-5 text-amber-600" />
-                      </div>
-                      <div className="flex-1 space-y-3">
-                        <div>
-                          <h4 className="font-semibold text-amber-700 dark:text-amber-400 text-base">
-                            {t("categorySubmissions.supplierNotice.title")}
-                          </h4>
-                          <p className="text-sm text-amber-700/80 dark:text-amber-300/80 mt-1">
-                            {t("categorySubmissions.supplierNotice.description")}
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="supplier-lead-days" className="text-amber-700 dark:text-amber-400 font-medium">
-                            {t("categorySubmissions.supplierNotice.label")}
-                          </Label>
-                          <div className="relative max-w-xs">
-                            <Input
-                              id="supplier-lead-days"
-                              type="number"
-                              min={0}
-                              value={supplierLeadDays ?? ""}
-                              onChange={(e) => setSupplierLeadDays(e.target.value ? parseInt(e.target.value) : null)}
-                              placeholder={t("categorySubmissions.supplierNotice.placeholder")}
-                              className="border-amber-500/50 focus:border-amber-500 focus:ring-amber-500/30"
-                            />
-                          </div>
-                          <p className="text-xs text-amber-600/80 dark:text-amber-400/70">
-                            {t("categorySubmissions.supplierNotice.tooltip")}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {supplierStatus?.isCompleted && (
                   <Badge variant="secondary" className="w-fit bg-success/10 text-success">
                     <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -2362,6 +2357,8 @@ export function CategorySubmissionsDialog({
                 )}
               </div>
             </div>
+            {/* Extra padding at the bottom to ensure visibility */}
+            <div className="h-2" />
           </div>
           </ScrollArea>
         </div>
