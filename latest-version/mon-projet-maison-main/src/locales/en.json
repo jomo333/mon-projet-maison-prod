@@ -1,0 +1,3814 @@
+{
+  "common": {
+    "understood": "Got it",
+    "locale": "en-CA",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "perMonth": "/month",
+    "perYear": "/year",
+    "freeMonths": "(2 months free)",
+    "step": "STEP",
+    "of": "of",
+    "project": "Project",
+    "createdOn": "Created on",
+    "updatedOn": "Updated on",
+    "viewAll": "View all",
+    "noData": "No data",
+    "confirmDelete": "Are you sure you want to delete?",
+    "optional": "optional",
+    "required": "required",
+    "actions": "Actions",
+    "status": "Status",
+    "details": "Details",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "retry": "Retry",
+    "refresh": "Refresh",
+    "unknownDate": "Unknown date",
+    "saving": "Saving...",
+    "placeholder": {
+      "amount": "0.00"
+    }
+  },
+  "budgetTasks": {
+    "houseStaking": "House staking (layout)",
+    "clearing": "Clearing (tree removal)",
+    "diggingExcavation": "Digging and excavation",
+    "footing": "Footing",
+    "pouringFoundations": "Pouring the foundations",
+    "waterproofing": "Waterproofing",
+    "frenchDrainBackfill": "French drain and backfill",
+    "mainFloorFraming": "Main floor framing",
+    "wallFraming": "Wall framing",
+    "secondFloorStructure": "Second-floor structure",
+    "roofTrussesInstallation": "Roof trusses installation",
+    "roofSheathing": "Roof sheathing",
+    "weatherproofing": "Weatherproofing",
+    "membraneShingles": "Membrane and shingles",
+    "windowInstallation": "Window installation",
+    "exteriorDoors": "Exterior doors",
+    "wallInsulation": "Wall insulation",
+    "atticRoofInsulation": "Attic/roof insulation",
+    "soundproofing": "Soundproofing",
+    "vapourBarrier": "Vapour barrier",
+    "furringStripsBlocking": "Furring strips and blocking",
+    "underSlabPlumbing": "Under-slab plumbing (first visit)",
+    "includedTasks": "Included tasks (guide steps)",
+    "subBasePreparation": "Sub-base preparation",
+    "concretePour": "Concrete pour",
+    "buildStaircase": "Build staircase",
+    "partitionWallFraming": "Partition wall framing",
+    "doorFraming": "Door framing",
+    "roughPlumbing": "Rough plumbing",
+    "waterHeater": "Water heater",
+    "gasLineRoughIn": "Gas line rough-in",
+    "municipalConnections": "Municipal connections",
+    "faucetsFixtures": "Faucets and fixtures",
+    "toiletsSinks": "Toilets and sinks",
+    "showerBathtub": "Shower and bathtub",
+    "electricalServiceEntry": "Electrical service entry",
+    "roughWiring": "Rough wiring",
+    "electricalInspection": "Electrical inspection",
+    "outletsSwitches": "Outlets and switches",
+    "lightFixtures": "Light fixtures",
+    "applianceHookups": "Appliance hookups",
+    "heatingSystem": "Heating system",
+    "hrvAirExchanger": "HRV (air exchanger)",
+    "ventilationDucts": "Ventilation ducts",
+    "exteriorCladding": "Exterior cladding",
+    "fasciaSoffit": "Fascia and soffit",
+    "balconiesDecks": "Balconies and decks",
+    "landscaping": "Landscaping",
+    "drywallInstallation": "Drywall installation",
+    "tapingMudding": "Taping and mudding",
+    "painting": "Painting",
+    "woodLaminateFlooring": "Wood or laminate flooring",
+    "ceramicTile": "Ceramic tile",
+    "kitchenCabinetsVanities": "Kitchen cabinets and vanities",
+    "countertops": "Countertops",
+    "interiorDoors": "Interior doors",
+    "trimBaseboards": "Trim and baseboards",
+    "staircaseFinishing": "Staircase finishing",
+    "finalCoatPaint": "Final coat of paint"
+  },
+  "construction": {
+    "tasks": {
+      "implantation": { "title": "House staking (layout)" },
+      "deboisement": { "title": "Clearing (tree removal)" },
+      "excavation-creusage": { "title": "Digging and excavation" },
+
+      "coulage-fondation": { "title": "Pouring the foundations" },
+      "drain-remblai": { "title": "French drain and backfill" },
+
+      "plancher": { "title": "Main floor framing" },
+      "murs": { "title": "Wall framing" },
+      "etage": { "title": "Second-floor structure" },
+      "fermes-toit": { "title": "Roof trusses installation" },
+      "pontage": { "title": "Roof sheathing" },
+      "etancheite": { "title": "Weatherproofing" },
+
+      "membrane": { "title": "Membrane and shingles" },
+
+      "fenetres": { "title": "Window installation" },
+      "portes-ext": { "title": "Exterior doors" },
+
+      "isolation-murs": { "title": "Wall insulation" },
+      "isolation-toit": { "title": "Attic/roof insulation" },
+      "insonorisation": { "title": "Soundproofing" },
+      "pare-vapeur": { "title": "Vapour barrier" },
+      "fourrures-clouage": { "title": "Furring strips and blocking" },
+
+      "plomberie-sous-dalle-visite": { "title": "Under-slab plumbing (first visit)" },
+      "preparation-dalle": { "title": "Sub-base preparation" },
+      "coulage-dalle": { "title": "Concrete pour" },
+
+      "construire-escalier": { "title": "Build staircase" },
+      "ossature-murs": { "title": "Partition wall framing" },
+      "cadrage-portes": { "title": "Door framing" },
+
+      "plomberie-brute": { "title": "Rough plumbing" },
+      "chauffe-eau": { "title": "Water heater" },
+      "conduite-gaz": { "title": "Gas line rough-in" },
+      "branchements": { "title": "Municipal connections" },
+
+      "entree-electrique": { "title": "Electrical service entry" },
+      "filage": { "title": "Rough wiring" },
+      "inspection-electrique": { "title": "Electrical inspection" },
+
+      "chauffage": { "title": "Heating system" },
+      "vrc": { "title": "HRV (air exchanger)" },
+      "conduits": { "title": "Ventilation ducts" },
+
+      "revetement": { "title": "Exterior cladding" },
+      "fascia-soffite": { "title": "Fascia and soffit" },
+      "balcons-terrasses": { "title": "Balconies and decks" },
+      "amenagement": { "title": "Landscaping" },
+
+      "pose-gypse": { "title": "Drywall installation" },
+      "tirage-joints": { "title": "Taping and mudding" },
+      "peinture": { "title": "Painting" },
+
+      "plancher-bois": { "title": "Wood or laminate flooring" },
+      "ceramique": { "title": "Ceramic tile" },
+
+      "armoires": { "title": "Kitchen cabinets and vanities" },
+      "comptoirs": { "title": "Countertops" },
+
+      "portes-int": { "title": "Interior doors" },
+      "moulures": { "title": "Trim and baseboards" },
+      "escalier": { "title": "Staircase finishing" },
+      "peinture-finition": { "title": "Final coat of paint" },
+
+      "prises-interrupteurs": { "title": "Outlets and switches" },
+      "luminaires": { "title": "Light fixtures" },
+      "appareils-electriques": { "title": "Appliance hookups" },
+
+      "robinetterie": { "title": "Faucets and fixtures" },
+      "toilettes-lavabos": { "title": "Toilets and sinks" },
+      "douche-bain": { "title": "Shower and bathtub" }
+    }
+  },
+  "stepPhotoUpload": {
+    "title": "Progress Photos - {{stepTitle}}",
+    "takePhoto": "Take a photo",
+    "addPhotos": "Add photos",
+    "uploading": "Uploading...",
+    "noPhotos": "No photos for this step",
+    "photo": "Photo",
+    "enlargedPhoto": "Enlarged photo"
+  },
+  "stepCard": {
+    "step": "Step {{number}}",
+    "completed": "Completed",
+    "late": "Late",
+    "today": "Today",
+    "daysShort": "{{count}}d",
+    "stepCompleted": "Step completed",
+    "markAsCompleted": "Mark as completed",
+    "viewDetails": "View details"
+  },
+  "projectOverview": {
+    "globalProgress": "Overall Progress",
+    "projectProgress": "Project progress",
+    "completed": "Completed",
+    "inProgress": "In progress",
+    "upcoming": "Upcoming",
+    "nextStep": "Next Step",
+    "stepNumber": "Step {{number}}",
+    "scheduledFor": "Scheduled for {{date}}",
+    "start": "Start",
+    "congratulations": "Congratulations!",
+    "allStepsCompleted": "All construction steps are completed.",
+    "upcomingSteps": "Upcoming Steps",
+    "noScheduleTitle": "No schedule configured",
+    "noScheduleDescription": "Go to the Schedule tab to generate a customized construction calendar."
+  },
+  "stepDetail": {
+    "tasksCount": "{{completed}}/{{total}} tasks",
+    "stepPlanning": "Step planning",
+    "syncing": "syncing...",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "reset": "Reset",
+    "resetTooltip": "Reset dates to calculated schedule",
+    "lock": "Lock",
+    "locked": "Locked",
+    "lockTooltip": "Click to lock this date",
+    "lockedTooltip": "Locked date (contractor commitment)",
+    "lockedDateInfo": "This date is locked (contractor commitment). It will not be automatically modified during recalculations.",
+    "noSchedule": "This step is not yet in the schedule. Generate the schedule from the Schedule page.",
+    "planningConflict": "🚨 PLANNING CONFLICT",
+    "conflictNote": "💡 The manually entered date has been preserved. If this conflict is intentional, you can close this warning.",
+    "tasksToComplete": "Tasks to complete",
+    "budgetAnalysis": "Budget analysis",
+    "analysis": "Analysis",
+    "notesOnNeeds": "Notes on your needs",
+    "needsDescription": "Describe your needs here. This information will be used to pre-fill the budget analysis.",
+    "needsPlaceholder": "Ex: 2-story house, 3 bedrooms, 2 bathrooms, double garage, finished basement, open kitchen...",
+    "installationType": "Installation type",
+    "selectServicesType": "Select the type of services for your project.",
+    "municipalServices": "Municipal services",
+    "municipalServicesDesc": "Municipal water and sewer",
+    "privateInstallation": "Private installation",
+    "privateInstallationDesc": "Artesian well + Septic tank + Drain field",
+    "municipalServicesTip": "Plan for water and sewer connection fees",
+    "privateInstallationTip": "Plan for: soil study for septic installation, well drilling, drain field installation",
+    "createProjectForSoumissions": "Create or select a project to manage quotes.",
+    "tips": "Tips",
+    "requiredDocuments": "Required documents",
+    "previousStep": "Previous step",
+    "nextStep": "Next step",
+    "noteSaved": "Note saved",
+    "needsSaved": "Your needs have been recorded.",
+    "noteSaveError": "Unable to save note",
+    "choiceSaved": "Choice saved",
+    "municipalServicesSelected": "Municipal services selected (water, sewer)",
+    "privateInstallationSelected": "Private installation selected (well, septic)",
+    "choiceSaveError": "Unable to save choice",
+    "conflictDetected": "⚠️ WARNING - Conflict detected",
+    "dateLocked": "🔒 Date locked",
+    "dateUnlocked": "🔓 Date unlocked",
+    "startDateSaved": "Start date has been saved and locked.",
+    "endDateSaved": "End date has been saved and locked.",
+    "dateUpdateError": "Unable to update date",
+    "dateLockedDescription": "This date now represents a commitment and will not be automatically modified.",
+    "dateUnlockedDescription": "This date can now be automatically adjusted during recalculations.",
+    "lockError": "Unable to modify lock",
+    "datesReset": "🔄 Dates reset",
+    "datesResetDescription": "Dates have been automatically recalculated according to the schedule.",
+    "resetError": "Unable to reset dates",
+    "alertsForStep": "Alerts for this step"
+  },
+  "taskDates": {
+    "subcontractorDates": "Subcontractor dates",
+    "subcontractorDatesDescription": "Set the expected dates for this subcontractor. These dates will be used to synchronize the overall schedule.",
+    "startDate": "Start",
+    "endDate": "End",
+    "datesWillSync": "Dates are synced with the project schedule",
+    "addDates": "Schedule"
+  },
+  "footer": {
+    "description": "Your intelligent assistant for residential construction in Quebec. Plan, budget, and build with confidence.",
+    "tagline": "The planning tool for owner-builders in Quebec.",
+    "navigation": "Navigation",
+    "plans": "Plans",
+    "dashboard": "Dashboard",
+    "budget": "Budget",
+    "guide": "Guide",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms of Use",
+    "termsShort": "Terms",
+    "cookies": "Cookies",
+    "cookiePolicy": "Cookie Policy",
+    "manageCookies": "Manage cookies",
+    "reportBug": "Report a bug",
+    "contact": "Contact",
+    "allRightsReserved": "All rights reserved.",
+    "copyright": "© {{year}} MonProjetMaison.ca. All rights reserved.",
+    "disclaimer": "The information provided is not legally binding. Always consult a professional.",
+    "socialProof": "owner-builders trust us in Quebec"
+  },
+  "nav": {
+    "menu": "Menu",
+    "myProjects": "My Projects",
+    "steps": "Steps",
+    "myFiles": "My Files",
+    "budget": "Budget",
+    "schedule": "Schedule",
+    "buildingCode": "Requirements Guide",
+    "guide": "Guide",
+    "plans": "Plans",
+    "admin": "Admin",
+    "login": "Log in",
+    "logout": "Log out",
+    "getStarted": "Get Started"
+  },
+  "hero": {
+    "badge": "For owner-builders in Quebec",
+    "title": "Your co-pilot for",
+    "titleHighlight": "building with confidence",
+    "subtitle": "Plan, budget, and manage your residential construction project. Avoid cost overruns and coordination errors.",
+    "cta": "Start my project",
+    "ctaSecondary": "View plans",
+    "feature1": "Building Code compliant",
+    "feature2": "Save time",
+    "feature3": "Reduce costs"
+  },
+  "problem": {
+    "title": "Owner-building challenges",
+    "subtitle": "Without the right tools, even well-intentioned projects can go off track.",
+    "item1": {
+      "title": "Unexpected delays",
+      "description": "Poor coordination of subcontractors and accumulating delays."
+    },
+    "item2": {
+      "title": "Budget overruns",
+      "description": "Hidden costs, oversights, and overly optimistic estimates."
+    },
+    "item3": {
+      "title": "Lack of visibility",
+      "description": "Hard to know where you really stand in your project."
+    }
+  },
+  "solution": {
+    "title": "A complete solution",
+    "subtitle": "All the tools you need to succeed in your owner-build project.",
+    "budget": {
+      "title": "Detailed budget",
+      "description": "Track your expenses by category and anticipate overruns."
+    },
+    "schedule": {
+      "title": "Smart schedule",
+      "description": "Plan each step and coordinate your subcontractors."
+    },
+    "quotes": {
+      "title": "Quote management",
+      "description": "Compare estimates and keep everything in one place."
+    },
+    "tracking": {
+      "title": "Tracking and journal",
+      "description": "Document your progress with photos and notes."
+    }
+  },
+  "howItWorks": {
+    "title": "How it works",
+    "subtitle": "Three simple steps to take control of your project.",
+    "step1": {
+      "title": "Create your project",
+      "description": "Enter basic information: type, square footage, target budget."
+    },
+    "step2": {
+      "title": "Add your data",
+      "description": "Upload your quotes, define your expense categories."
+    },
+    "step3": {
+      "title": "Track and adjust",
+      "description": "Visualize your progress and adapt your plan in real-time."
+    }
+  },
+  "pricing": {
+    "title": "A plan tailored to your needs",
+    "subtitle": "Start free, upgrade when you're ready",
+    "mostPopular": "Most popular",
+    "discovery": {
+      "name": "Discovery",
+      "description": "Explore basic features for free.",
+      "cta": "Start for free",
+      "features": [
+        "1 active project",
+        "Read-only guide and structure",
+        "10 GB storage",
+        "1 AI analysis per month"
+      ]
+    },
+    "essential": {
+      "name": "Essential",
+      "description": "The complete tool to manage your owner-build.",
+      "cta": "Choose Essential",
+      "features": [
+        "1 active project",
+        "Editable schedule and budget",
+        "Complete guide with tracking",
+        "10 GB storage",
+        "10 AI analyses per month"
+      ]
+    },
+    "complete": {
+      "name": "Complete Management",
+      "description": "Advanced management with specialized analyses.",
+      "cta": "Choose Complete Management",
+      "features": [
+        "1 active project",
+        "Everything in Essential",
+        "Step-by-step quote analysis",
+        "RBQ license and tax number verification",
+        "Conflict alerts and subcontractor reminders",
+        "Critical omission and inconsistency detection",
+        "10 GB storage",
+        "25 AI analyses per month"
+      ]
+    }
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "subtitle": "Everything you need to know to get started.",
+    "q1": {
+      "question": "How does MonProjetMaison help stay within budget?",
+      "answer": "Our budget tracking tool lets you categorize each expense, compare with initial estimates, and receive alerts for overruns. AI analysis can also identify at-risk items."
+    },
+    "q2": {
+      "question": "Can I manage multiple projects?",
+      "answer": "Current plans include 1 active project. If you need to manage multiple projects simultaneously, contact us for a customized solution."
+    },
+    "q3": {
+      "question": "Is my data secure?",
+      "answer": "Yes, all your data is encrypted and stored securely. We never share your information with third parties."
+    },
+    "q4": {
+      "question": "How do quotes and estimates work?",
+      "answer": "You can upload your quotes as PDFs or enter them manually. Our AI can analyze documents to extract key information and help you compare offers."
+    },
+    "q5": {
+      "question": "Can I cancel or change plans?",
+      "answer": "You can change plans or cancel anytime. Changes take effect at the next billing period."
+    }
+  },
+  "cta": {
+    "title": "Ready to start your project?",
+    "subtitle": "Join owner-builders who manage their projects with confidence.",
+    "button": "Start my project for free"
+  },
+  "ctaBenefits": {
+    "planning": "Step-by-step planning",
+    "budget": "Real-time budget tracking",
+    "ai": "24/7 AI Assistant",
+    "compliant": "Quebec standards compliant"
+  },
+  "auth": {
+    "title": "My Project Space",
+    "subtitle": "Sign in to save and find your projects",
+    "login": "Log in",
+    "signup": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signupButton": "Create my account",
+    "loginButton": "Log in",
+    "orContinueWith": "Or continue with",
+    "displayName": "Display name",
+    "yourName": "Your name",
+    "resetPassword": "Reset password",
+    "newPassword": "New password",
+    "sendResetLink": "Send reset link",
+    "backToLogin": "Back to login",
+    "emailSent": "Email sent!",
+    "checkInbox": "Check your inbox at",
+    "checkSpam": "Can't find the email? Check your spam folder.",
+    "passwordUpdated": "Password updated!",
+    "passwordUpdatedDesc": "Your password has been changed successfully. You can now log in with your new password.",
+    "invalidLink": "Invalid or expired link",
+    "invalidLinkDesc": "This reset link is no longer valid. Please request a new one.",
+    "verifying": "Verifying...",
+    "goHome": "Go to home",
+    "minChars": "Minimum 6 characters",
+    "passwordMismatch": "Passwords do not match",
+    "loginError": "Login error",
+    "signupError": "Sign up error",
+    "loginSuccess": "Login successful!",
+    "signupSuccess": "Account created successfully!",
+    "resetSuccess": "Reset email sent!",
+    "updatePassword": "Update password",
+    "enterNewPassword": "Enter your new password below"
+  },
+  "planUsage": {
+    "title": "My plan",
+    "currentUsage": "Current usage",
+    "projects": "Projects",
+    "aiAnalyses": "AI Analyses (this month)",
+    "storage": "Storage",
+    "unlimited": "Unlimited",
+    "upgrade": "Upgrade to a higher plan",
+    "gb": "GB"
+  },
+  "premiumFeatures": {
+    "quoteAnalysisRestricted": "AI quote analysis with RBQ/tax verification is reserved for the Complete Management plan",
+    "quoteAnalysisTooltip": "Automatic analysis of your quotes by construction step, verification of RBQ licenses and contractor tax numbers.",
+    "quoteAnalysisPlan": "Available with Complete Management plan",
+    "alertsRestricted": "Conflict alerts and subcontractor contact reminders are reserved for the Complete Management plan",
+    "alertsTooltip": "Receive automatic alerts for schedule conflicts and reminders to contact your subcontractors at the right time.",
+    "alertsPlan": "Available with Complete Management plan",
+    "upgradeToUnlock": "Upgrade to Complete Management to unlock this feature",
+    "viewPlans": "View plans"
+  },
+  "projects": {
+    "title": "My Projects",
+    "subtitle": "Find and manage all your construction projects",
+    "create": "New project",
+    "createFirst": "Create my first project",
+    "noProjects": "No projects",
+    "noProjectsDesc": "Create your first project to start planning your construction",
+    "projectName": "Project name",
+    "projectType": "Project type",
+    "squareFootage": "Square footage",
+    "sqft": "sq ft",
+    "totalBudget": "Total budget",
+    "startDate": "Expected start date",
+    "status": "Status",
+    "statuses": {
+      "planning": "Planning",
+      "permit": "Pending permit",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "paused": "Paused",
+      "undefined": "Undefined"
+    },
+    "types": {
+      "newHome": "New home",
+      "extension": "Extension",
+      "detachedGarage": "Detached garage",
+      "majorRenovation": "Major renovation",
+      "cabin": "Cabin"
+    },
+    "notFound": "Project not found",
+    "backToProjects": "Back to my projects",
+    "deleted": "Project deleted",
+    "deleteError": "Error deleting project",
+    "overview": "Overview",
+    "steps": "Steps",
+    "photos": "Photos",
+    "documentsTab": "Documents",
+    "noPhotosTitle": "No photos",
+    "noPhotosDesc": "Add tracking photos in each construction step",
+    "goToSteps": "Go to steps",
+    "noDocumentsTitle": "No documents",
+    "noDocumentsDesc": "Add documents (plans, quotes, estimates) in the tasks of each step",
+    "allPhases": "All phases",
+    "contactSubcontractor": "Contact subcontractor",
+    "stepReminder": "Make sure all previous steps have been completed before starting this one.",
+    "createdOnDate": "Created on {{date}}",
+    "view": "View"
+  },
+  "budget": {
+    "title": "Budget",
+    "subtitle": "Track and manage your project budget",
+    "pageTitle": "Project Budget",
+    "pageSubtitle": "Manage and track your construction expenses",
+    "totalBudget": "Total budget",
+    "spent": "Spent",
+    "remaining": "Remaining",
+    "estimatedRemaining": "Estimated remaining",
+    "estimatedBudget": "Estimated budget",
+    "budgetRange": "Range ±10%",
+    "noAnalysis": "No analysis performed",
+    "percentUsed": "of budget used",
+    "categories": "Categories",
+    "addCategory": "Add category",
+    "addExpense": "Add expense",
+    "newExpense": "New expense",
+    "newExpenseDesc": "Record a new expense for your project",
+    "category": "Category",
+    "description": "Description",
+    "amount": "Amount ($)",
+    "descriptionPlaceholder": "E.g.: Concrete for foundation",
+    "subtotal": "Subtotal",
+    "contingency": "Contingency (5%)",
+    "taxes": "Taxes (GST + QST)",
+    "grandTotal": "Grand total",
+    "selectProject": "Select a project",
+    "associatedProject": "Associated project",
+    "noProjectSelected": "No project selected",
+    "noProjectsYet": "You don't have any projects yet.",
+    "createProjectLink": "Create one",
+    "toSaveBudget": "to save your budget.",
+    "autoSaveNote": "Budget will be automatically saved for this project",
+    "loginToSave": "to save your budget in your project.",
+    "createProjectFirst": "Create a project to start managing your budget",
+    "analyzePlans": "Analyze plans",
+    "resetBudget": "Reset",
+    "resetting": "Resetting...",
+    "saveBudget": "Save",
+    "saving": "Saving...",
+    "generateSchedule": "Generate schedule",
+    "budgetSaved": "Budget saved successfully!",
+    "budgetReset": "Budget reset successfully!",
+    "estimatedRange": "Estimated range",
+    "distribution": "Budget distribution",
+    "distributionDesc": "Overview by category",
+    "detailedBudget": "Detailed budget by category",
+    "itemsDetails": "Item details",
+    "seeSubmissions": "View submissions",
+    "finalTotal": "Final total",
+    "totalWithTaxes": "Total (taxes included)",
+    "noItems": "No detailed items",
+    "noItemsDesc": "Analyze your plans to generate items",
+    "detailedBudgetDesc": "Budget and expenses by category — Upload your quotes to adjust your actual budget",
+    "exceeded": "Over budget",
+    "includedTasks": "Included tasks (guide steps)",
+    "noItemsAnalyzed": "No items analyzed for this category yet.",
+    "noItemsAssociated": "No items associated.",
+    "noTasksDefined": "No tasks defined for this category.",
+    "noItemsDetected": "No items detected for this task.",
+    "itemCount": "{{count}} item",
+    "itemCount_other": "{{count}} items",
+    "element": "Item",
+    "quantity": "Quantity",
+    "cost": "Cost",
+    "otherItems": "Other items",
+    "contingencyBudget": "Contingency budget (5%)",
+    "taxesTpsQst": "Taxes (GST 5% + QST 9.975%)",
+    "manageBudgetSubmissions": "Manage budget and submissions",
+    "addSubmissions": "Add your quotes",
+    "categoriesCount": "categories",
+    "analysisLabel": "Analysis",
+    "confirmedSupplier": "Confirmed Supplier",
+    "contactPerson": "Contact",
+    "amountPlaceholder": "0.00",
+    "categories": {
+      "Excavation": "Excavation",
+      "Fondation": "Foundation",
+      "Structure et charpente": "Structure and Framing",
+      "Toiture": "Roofing",
+      "Fenêtres et portes extérieures": "Windows and Exterior Doors",
+      "Isolation et pare-vapeur": "Insulation and Vapor Barrier",
+      "Plomberie sous dalle": "Under-Slab Plumbing",
+      "Coulée de dalle du sous-sol": "Basement Slab Pouring",
+      "Murs de division": "Partition Walls",
+      "Plomberie": "Plumbing",
+      "Électricité": "Electrical",
+      "Chauffage et ventilation": "Heating and Ventilation",
+      "Revêtement extérieur": "Exterior Siding",
+      "Gypse et peinture": "Drywall and Painting",
+      "Revêtements de sol": "Flooring",
+      "Travaux ébénisterie": "Cabinetry Work",
+      "Finitions intérieures": "Interior Finishes",
+      "Autres éléments": "Other Items"
+    }
+  },
+  "categorySubmissions": {
+    "manageSubmissionsFor": "Manage quotes for \"{{name}}\"",
+    "manageBudgetAndSubmissions": "Manage budget, quotes and sub-categories",
+    "supplierNotice": {
+      "title": "Supplier Notice",
+      "description": "Specify the lead time required to notify the supplier before this step begins. The system will use this information to automatically create an alert reminding you to contact the supplier at the right time to schedule their work without delays.",
+      "label": "Required notice period (in days)",
+      "placeholder": "E.g. 14 days",
+      "tooltip": "Example: 14 days – contact the supplier 2 weeks before the step starts."
+    },
+    "taskSubmissions": {
+      "title": "Submissions by task",
+      "noSupplier": "No supplier assigned for this task",
+      "noSupplierHint": "Upload quotes and analyze them or manually add a supplier",
+      "documentsUploaded": "document(s) uploaded",
+      "summary": "Supplier summary",
+      "total": "Total",
+      "byTask": "By task",
+      "bySubcategory": "DIY (Do it myself)",
+      "diyModeDescription": "Create sub-categories for work you do yourself. The AI will analyze your plans to estimate material costs only (no labor).",
+      "confirmed": "Confirmed",
+      "supplier": "Supplier",
+      "amount": "Amount",
+      "leadDays": "Lead time",
+      "singleMode": "Single submission",
+      "singleModeDescription": "A single subcontractor performs all tasks for this step. Upload the quote and select the retained supplier below.",
+      "resetCategory": "Reset",
+      "resetCategoryTitle": "Reset this category?",
+      "resetCategoryDescription": "This action will delete all submission data for this category: documents, selected supplier, amounts, and analyses. This action cannot be undone.",
+      "resetCategoryConfirm": "Yes, reset",
+      "resetCategorySuccess": "Category reset successfully"
+    }
+  },
+  "analysisFullView": {
+    "quoteAnalysis": "Quote Analysis"
+  },
+  "diyAnalysisView": {
+    "materialAnalysis": "DIY Material Analysis"
+  },
+  "subCategoryManager": {
+    "diyItems": "DIY work (do it myself)",
+    "noDiyItems": "No DIY work",
+    "addDiyHint": "Add work you do yourself to calculate material costs (e.g., Light fixtures, Painting...)",
+    "addDiyTitle": "Add DIY work",
+    "diyInfoBanner": "The AI will analyze your plans to estimate the required material costs (no labor).",
+    "diyItemName": "Work name",
+    "diyItemPlaceholder": "E.g.: Light fixtures, Bedroom painting...",
+    "suggestions": "Suggestions",
+    "totalDiyItems": "Total DIY work",
+    "analyzed": "Analyzed",
+    "materials": "Materials"
+  },
+  "budgetAnalysis": {
+    "analysisResult": "Analysis result",
+    "rangePlusMinus10": "Range ±10%",
+    "mergedAnalysis": "Merged analysis from {{count}} plan(s)",
+    "newConstruction": "New construction of {{sqft}} sq ft on {{floors}} floor(s)",
+    "categoryCountWithContingencyTaxes": "{{count}} category(ies) + Contingency + Taxes • Range ±10%",
+    "warnings": "Warnings",
+    "to": "to",
+    "allCategories": "All categories",
+    "alertsWarnings": "Alerts and Warnings",
+    "recommendations": "Recommendations",
+    "totalIncludes": "This total includes:",
+    "allConstructionWork": "All construction work",
+    "contingencyForUnforeseen": "Contingency (5% for unforeseen)",
+    "tpsTvq": "GST (5%) + QST (9.975%)",
+    "preliminaryEstimate": "Preliminary estimate",
+    "includesTaxesContingency": "Includes taxes and contingency",
+    "ttc": "All taxes incl.",
+    "materials": "Materials",
+    "labor": "Labor",
+    "contingency5": "Contingency (5%)",
+    "taxesTpsTvq": "Taxes (GST+QST)",
+    "surfacesComplete": "Surfaces complete",
+    "surfacesIncomplete": "Surfaces incomplete",
+    "laborMaterialRatio": "Labor/Material ratio",
+    "budgetDistribution": "Budget distribution",
+    "budgetByCategory": "Budget by category",
+    "beforeTaxes": "Before taxes",
+    "budgetSummary": "Budget summary",
+    "budgetSummaryTooltip": "This summary shows the complete breakdown: work, contingency (5% for unforeseen) and applicable Quebec taxes (GST + QST).",
+    "workSubtotal": "Work subtotal",
+    "contingencyBudget": "Contingency budget (5%)",
+    "contingencyTooltip": "Recommended reserve to cover unforeseen events and modifications during construction.",
+    "tps5": "GST (5%)",
+    "tpsTooltip": "Goods and Services Tax (federal)",
+    "tvq": "QST (9.975%)",
+    "tvqTooltip": "Quebec Sales Tax (provincial)",
+    "totalEstimated": "ESTIMATED TOTAL",
+    "totalIncludesBreakdown": "Total including: work + contingency (5%) + taxes (GST 5% + QST 9.975%)",
+    "searchItem": "Search for an item...",
+    "filterByCategory": "Filter by category",
+    "beforeTaxesPercent": "Before taxes • {{percent}}%",
+    "overview": "Overview",
+    "details": "Details",
+    "table": "Table",
+    "export": "Export",
+    "category": "Category",
+    "budget": "Budget",
+    "budgetTooltip": "Amount before taxes and contingency",
+    "percentOfTotal": "% of total",
+    "description": "Description",
+    "excludingTaxesContingency": "Amount excluding taxes and contingency",
+    "reserveForUnforeseen": "Reserve for unforeseen events and modifications",
+    "federalTax": "Federal goods and services tax",
+    "provincialTax": "Quebec sales tax",
+    "workPlusContingencyTaxes": "Work + contingency + taxes",
+    "exportAnalysis": "Export analysis",
+    "exportDescription": "Download your budget analysis in different formats",
+    "exportPdf": "Professional PDF export",
+    "exportExcel": "Excel export",
+    "comingSoon": "Coming soon",
+    "applyBudget": "Apply this budget to project"
+  },
+  "budgetWarnings": {
+    "missingElement": "⚠️ Missing element:",
+    "ambiguity": "❓ Ambiguity:",
+    "inconsistency": "⚡ Inconsistency:",
+    "sitePreparation": "🏗️ SITE PREPARATION:",
+    "permitsInspections": "🚧 PERMITS AND INSPECTIONS:",
+    "publicServices": "📋 PUBLIC SERVICES:",
+    "structuralJoining": "🔗 STRUCTURAL JOINING:",
+    "electricalConnection": "⚡ ELECTRICAL CONNECTION:",
+    "plumbingConnection": "🔌 PLUMBING CONNECTION:",
+    "waterproofing": "🏠 WATERPROOFING:",
+    "harmonization": "🎨 HARMONIZATION:",
+    "fireSeparation": "🔥 FIRE SEPARATION:",
+    "sitePreparationFull": "🏗️ SITE PREPARATION: Verify excavation, grading, and site access costs",
+    "permitsInspectionsFull": "🚧 PERMITS AND INSPECTIONS: Building permit fees and municipal inspections to be expected",
+    "publicServicesFull": "📋 PUBLIC SERVICES: Confirm connections (water, sewer, electricity, gas) and associated fees",
+    "structuralJoiningFull": "🔗 STRUCTURAL JOINING: Connection work to existing structure (lintels, anchors, foundation reinforcement)",
+    "electricalConnectionFull": "⚡ ELECTRICAL CONNECTION: Extension of existing panel and code compliance possibly required",
+    "plumbingConnectionFull": "🔌 PLUMBING CONNECTION: Connection to existing systems (water, drainage, heating)",
+    "waterproofingFull": "🏠 WATERPROOFING: Waterproof seal between new and old construction is critical",
+    "harmonizationFull": "🎨 HARMONIZATION: Finishing work to match existing exterior materials",
+    "fireSeparationFull": "🔥 FIRE SEPARATION: Check fire separation requirements between garage and dwelling",
+    "multiLotAnalysis": "Multi-lot analysis: {{lots}} lot(s) merged for {{plans}} plan(s) total.",
+    "missing": {
+      "floorPlans": "Detailed floor plans",
+      "insulationSpecs": "Insulation specifications",
+      "electricalPlumbing": "Electrical and plumbing details",
+      "interiorFinishes": "Interior finishes",
+      "windowDimensions": "Exact dimensions of all windows",
+      "roofing": "Roofing and covering",
+      "windowsDoors": "Windows and exterior doors",
+      "exteriorSiding": "Exterior siding",
+      "insulationDetailed": "Detailed insulation",
+      "hvac": "HVAC system",
+      "kitchenBathroom": "Finished kitchen and bathrooms",
+      "windowDetails": "Specific window details (exact dimensions, types)",
+      "electricalPlumbingSpecs": "Electrical and plumbing specifications",
+      "interiorFinishDetails": "Interior finish details",
+      "sidingType": "Exterior siding type",
+      "heatingSystem": "Heating system",
+      "windowSpecificDetails": "Specific window details and exact dimensions",
+      "interiorFinishesDetailed": "Detailed interior finishes",
+      "exteriorSidingSpecified": "Specified exterior siding",
+      "windowsDoorsDimensionsNotVisible": "Windows and doors - dimensions not visible",
+      "electricalCircuitsNotDetailed": "Electrical - circuits not detailed",
+      "plumbingAppliancesNotSpecified": "Plumbing - appliances not specified",
+      "interiorFinishesMaterialsNotSpecified": "Interior finishes - materials not specified",
+      "countertops": "Countertops",
+      "kitchenCabinets": "Kitchen cabinets",
+      "vanities": "Vanities",
+      "staircase": "Staircase",
+      "railings": "Railings and guards",
+      "flooring": "Flooring",
+      "paint": "Paint",
+      "interiorDoors": "Interior doors",
+      "trimBaseboards": "Trim and baseboards",
+      "lightFixtures": "Light fixtures",
+      "outletsSwitches": "Outlets and switches",
+      "faucets": "Faucets",
+      "sanitaryFixtures": "Sanitary fixtures",
+      "ventilation": "Ventilation",
+      "airConditioning": "Air conditioning system",
+      "fireplaceOrStove": "Fireplace or stove",
+      "garage": "Garage",
+      "deckOrBalcony": "Deck or balcony",
+      "landscaping": "Landscaping",
+      "driveway": "Driveway",
+      "fence": "Fence"
+    },
+    "ambiguity": {
+      "buildingDimensions": "Exact building dimensions not clearly indicated",
+      "windowTypes": "Precise window types difficult to distinguish",
+      "foundationWallHeight": "Exact foundation wall height to be confirmed",
+      "foundationWallHeightSimple": "Exact foundation wall height",
+      "floorFinishType": "Exact floor finish type",
+      "mechanicalSpecs": "Mechanical system specifications",
+      "windowCountDimensions": "Exact window count and dimensions not specified",
+      "wallHeightEstimated9": "Exact wall height (estimated 9')",
+      "foundationTypeEstimated": "Foundation type (estimated standard poured concrete)",
+      "windowCountDimensionsNotClear": "Exact window count and dimensions not clearly indicated",
+      "exteriorSidingNotSpecified": "Exterior siding type not specified",
+      "wallHeightNotSpecified": "Exact wall height not specified",
+      "wallHeightEstimated8": "Exact wall height - estimated at 8'",
+      "exteriorSidingType": "Exact exterior siding type",
+      "windowCountAndDimensions": "Window count and dimensions",
+      "exactAreaNotVisible": "Exact area not visible",
+      "materialQualityNotSpecified": "Material quality not specified",
+      "finishLevelNotIndicated": "Finish level not indicated",
+      "heatingTypeNotSpecified": "Heating type not specified",
+      "electricalConfigNotDetailed": "Electrical configuration not detailed"
+    },
+    "inconsistency": {
+      "noMajorOnElevations": "No major inconsistency detected on this elevation page",
+      "basementOnlyMissingFloors": "Plan shows basement only, missing upper floors for complete estimate",
+      "noMajorDetected": "No major inconsistency detected",
+      "sectionDimensionsNotVisible": "Plan shows section but complete dimensions not visible",
+      "dimensionsMismatch": "Inconsistent dimensions between plans",
+      "areaMismatch": "Calculated area does not match indicated area",
+      "windowCountMismatch": "Different window count between elevations and plans"
+    }
+  },
+  "categories": {
+    "excavation": "Excavation",
+    "foundation": "Foundation",
+    "plumbing": "Plumbing",
+    "electrical": "Electrical",
+    "structure": "Structure and framing",
+    "roofing": "Roofing",
+    "windowsDoors": "Windows and exterior doors",
+    "insulation": "Insulation and vapour barrier",
+    "hvac": "Heating and ventilation",
+    "exterior": "Exterior cladding",
+    "drywall": "Drywall and paint",
+    "flooring": "Flooring",
+    "plumbingSlab": "Under-slab plumbing",
+    "basementSlab": "Basement slab pour",
+    "interiorWalls": "Partition walls",
+    "cabinetry": "Cabinetry work",
+    "interiorFinishes": "Interior finishes",
+    "otherItems": "Other items",
+    "contingency": "Contingency budget (5%)",
+    "taxes": "Taxes"
+  },
+  "planAnalyzer": {
+    "aiProjectAnalysis": "AI Project Analysis",
+    "chooseMethod": "Choose your analysis method to generate a personalized budget",
+    "importantNote": "Important note",
+    "disclaimer": "Estimates provided by AI are based on average market costs and are intended for planning purposes. They help estimate costs and structure the project, but do not replace professional quotes, which remain essential for determining the actual cost of each phase of work.",
+    "tabs": {
+      "manual": "Manual configuration",
+      "plan": "Plan analysis"
+    },
+    "manualConfig": "Manual configuration",
+    "planAnalysis": "Plan analysis",
+    "manualConfigDesc": "Enter your project details to get a budget estimate based on parameters.",
+    "projectType": "Project type",
+    "projectTypes": {
+      "maisonUnifamiliale": "Single-family home",
+      "bungalow": "Bungalow",
+      "cottage": "Cottage (2 stories)",
+      "jumelee": "Semi-detached house",
+      "agrandissement": "Extension",
+      "garage": "Detached garage",
+      "garageEtage": "Garage with finished upper floor",
+      "chalet": "Cottage/Chalet"
+    },
+    "foundationType": "Foundation type",
+    "foundationTypes": {
+      "dalleMonolithique": "Monolithic slab",
+      "fondation": "Standard foundation"
+    },
+    "monolithicDesc": "Slab and walls poured together (more economical)",
+    "standardFoundationDesc": "Foundation walls with separate slab",
+    "totalSqft": "Total area (sq ft)",
+    "numberOfFloors": "Number of floors",
+    "floors": {
+      "one": "1 floor (single-story)",
+      "two": "2 floors",
+      "three": "3 floors"
+    },
+    "foundationSqft": "Foundation area (sq ft)",
+    "floorSqft": "Floor {{number}} area (sq ft)",
+    "garage": "Garage",
+    "includeGarage": "Include a garage",
+    "finishQuality": "Interior finish quality",
+    "qualityLevels": {
+      "economique": "🏷️ Economy",
+      "economiqueDesc": "Basic materials, laminate flooring, melamine cabinets, laminate countertops",
+      "standard": "⭐ Standard",
+      "standardDesc": "Engineered hardwood, semi-custom cabinets, quartz countertops",
+      "hautDeGamme": "💎 High-end",
+      "hautDeGammeDesc": "Solid hardwood, custom cabinets, granite/marble countertops"
+    },
+    "qualityNote": "This choice affects flooring, cabinets, countertops, hardware, and finish costs.",
+    "needsNotes": "Notes on your needs (optional)",
+    "needsPlaceholder": "E.g.: Open kitchen to living room, 3 bedrooms including 1 master suite, finished basement with home theater...",
+    "prefilledFromStep1": "Pre-filled from your needs defined in step 1",
+    "referenceImages": "Reference images (optional)",
+    "referenceImagesDesc": "Add photos or sketches to help the analysis (plans, inspiration, etc.)",
+    "add": "Add",
+    "imagesAdded": "{{count}} image(s) added for analysis",
+    "enrichedAnalysis": "💡 Enhanced analysis",
+    "enrichedAnalysisDesc": "Upload your plans AND add additional information for the most accurate estimate possible.",
+    "convertingPdf": "Converting PDF...",
+    "percentComplete": "{{percent}}% complete",
+    "constructionPlans": "Construction plans",
+    "plansFound": "Plans found",
+    "plansFoundDesc": "Add all plans (floors, elevations, sections) for a complete analysis.",
+    "importLatestPlan": "Import latest plan",
+    "addExistingPlan": "Add an existing plan...",
+    "upload": "Upload",
+    "converting": "Converting...",
+    "clear": "Clear",
+    "plan": "Plan",
+    "materialsAndFinishes": "Materials and finishes (recommended)",
+    "materialsAndFinishesDesc": "These details are usually not visible on plans. Specify them for a more realistic estimate.",
+    "generalFinishQuality": "General finish quality",
+    "exteriorSiding": "Exterior siding",
+    "sidingTypes": {
+      "vinyle": "Vinyl",
+      "canexel": "Canexel / Fiber cement",
+      "bois": "Natural wood",
+      "brique": "Brick",
+      "pierre": "Stone / Stone veneer",
+      "aluminium": "Aluminum",
+      "mixte": "Mixed (multiple materials)"
+    },
+    "roofType": "Roof type",
+    "roofTypes": {
+      "bardeauAsphalte": "Asphalt shingles",
+      "bardeauArchitectural": "Architectural shingles",
+      "metal": "Metal roofing",
+      "elastomere": "Elastomeric membrane (flat roof)",
+      "tpoEpdm": "TPO / EPDM (flat roof)"
+    },
+    "windowType": "Window type",
+    "windowTypes": {
+      "pvcStandard": "Standard PVC",
+      "pvcTriple": "Triple-pane PVC",
+      "aluminium": "Aluminum",
+      "pvcAlu": "Hybrid PVC/Alu",
+      "bois": "Solid wood"
+    },
+    "insulationType": "Insulation type",
+    "insulationTypes": {
+      "laineStandard": "Standard insulation batt",
+      "laineHauteDensite": "High-density batt",
+      "polyurethane": "Spray foam polyurethane",
+      "cellulose": "Blown cellulose",
+      "panneauRigide": "Rigid panels (SIP)"
+    },
+    "heatingType": "Heating system",
+    "heatingTypes": {
+      "plinthes": "Electric baseboards",
+      "thermopompeMurale": "Wall-mounted heat pump",
+      "thermopompeCentrale": "Central heat pump",
+      "plancherRadiant": "Electric radiant floor",
+      "plancherRadiantHydro": "Hydronic radiant floor",
+      "biEnergie": "Dual-energy (furnace + heat pump)",
+      "geothermie": "Geothermal"
+    },
+    "flooringType": "Main flooring type",
+    "flooringTypes": {
+      "flottantStratifie": "Laminate flooring",
+      "vinyleLuxe": "Luxury vinyl plank (LVP)",
+      "boisIngenierie": "Engineered hardwood",
+      "boisFranc": "Solid hardwood",
+      "ceramique": "Ceramic / Porcelain",
+      "betonPoli": "Polished concrete"
+    },
+    "cabinetType": "Kitchen cabinet type",
+    "cabinetTypes": {
+      "melamine": "Melamine",
+      "polyester": "Polymer / Polyester",
+      "thermoplastique": "Thermoplastic",
+      "laque": "Lacquer / Acrylic",
+      "boisMassif": "Solid wood",
+      "surMesure": "High-end custom"
+    },
+    "countertopType": "Countertop type",
+    "countertopTypes": {
+      "stratifie": "Laminate",
+      "quartz": "Quartz",
+      "granit": "Granite",
+      "marbre": "Marble",
+      "blocBoucher": "Butcher block (wood)",
+      "beton": "Concrete",
+      "dekton": "Dekton / Ultra-compact"
+    },
+    "projectNotes": "Project notes (optional)",
+    "projectNotesPlaceholder": "E.g.: Open kitchen with island, 3 bedrooms, finished basement, wall heat pump, heated bathroom floor, 12x10 balcony...",
+    "moreDetailsNote": "The more details you provide, the more accurate the estimate (desired materials, special equipment, etc.)",
+    "inspirationImages": "Inspiration images (optional)",
+    "generateBudget": "Generate budget",
+    "analyzePlan": "Analyze plan",
+    "analyzing": "Analyzing...",
+    "batchAnalysis": "Batch {{current}}/{{total}}...",
+    "batchAnalysisProgress": "Batch analysis ({{current}}/{{total}})",
+    "plansProgress": "Plans {{start}} to {{end}} of {{total}}",
+    "batchAnalysisNote": "Analyzing {{count}} plans in {{batches}} batch(es) to avoid timeouts...",
+    "analysisNote": "Analysis may take a few minutes depending on plan complexity...",
+    "analysisResult": "Analysis result",
+    "rangeNote": "Range ±10%",
+    "contingencyBudget": "Contingency budget (5%)",
+    "taxesLabel": "Taxes (GST 5% + QST 9.975%)",
+    "categoriesCount": "{{count}} category(ies) + Contingency + Taxes • Range ±10%",
+    "summaryLine": "{{count}} category(ies) + Contingency + Taxes • Range ±10%",
+    "warningsTitle": "Warnings",
+    "recommendationsTitle": "Recommendations",
+    "warnings": "Warnings",
+    "recommendations": "Recommendations",
+    "applyBudget": "Apply this budget",
+    "select": "Select..."
+  },
+  "schedule": {
+    "title": "Schedule",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "duration": "Duration",
+    "totalDuration": "Total duration",
+    "days": "days",
+    "status": {
+      "notStarted": "Not started",
+      "pending": "Pending",
+      "inProgress": "In progress",
+      "completed": "Completed",
+      "delayed": "Delayed"
+    },
+    "gantt": "Gantt",
+    "calendar": "Calendar",
+    "table": "Table",
+    "conflicts": "Conflicts",
+    "conflictDetected": "Conflicts detected",
+    "alerts": "Alerts",
+    "noAlerts": "No alerts",
+    "addStep": "Add step",
+    "total": "Total",
+    "waiting": "Pending",
+    "inProgress": "In progress",
+    "completed": "Completed",
+    "regenerate": "Regenerate",
+    "projectPlanning": "Project Planning",
+    "updateSchedule": "Update Schedule",
+    "noScheduledSteps": "No scheduled steps with dates.",
+    "addDatesToSeeGantt": "Add start dates to steps to see the Gantt chart.",
+    "alertsAndReminders": "Alerts and Reminders",
+    "noActiveAlerts": "No active alerts",
+    "overdue": "overdue",
+    "supplier": "Supplier",
+    "includedTasks": "Included tasks:",
+    "moreTasks": "+{{count}} more tasks",
+    "curingPeriod": "Curing period",
+    "curingDescription": "Mandatory {{days}}-day period for concrete curing before loading foundation walls.",
+    "curingMinRecommended": "Minimum recommended: 21 days (3 weeks)",
+    "concreteCuring": "Concrete curing",
+    "dateLockedManually": "Date locked manually",
+    "andMoreConflicts": "And {{count}} more conflicts...",
+    "trades": {
+      "excavation": "Excavation",
+      "foundation": "Foundation/Concrete",
+      "carpenter": "Carpenter",
+      "roofer": "Roofer",
+      "windowsDoors": "Windows/Doors",
+      "electrician": "Electrician",
+      "plumber": "Plumber",
+      "hvac": "Heating/Ventilation",
+      "insulation": "Insulation",
+      "drywall": "Drywall",
+      "painter": "Painter",
+      "flooring": "Flooring",
+      "tiler": "Tiler",
+      "cabinetMaker": "Cabinetry",
+      "countertops": "Countertops",
+      "interiorFinish": "Interior Finish",
+      "exteriorSiding": "Exterior Siding",
+      "landscaping": "Landscaping",
+      "inspector": "Inspector",
+      "surveyor": "Surveyor",
+      "generalContractor": "General Contractor",
+      "other": "Other",
+      "concrete": "Concrete"
+    },
+    "alertTypes": {
+      "supplierCall": "Call supplier",
+      "fabricationStart": "Start fabrication",
+      "measurement": "Take measurements",
+      "contactSubcontractor": "Contact subcontractor"
+    },
+    "urgency": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "soon": "Soon",
+      "upcoming": "Upcoming"
+    },
+    "delayReasons": {
+      "concreteCuring": "Foundation concrete curing (minimum 3 weeks)",
+      "exteriorAfterElectrical": "Exterior cladding can begin after electrical rough-in"
+    },
+    "alertsTitle": "Important Reminders",
+    "alertsModalDescription": "These reminders help you coordinate your subcontractors. Contact them as soon as possible to confirm dates.",
+    "remindLater": "Remind me later",
+    "remindMeIn": "Remind me in...",
+    "reminderOptions": {
+      "1hour": "1 hour",
+      "3hours": "3 hours",
+      "tomorrow": "Tomorrow",
+      "2days": "2 days",
+      "1week": "1 week",
+      "2weeks": "2 weeks"
+    }
+  },
+  "guide": {
+    "title": "Construction Guide",
+    "subtitle": "Follow these steps to successfully complete your self-build project.",
+    "steps": "Steps",
+    "tasks": "Tasks",
+    "markComplete": "Mark as complete",
+    "markCompleteDesc": "In each step, mark completed tasks to track your progress and adjust the schedule.",
+    "notes": "Notes",
+    "attachments": "Attachments",
+    "disclaimer": "Important Notice",
+    "disclaimerText": "The information in this guide is provided for informational purposes only and has no legal value. Always consult the appropriate authorities (municipality, RBQ) and qualified professionals for your projects.",
+    "usefulLinks": "Useful Links",
+    "usefulLinksDesc": "Official resources for your project",
+    "official": "Official",
+    "recalculate": "Recalculate",
+    "recalculateSchedule": "Recalculate Schedule",
+    "recalculateScheduleDesc": "The \"Recalculate\" button automatically updates your project dates based on estimated durations.",
+    "preliminarySchedule": "Preliminary Schedule",
+    "preliminaryScheduleDesc": "Your work start date is based on a preliminary estimate. It may vary depending on your planning progress, permit acquisition, and contractor availability. Complete the preparation steps to refine this date.",
+    "categories": {
+      "rbq": "RBQ Requirements",
+      "rbqDesc": "Régie du bâtiment du Québec",
+      "inspections": "Required Inspections",
+      "inspectionsDesc": "Municipal verification steps",
+      "code": "Building Code",
+      "codeDesc": "Essential technical requirements",
+      "trades": "Trades",
+      "tradesDesc": "Coordinating contractors",
+      "safety": "Site Safety",
+      "safetyDesc": "Accident prevention"
+    }
+  },
+  "buildingCode": {
+    "title": "Building Requirements Guide (Quebec)",
+    "subtitle": "Understand the Construction Code principles applicable to your project",
+    "search": "Search the code...",
+    "searchPlaceholder": "Ask your question about the building code...",
+    "categories": {
+      "all": "All",
+      "structure": "Structure",
+      "safety": "Safety",
+      "stairs": "Stairs",
+      "insulation": "Insulation",
+      "plumbing": "Plumbing",
+      "electrical": "Electrical",
+      "ventilation": "Ventilation",
+      "finishes": "Finishes",
+      "windows": "Windows",
+      "municipal": "Municipal code"
+    },
+    "importance": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium"
+    },
+    "article": "Article",
+    "seeArticle": "View full article",
+    "aiAssistant": "AI Assistant",
+    "askQuestion": "Ask your question",
+    "resultsFor": "Results for",
+    "noResults": "No results found",
+    "tryDifferent": "Try different keywords",
+    "disclaimer": {
+      "title": "Important notice",
+      "intro": "The information presented on this page, including that generated by the AI assistant, is provided for informational and educational purposes only. It is intended to help with the general understanding of Building Code principles applicable to residential construction and self-building projects.",
+      "notOfficial": "This content does not reproduce or replace the official texts of the National Building Code of Canada or the Quebec Construction Code, which remain the only legal and regulatory reference.",
+      "noAdvice": "MonProjetMaison.ca does not provide any legal, regulatory, or professional advice. Applicable requirements may vary depending on the municipality, project type, and specific site conditions.",
+      "recommendation": "Before starting work or making a technical decision, it is recommended to consult the official texts and validate your project with the competent authorities or qualified professionals (building inspector, engineer, architect, licensed contractor).",
+      "liability": "MonProjetMaison.ca disclaims all liability for the use, interpretation, or application of the information provided on this page.",
+      "text": "The information provided is for reference only. Always consult a qualified professional and local authorities."
+    },
+    "selectedProject": "Selected project",
+    "activeMunicipalCodes": "Active municipal codes",
+    "change": "Change",
+    "smartSearch": "Smart search",
+    "newSearch": "New search",
+    "guideYou": "I will guide you with questions to find the best answer.",
+    "enterMunicipality": "Enter your municipality...",
+    "examples": [
+      "Guardrail height",
+      "Stair dimensions",
+      "Wall insulation",
+      "Minimum front setback",
+      "Electrical outlets",
+      "Emergency exits"
+    ],
+    "results": {
+      "searchSummary": "Search Summary",
+      "buildingCodeSummary": "Building Code (educational summary)",
+      "municipalCodes": "Municipal codes",
+      "result": "result",
+      "results": "results",
+      "keyPoints": "Key points",
+      "technicalChecks": "Technical checks",
+      "commonMistakes": "Common mistakes in self-building",
+      "consultProfessional": "When to consult a professional / municipality",
+      "suggestedLinks": "Suggested official links",
+      "disclaimer": "This information is provided for informational purposes only and does not replace official texts or the advice of a qualified professional.",
+      "noResultsFound": "I couldn't find any results matching your search. Try other terms like: guardrail, staircase, insulation, ventilation, front setback...",
+      "clarificationPrompt": "To refine my answer, could you clarify:",
+      "ifCondition": "If",
+    "errorOccurred": "An error occurred. Please try again.",
+    "authRequired": "You must be logged in to use this feature.",
+      "principle": "Principle",
+      "practicalTips": "Practical tips"
+    },
+    "municipalitySet": "Municipality set: {{municipality}}. {{extra}}",
+    "hasData": "I have specific data for this city. Ask your question.",
+    "noMunicipalData": "This municipality is not in our database. I will provide references from the Quebec Construction Code, but please verify specific requirements with your municipality.",
+    "officialLinkLabel": "Consult the official Building Code text"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "overview": "Overview",
+    "progress": "Progress",
+    "globalProgress": "Overall Progress",
+    "upcomingTasks": "Upcoming tasks",
+    "recentActivity": "Recent activity",
+    "backToSteps": "Back to steps",
+    "stepOf": "Step {{current}} of {{total}}",
+    "stepsCompleted": "step(s) completed of",
+    "nextStep": "Next",
+    "filterByPhase": "Filter by phase",
+    "allPhases": "All phases",
+    "howToUse": "How to use this page",
+    "howToUseDesc": "Here are the features available to manage your construction steps.",
+    "photosDocuments": "Photos & Documents",
+    "noProjectSelected": "No project selected",
+    "createProjectToUnlock": "Create a project to unlock notes and step tracking.",
+    "createProject": "Create a project",
+    "tips": {
+      "filterPhase": "Filter by phase",
+      "filterPhaseDesc": "Use badges to display only the steps of a specific phase (pre-construction, structural, secondary, finishes).",
+      "viewStep": "View a step",
+      "viewStepDesc": "Click a card to see detailed tasks, practical tips, and required documents for each step.",
+      "markComplete": "Mark as complete",
+      "markCompleteDesc": "Check off completed steps directly on cards to track your overall progress and stay ahead of schedule.",
+      "photosDocuments": "Photos & Documents",
+      "photosDocumentsDesc": "Save your site photos and important project documents for better tracking."
+    },
+    "reminder": "Important reminder",
+    "reminderText": "Make sure all previous steps have been completed before starting this one.",
+    "viewAllSteps": "View all steps",
+    "allSteps": "All construction steps",
+    "allStepsDesc": "Follow this guide to successfully complete your self-build project.",
+    "supplierAlerts": {
+      "title": "Supplier Alerts",
+      "overdue": "Overdue",
+      "today": "Today",
+      "upcoming": "Upcoming",
+      "viewSchedule": "View schedule",
+      "noName": "Unidentified supplier",
+      "dismiss": "Dismiss alert",
+      "lockDateNote": "After confirming with the supplier, lock the date in the step card to keep the alert up to date.",
+      "dateLocked": "Date locked"
+    }
+  },
+  "gallery": {
+    "title": "My Files",
+    "subtitle": "Photos and documents for your projects",
+    "photos": "Photos",
+    "documents": "Documents",
+    "quotes": "Quotes",
+    "noPhotos": "No photos",
+    "noDocuments": "No documents",
+    "noQuotes": "No quotes",
+    "selectProject": "Select a project",
+    "chooseProject": "Choose a project",
+    "selectToView": "Select a project to view its files",
+    "noProject": "No project",
+    "createProjectFirst": "Create a project to start uploading files",
+    "filterByStep": "Filter by step",
+    "allSteps": "All steps",
+    "filterByCategory": "Filter by category",
+    "allDocuments": "All documents",
+    "documentCategories": {
+      "plan": "Plans",
+      "devis": "Estimates",
+      "soumission": "Quotes",
+      "contract": "Contracts",
+      "permit": "Permits",
+      "facture": "Invoices",
+      "photo": "Photos",
+      "other": "Other"
+    },
+    "retained": "Selected",
+    "notRetained": "Not selected",
+    "amount": "Amount",
+    "supplier": "Supplier",
+    "downloadAll": "Download all",
+    "downloading": "Downloading...",
+    "downloadSuccess": "Download complete!",
+    "downloadSuccessCount": "{{count}} files downloaded!",
+    "downloadError": "Error downloading files",
+    "noFilesToDownload": "No files to download",
+    "browserNotSupported": "Your browser doesn't support this feature. Use Chrome or Edge.",
+    "saveToGallery": "Save to My Files",
+    "analysisSaved": "Analysis saved",
+    "analysisSavedDesc": "The AI analysis has been saved to your files",
+    "analysisSavedShort": "Saved",
+    "analysisSaveError": "Unable to save the analysis",
+    "aiAnalyses": "AI Analyses",
+    "noAnalyses": "No AI analysis"
+  },
+  "startProject": {
+    "title": "Create a new project",
+    "step1Title": "Project name",
+    "step1Desc": "Give your construction project a name",
+    "step2Title": "Project type",
+    "step2Desc": "What type of project will you be doing?",
+    "step3Title": "Municipality",
+    "step3Desc": "Where is your project located?",
+    "step4Title": "Current stage",
+    "step4Desc": "What stage are you at?",
+    "step5Title": "Start date",
+    "step5Desc": "When do you plan to start construction?",
+    "step6Title": "Your plans",
+    "step6Desc": "Upload your construction plans (optional)",
+    "step7Title": "Summary",
+    "step7Desc": "Your project is ready!",
+    "projectName": "What would you like to name your project?",
+    "projectNameHelp": "A name that will help you identify it easily",
+    "projectNamePlaceholder": "E.g.: Tremblay family home",
+    "projectType": "What type of project are you building?",
+    "projectTypeHelp": "Select the type that best matches",
+    "municipality": "Where is your project located?",
+    "municipalityHelp": "The municipality where your project will be built",
+    "municipalityPlaceholder": "E.g.: Sherbrooke, Quebec",
+    "currentStage": "Where are you in your project?",
+    "currentStageHelp": "Select your project's current stage",
+    "targetDate": "When would you like to start construction?",
+    "targetDateHelp": "This date will help us create a preliminary schedule",
+    "selectADate": "Select a date",
+    "skipForNow": "Skip for now",
+    "dateSelectedFor": "Date selected for",
+    "projectTypes": {
+      "newHome": "New home",
+      "extension": "Extension",
+      "detachedGarage": "Detached garage",
+      "cottage": "Cottage"
+    },
+    "phases": {
+      "preConstruction": "Pre-construction",
+      "roughWork": "Structural work",
+      "secondaryWork": "Secondary work",
+      "finishing": "Finishing"
+    },
+    "stages": {
+      "planification": {
+        "label": "Planning",
+        "description": "I'm thinking about my project"
+      },
+      "plansPermis": {
+        "label": "Plans and permits",
+        "description": "I'm preparing or waiting for permits"
+      },
+      "soumissions": {
+        "label": "Quotes",
+        "description": "I'm getting contractor quotes"
+      },
+      "financement": {
+        "label": "Financing",
+        "description": "I'm finalizing my financing"
+      },
+      "excavation": {
+        "label": "Excavation",
+        "description": "Excavation work is starting"
+      },
+      "fondation": {
+        "label": "Foundation",
+        "description": "Foundation work is in progress"
+      },
+      "structure": {
+        "label": "Structure",
+        "description": "Framing and structure"
+      },
+      "toiture": {
+        "label": "Roofing",
+        "description": "Roof installation"
+      },
+      "fenetresPortes": {
+        "label": "Windows and doors",
+        "description": "Window and door installation"
+      },
+      "isolation": {
+        "label": "Insulation",
+        "description": "Insulation and vapor barrier"
+      },
+      "plomberieRoughin": {
+        "label": "Plumbing (rough-in)",
+        "description": "Rough plumbing installation"
+      },
+      "electriciteRoughin": {
+        "label": "Electrical (rough-in)",
+        "description": "Rough electrical installation"
+      },
+      "gypse": {
+        "label": "Drywall",
+        "description": "Drywall installation"
+      },
+      "revetementsSol": {
+        "label": "Flooring",
+        "description": "Floor installation"
+      },
+      "cuisineSdb": {
+        "label": "Kitchen and bathroom",
+        "description": "Kitchen and bathroom installation"
+      },
+      "finitionsInt": {
+        "label": "Interior finishes",
+        "description": "Final touches and finishes"
+      }
+    },
+    "planUpload": {
+      "title": "Do you have construction plans?",
+      "subtitle": "Plans will help us generate a more accurate budget estimate.",
+      "uploadArea": "Drag and drop files here or click to select",
+      "formats": "Images or PDF (max 10 MB per file)",
+      "converting": "Converting PDF...",
+      "skipPlans": "Skip this step",
+      "continue": "Continue"
+    },
+    "enterName": "Enter your project name",
+    "enterMunicipality": "Enter the municipality",
+    "selectDate": "Select a date",
+    "uploadPlans": "Upload plans",
+    "dragDrop": "Drag and drop your files or click to select",
+    "supportedFormats": "Supported formats: images and PDF",
+    "creating": "Creating...",
+    "analyzing": "Analyzing...",
+    "preparingSchedule": "Preparing preliminary schedule...",
+    "projectCreated": "Project created successfully!",
+    "whatNext": "What would you like to do now?",
+    "goToBudget": "View budget",
+    "goToSchedule": "View schedule",
+    "goToSteps": "View steps",
+    "plansReady": "{{count}} plan(s) ready",
+    "plansReadyForAnalysis": "{{count}} plan(s) ready for analysis",
+    "noPlanSelected": "No plan selected",
+    "analysisComplete": "Analysis complete!",
+    "autoSchedule": {
+      "title": "Automatic schedule",
+      "businessDays": "business days",
+      "preparationDays": "preparation days",
+      "beforeWorkStarts": "before work starts",
+      "constructionDays": "construction days",
+      "fromTargetDate": "from target date",
+      "targetDateExplanation": "📅 Target date = Day 1 of construction",
+      "preparationExplanation": "Preparation steps (plans, permits, financing) will be scheduled <strong>before</strong> this date to give you a clear view of timelines.",
+      "planningBeforeDate": "Planning and financing before target date",
+      "permitAlerts": "Alerts for permit applications",
+      "supplierDelays": "Supplier and fabrication lead times calculated"
+    }
+  },
+  "plans": {
+    "title": "Plans",
+    "heroTitle": "Plans designed to better manage your project from the start",
+    "problemIntro": "Building your own home is a significant project, both financially and personally. Even with motivation and good intentions, poor planning or imprecise management can quickly lead to costly consequences:",
+    "problemHighlight": "delays, rushed decisions, budget overruns, or work that needs to be redone",
+    "problemConclusion": "In many cases, these problems don't come from a lack of skill, but from a",
+    "problemConclusionHighlight": "lack of structure, visibility, and tools adapted",
+    "problemConclusionEnd": "to the reality of owner-building.",
+    "approachTitle": "An approach based on clarity and prevention",
+    "approachSubtitle": "Monprojetmaison.ca plans are designed to help owner-builders:",
+    "approachNote": "The goal is not to replace professionals, but to",
+    "approachNoteHighlight": "reduce avoidable errors",
+    "approachNoteEnd": "and improve coordination throughout the project.",
+    "evolvingTitle": "Scalable plans based on your real needs",
+    "evolvingDesc": "Each plan offers progressive access to planning, management, and analysis tools. You can start simply, then move to more advanced features as your project grows in complexity.",
+    "noWrongPlan": "There's no \"bad\" plan.",
+    "noWrongPlanDesc": "You can start for free, explore the platform, and upgrade when your needs evolve.",
+    "disclaimer": "is designed exclusively for residential owner-builders. Tools and analyses serve to structure the project and support decision-making, without replacing professionals or actual quotes.",
+    "benefit1Title": "Structure your project",
+    "benefit1Desc": "Step by step, with a clear view of what's left to do.",
+    "benefit2Title": "Visualize budget and schedule",
+    "benefit2Desc": "Keep control over costs and your project timeline.",
+    "benefit3Title": "Centralize information",
+    "benefit3Desc": "Documents, quotes, and notes in one place.",
+    "benefit4Title": "Identify risks",
+    "benefit4Desc": "Spot often-forgotten items before they become problems.",
+    "benefit5Title": "Decide at the right time",
+    "benefit5Desc": "Make more thoughtful decisions, without pressure.",
+    "choosePlan": "Choose this plan",
+    "startFree": "Start for free",
+    "tiers": {
+      "decouverte": {
+        "name": "Discovery",
+        "description": "To understand and structure the basics of your project",
+        "features": [
+          "1 project",
+          "Construction guide (read-only)",
+          "Schedule (read-only)",
+          "Budget (read-only)",
+          "Upload of 2 documents",
+          "Access to building code (1 search)",
+          "1 AI analysis per month",
+          "Storage: 1 GB"
+        ]
+      },
+      "essentiel": {
+        "name": "Essential",
+        "description": "To actively manage your owner-building project",
+        "features": [
+          "1 project",
+          "10 AI analyses per month",
+          "Editable schedule",
+          "Editable budget",
+          "Document upload and management",
+          "Full access to construction guide",
+          "Access to building code (reasonable searches)",
+          "Storage: 5 GB"
+        ]
+      },
+      "gestionComplete": {
+        "name": "Complete Management",
+        "description": "For complete control of your build from A to Z",
+        "features": [
+          "1 active project",
+          "25 AI analyses per month",
+          "Quote analysis by construction step",
+          "RBQ license and tax number verification",
+          "Conflict alerts and subcontractor contact reminders",
+          "Detection of inconsistencies and critical omissions",
+          "Complete document centralization",
+          "Extended access to building code",
+          "Storage: 10 GB"
+        ]
+      }
+    }
+  },
+  "trades": {
+    "excavation": "Excavation",
+    "foundation": "Foundation/Concrete",
+    "carpentry": "Carpenter",
+    "roofing": "Roofer",
+    "windows": "Windows/Doors",
+    "electrical": "Electrician",
+    "plumbing": "Plumber",
+    "hvac": "Heating/Ventilation",
+    "insulation": "Insulation",
+    "drywall": "Drywall/Plasterer",
+    "painting": "Painter",
+    "flooring": "Flooring",
+    "tiling": "Tile setter",
+    "cabinets": "Cabinetmaker",
+    "countertops": "Countertops",
+    "finishes": "Interior finishing",
+    "exterior": "Exterior cladding",
+    "landscaping": "Landscaping",
+    "inspector": "Inspector",
+    "surveyor": "Surveyor",
+    "generalContractor": "General contractor",
+    "other": "Other"
+  },
+  "phases": {
+    "preparation": "Preparation",
+    "preConstruction": "Pre-construction",
+    "roughWork": "Structural work",
+    "secondaryWork": "Secondary work",
+    "finishing": "Finishing"
+  },
+  "legal": {
+    "lastUpdate": "Last update",
+    "effectiveSince": "Effective since",
+    "privacyTitle": "Privacy Policy",
+    "privacySubtitle": "At Monprojetmaison.ca, we take the protection of your personal information seriously.",
+    "termsTitle": "Terms of Use",
+    "termsSubtitle": "Please read these terms carefully before using the Monprojetmaison.ca platform.",
+    "cookiesTitle": "Cookie Policy",
+    "cookiesSubtitle": "This policy explains how Monprojetmaison.ca uses cookies and similar technologies.",
+    "legalAgreement": "Legal Agreement",
+    "legalAgreementText": "By accessing and using the Monprojetmaison.ca platform (hereinafter \"the Platform\"), you agree to be bound by these Terms of Use. If you do not accept these terms, please do not use our Platform. These terms constitute a legally binding contract between you and Monprojetmaison.ca.",
+    "contactUs": "Contact us",
+    "questionsAbout": "Questions about these terms",
+    "questionsAboutCookies": "Questions about cookies",
+    "email": "Email",
+    "address": "Address",
+    "complianceNote": "This privacy policy complies with Quebec's Act respecting the protection of personal information in the private sector and Canada's Personal Information Protection and Electronic Documents Act (PIPEDA).",
+    "manageCookiePrefs": "Manage my cookie preferences"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "notFound": "Page not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Access denied",
+    "serverError": "Server error",
+    "networkError": "Network error",
+    "tryAgain": "Please try again",
+    "goHome": "Go to home"
+  },
+  "notFound": {
+    "description": "Sorry, the page you are looking for does not exist or has been moved."
+  },
+  "toasts": {
+    "saved": "Saved successfully",
+    "deleted": "Deleted successfully",
+    "error": "An error occurred",
+    "copied": "Copied to clipboard",
+    "uploaded": "Uploaded successfully",
+    "downloadStarted": "Download started",
+    "mustBeLoggedIn": "You must be logged in to create a project",
+    "projectCreated": "Project created successfully!",
+    "projectCreateError": "Error creating project",
+    "projectAnalyzed": "Project analyzed successfully!",
+    "analysisError": "Error during analysis",
+    "plansUploaded": "Plans uploaded successfully!",
+    "uploadError": "Error uploading plans",
+    "budgetSaved": "Budget saved successfully!",
+    "budgetSaveError": "Error saving budget",
+    "budgetReset": "Budget reset successfully!",
+    "budgetResetError": "Error resetting budget",
+    "noProjectSelected": "No project selected",
+    "photoAdded": "Photo added successfully!",
+    "photoDeleted": "Photo deleted",
+    "photoError": "Error",
+    "fileAdded": "File added successfully",
+    "fileDeleted": "File deleted",
+    "fileUploadError": "Error uploading file",
+    "fileDeleteError": "Error deleting",
+    "planUploaded": "Plan uploaded successfully!",
+    "planDeleted": "Plan deleted",
+    "planUploadError": "Error uploading plan",
+    "planDeleteError": "Error deleting",
+    "docUploaded": "Document uploaded successfully",
+    "docDeleted": "Document deleted",
+    "docDeleteError": "Error deleting",
+    "supplierDeleted": "Supplier removed — you can run analysis again",
+    "subcategoryDeleted": "Subcategory deleted",
+    "selectSubcategory": "Please select a subcategory",
+    "rateLimit": "Rate limit reached, please try again later.",
+    "insufficientCredits": "Insufficient credits. Please top up your account.",
+    "analysisDone": "Analysis completed successfully",
+    "uploadPlansFirst": "Please upload submissions first",
+    "materialsCostSaved": "Materials cost saved",
+    "acceptTerms": "Please accept the terms to continue",
+    "acceptTermsError": "Error saving. Please try again.",
+    "thanksAccepted": "Thank you for accepting our terms",
+    "unexpectedError": "An error occurred",
+    "projectDeleted": "Project deleted successfully",
+    "projectDeleteError": "Error deleting project",
+    "selectDate": "Please select a target start date",
+    "scheduleGenerated": "Schedule generated successfully!",
+    "scheduleError": "Error generating schedule",
+    "pdfError": "Error converting PDF",
+    "unsupportedFormat": "Unsupported format (use an image or PDF)",
+    "selectOrUploadPlan": "Please select or upload at least one plan",
+    "plansOptimized": "Plans optimized. Starting analysis...",
+    "budgetApplied": "Budget applied successfully!",
+    "imagesAdded": "Image(s) added successfully",
+    "downloadError": "Error downloading",
+    "sessionStatsError": "Error loading session statistics",
+    "bugReportsError": "Error loading bug reports",
+    "aiStatsError": "Error loading AI statistics",
+    "updateError": "Error updating",
+    "notesSaved": "Notes saved",
+    "saveError": "Error saving",
+    "taskUpdateError": "Error updating task",
+    "optimizingPlans": "Optimizing plans (JPEG compression) before analysis...",
+    "convertingPdf": "Converting PDF to images...",
+    "analyzingBatch": "Analyzing batch {{current}}/{{total}} (plans {{start}}-{{end}})...",
+    "mergingResults": "Merging results from all batches...",
+    "diyAnalysisDone": "Material analysis complete",
+    "estimatedMaterialCost": "Estimated material cost: {{amount}} $",
+    "diyAnalysisError": "DIY analysis error",
+    "suppliersDetected": "{{count}} supplier(s) detected. Select your choice below.",
+    "batchError": "Error on batch {{batch}}: {{message}}",
+    "partialAnalysis": "{{succeeded}} plan(s) analyzed out of {{total}}, {{failed}} failed. Results are partial.",
+    "subCategoryAdded": "Subcategory \"{{name}}\" added",
+    "subCategoryAddedDiy": "Subcategory \"{{name}}\" added (DIY)",
+    "deleteError": "Error deleting",
+    "pdfConvertedSuccess": "PDF converted to {{count}} image(s) successfully!",
+    "pdfConvertedAdded": "PDF converted to {{count}} image(s) and added to selection.",
+    "pdfTooManyPages": "The PDF contains {{count}} pages. Only the first 20 were converted.",
+    "analysisCompleteCount": "Complete analysis of {{count}} plan(s) finished!",
+    "categoryUpdated": "Category updated",
+    "subCategoryUpdated": "Subcategory updated",
+    "alertsSynced": "Supplier alerts synchronized"
+  },
+  "reportBug": {
+    "title": "Report a bug",
+    "description": "Describe the problem you encountered. We will review your report quickly.",
+    "problemLabel": "Describe the problem",
+    "placeholder": "Explain what happened, what you expected, and the steps to reproduce the issue...",
+    "autoCapture": "The current page and technical information will be automatically included.",
+    "send": "Send",
+    "success": "Thank you, your report has been sent!",
+    "error": "Error sending the report",
+    "descriptionRequired": "Please describe the problem"
+  },
+  "cookies": {
+    "title": "Cookie management",
+    "description": "We use cookies to improve your experience, analyze traffic, and provide relevant content. You can accept, refuse, or customize your preferences at any time.",
+    "learnMore": "Learn more",
+    "accept": "Accept",
+    "refuse": "Refuse",
+    "customize": "Customize",
+    "settingsTitle": "Cookie settings",
+    "settingsDescription": "Customize your cookie preferences. You can change these settings at any time.",
+    "viewPolicy": "View our cookie policy",
+    "required": "Required",
+    "refuseAll": "Refuse all",
+    "acceptAll": "Accept all",
+    "savePreferences": "Save my preferences",
+    "categories": {
+      "essential": "Essential cookies",
+      "essentialDesc": "These cookies are necessary for the site to function and cannot be disabled. They enable navigation, security, and authentication.",
+      "analytics": "Analytics cookies",
+      "analyticsDesc": "These cookies help us understand how visitors use the site by collecting anonymous information. They help improve our services.",
+      "marketing": "Marketing cookies",
+      "marketingDesc": "These cookies are used to show you relevant ads and measure the effectiveness of our marketing campaigns.",
+      "functional": "Functional cookies",
+      "functionalDesc": "These cookies enhance site functionality, such as remembering your preferences (language, region, etc.)."
+    }
+  },
+  "legalAcceptance": {
+    "title": "Acceptance required",
+    "description": "To use Monprojetmaison.ca, you must accept our terms.",
+    "readTerms": "Read Terms of Use",
+    "readPrivacy": "Read Privacy Policy",
+    "acceptLabel": "I accept the",
+    "termsOfUse": "Terms of Use",
+    "privacyPolicy": "Privacy Policy",
+    "recordNote": "Your acceptance will be recorded for legal purposes.",
+    "continue": "Continue",
+    "pleaseAccept": "Please accept the terms to continue",
+    "saveError": "Error saving. Please try again.",
+    "thankYou": "Thank you for accepting our terms"
+  },
+  "attachments": {
+    "title": "Attachments",
+    "category": "Category",
+    "addFile": "Add a file",
+    "noAttachments": "No attachments. Add your plans, permits, quotes...",
+    "uploadSuccess": "File added successfully",
+    "uploadError": "Error uploading file",
+    "deleteSuccess": "File deleted",
+    "deleteError": "Error deleting file",
+    "budgetSuggestion": {
+      "title": "Document uploaded successfully!",
+      "description": "You can now create a detailed budget to estimate the costs of your construction project.",
+      "cta": "Create my budget",
+      "later": "Later"
+    }
+  },
+  "auth": {
+    "title": "My Project Space",
+    "subtitle": "Sign in to save and find your projects",
+    "login": "Log in",
+    "signup": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signupButton": "Create my account",
+    "loginButton": "Log in",
+    "orContinueWith": "Or continue with",
+    "displayName": "Display name",
+    "yourName": "Your name",
+    "resetPassword": "Reset password",
+    "newPassword": "New password",
+    "sendResetLink": "Send reset link",
+    "backToLogin": "Back to login",
+    "emailSent": "Email sent!",
+    "checkInbox": "Check your inbox at",
+    "checkSpam": "Can't find the email? Check your spam folder.",
+    "passwordUpdated": "Password updated!",
+    "passwordUpdatedDesc": "Your password has been changed successfully. You can now log in with your new password.",
+    "invalidLink": "Invalid or expired link",
+    "invalidLinkDesc": "This reset link is no longer valid. Please request a new one.",
+    "verifying": "Verifying...",
+    "goHome": "Go to home",
+    "minChars": "Minimum 6 characters",
+    "passwordMismatch": "Passwords do not match",
+    "loginError": "Login error",
+    "signupError": "Sign up error",
+    "loginSuccess": "Login successful!",
+    "signupSuccess": "Account created successfully!",
+    "resetSuccess": "Reset email sent!",
+    "updatePassword": "Update password",
+    "enterNewPassword": "Enter your new password below",
+    "notAuthenticated": "Not authenticated"
+  },
+  "scheduleDialog": {
+    "title": "Add a step to the schedule",
+    "constructionStep": "Construction step",
+    "selectStep": "Select a step",
+    "trade": "Trade",
+    "selectTrade": "Select a trade",
+    "estimatedDays": "Estimated duration (business days)",
+    "startDate": "Start date",
+    "chooseDate": "Choose a date (optional)",
+    "supplier": "Supplier",
+    "supplierName": "Supplier name",
+    "supplierPhone": "Phone",
+    "callDaysBefore": "Call X days before",
+    "fabrication": "Fabrication",
+    "fabricationLeadDays": "Fabrication lead time (business days)",
+    "measurements": "Measurements",
+    "measurementRequired": "Measurements required by supplier",
+    "measurementAfter": "Take measurements after which step?",
+    "measurementNotes": "Measurement notes",
+    "generalNotes": "General notes",
+    "notesPlaceholder": "Additional notes..."
+  },
+  "generateSchedule": {
+    "title": "Generate schedule",
+    "description": "Preparation (planning, financing, permits) will start today. Choose the target date for the start of construction (day 1 of excavation).",
+    "targetDate": "Target date for start of construction",
+    "selectDate": "Select a date",
+    "impossibleDate": "Date not possible!",
+    "preparationNeeds": "Preparation requires {{days}} business days.",
+    "earliestDate": "The earliest date to start construction is",
+    "summary": "Schedule summary:",
+    "preparation": "Preparation: {{days}} business days (starts today)",
+    "stepsCreated": "{{count}} steps will be created",
+    "totalDuration": "Total duration: {{days}} business days",
+    "dateAchievable": "Date achievable - construction on {{date}}",
+    "generating": "Generating...",
+    "generate": "Generate schedule",
+    "pleaseSelectDate": "Please select a target date for the start of construction"
+  },
+  "_stepDetail_duplicate_removed": true,
+  "myProjectSection": {
+    "title": "My project",
+    "subtitle": "Pick up where you left off",
+    "viewAll": "View all my projects",
+    "deleteTitle": "Delete this project?",
+    "deleteDescription": "This action is irreversible. All data for the project \"{{name}}\" will be permanently deleted, including budget and attachments."
+  },
+  "steps": {
+    "phases": {
+      "preConstruction": "Pre-construction",
+      "grosOeuvre": "Shell construction",
+      "secondOeuvre": "Systems & rough-in",
+      "finitions": "Finishing"
+    },
+    "planification": {
+      "title": "Project planning",
+      "description": "Define your needs, budget, and goals before you begin.",
+      "duration": "4-5 days",
+      "tasks": {
+        "besoins": {
+          "title": "Define your needs",
+          "description": "List the number of bedrooms, bathrooms, storage spaces, and desired features.",
+          "tips": [
+            "Consider future needs (growing family, remote work)",
+            "Visit model homes for inspiration"
+          ]
+        },
+        "budget-initial": {
+          "title": "Establish preliminary budget",
+          "description": "Calculate your financial capacity including land, construction, and contingencies.",
+          "tips": [
+            "Plan for 10-15% of the budget for contingencies",
+            "Include utility connection fees (electricity, water, sewer)"
+          ]
+        },
+        "terrain": {
+          "title": "Land search and purchase",
+          "description": "Find land that matches your criteria and verify zoning.",
+          "tips": [
+            "Check municipal urban planning regulations",
+            "Have a soil study done before purchase"
+          ],
+          "documents": ["Survey certificate", "Sales deed", "Geotechnical study"]
+        },
+        "preapprobation-planification": {
+          "title": "Mortgage pre-approval",
+          "description": "Obtain pre-approval from your financial institution to know your maximum borrowing capacity.",
+          "tips": [
+            "Compare offers from multiple banks and brokers",
+            "Pre-approval is usually valid for 90 to 120 days",
+            "Prepare your income proofs and bank statements"
+          ],
+          "documents": ["Pay stubs", "Tax assessment", "Bank statements"]
+        }
+      }
+    },
+    "plans-permis": {
+      "title": "Plans and permits",
+      "description": "Have your plans prepared and obtain all necessary permits.",
+      "duration": "6-8 weeks",
+      "tasks": {
+        "plans-architecture": {
+          "title": "Architectural plans",
+          "description": "Hire an architect or technologist to draw your plans.",
+          "tips": [
+            "Consider buying pre-designed plans to speed up the process and reduce costs",
+            "Ensure plans comply with the Building Code",
+            "Include structural and mechanical plans",
+            "Start requesting quotes as soon as you have your plans"
+          ],
+          "documents": ["Architectural plans", "Structural plans", "Mechanical plans"]
+        },
+        "test-sol": {
+          "title": "Soil test (geotechnical study)",
+          "description": "Have a geotechnical study done to determine soil bearing capacity.",
+          "tips": [
+            "Required for permits in many municipalities",
+            "Helps determine the appropriate foundation type",
+            "Identifies high water table risks"
+          ],
+          "documents": ["Geotechnical report", "Foundation recommendations"]
+        },
+        "services-publics": {
+          "title": "Service validation (water, sewer)",
+          "description": "Check municipal service availability or plan private installations.",
+          "tips": [
+            "Contact the municipality to learn about available services",
+            "If off-grid: plan soil study for septic installation",
+            "Septic field requires adequate lot area"
+          ],
+          "documents": ["Septic compliance certificate", "Septic installation permit", "Water analysis (well)"]
+        },
+        "permis-construction": {
+          "title": "Building permit application",
+          "description": "Submit your application to the municipality with all required documents.",
+          "tips": [
+            "Processing time varies by municipality (2-8 weeks)",
+            "Some municipalities require a professional commitment"
+          ],
+          "documents": ["Application form", "Certified plans", "Survey certificate"]
+        }
+      }
+    },
+    "soumissions": {
+      "title": "Quotes",
+      "description": "Obtain and compare quotes from different trades.",
+      "duration": "2-3 weeks",
+      "tasks": {
+        "obtenir-soumissions": {
+          "title": "Obtain quotes",
+          "description": "Request detailed quotes from different trades.",
+          "tips": [
+            "Get at least 3 quotes per specialty",
+            "Don't choose based solely on the lowest price",
+            "Check contractor references",
+            "Request liability insurance proof",
+            "Verify RBQ licenses"
+          ],
+          "documents": ["Signed quotes", "Insurance proofs", "RBQ licenses"]
+        },
+        "assurance-chantier": {
+          "title": "Construction insurance",
+          "description": "Get construction insurance to protect your project.",
+          "tips": [
+            "⚠️ IMPORTANT: Ensure coverage starts BEFORE the first shovel",
+            "Construction insurance covers damages during building",
+            "Verify coverage includes theft, vandalism, and weather damage"
+          ],
+          "documents": ["Construction insurance policy", "Contractor insurance certificates"]
+        }
+      }
+    },
+    "financement": {
+      "title": "Financing",
+      "description": "Obtain your financing and prepare your financial package.",
+      "duration": "2-4 weeks",
+      "tasks": {
+        "pret-construction": {
+          "title": "Construction loan",
+          "description": "Negotiate your construction loan with progressive disbursements.",
+          "tips": [
+            "Funds are released in stages based on progress",
+            "Plan for personal funds for initial expenses"
+          ],
+          "documents": ["Contractor quotes", "Plans and specifications", "Detailed budget"]
+        }
+      }
+    },
+    "excavation": {
+      "title": "Excavation",
+      "description": "Site preparation and digging for foundations.",
+      "duration": "3-5 days",
+      "tasks": {
+        "implantation": {
+          "title": "House layout",
+          "description": "The surveyor positions the house on the lot according to plans.",
+          "tips": [
+            "Respect required setbacks",
+            "Verify before excavation"
+          ],
+          "documents": ["Layout certificate"]
+        },
+        "deboisement": {
+          "title": "Land clearing",
+          "description": "Tree felling and clearing of the construction zone.",
+          "tips": [
+            "Check municipal regulations regarding tree cutting",
+            "Some municipalities require a cutting permit"
+          ]
+        },
+        "excavation-creusage": {
+          "title": "Digging and excavation",
+          "description": "Digging for the basement and site preparation.",
+          "tips": [
+            "Plan for storage of excavated soil",
+            "Protect excavation from rain"
+          ]
+        }
+      }
+    },
+    "fondation": {
+      "title": "Foundation",
+      "description": "Foundation construction and waterproofing.",
+      "duration": "1-2 weeks",
+      "tasks": {
+        "coulage-fondation": {
+          "title": "Foundation pouring",
+          "description": "Form installation and concrete pouring for footings and walls.",
+          "tips": [
+            "Concrete curing: wait at least 21 days before loading",
+            "Waterproof foundation walls with membrane"
+          ]
+        },
+        "drain-remblai": {
+          "title": "Drain and backfill",
+          "description": "French drain installation and backfilling around foundations.",
+          "tips": [
+            "Use perforated PVC drain with cleanouts"
+          ],
+          "documents": ["Foundation inspection report"]
+        }
+      }
+    },
+    "structure": {
+      "title": "Structure and framing",
+      "description": "Erection of the wood or steel house structure.",
+      "duration": "2-4 weeks",
+      "tasks": {
+        "plancher": {
+          "title": "Ground floor",
+          "description": "Installation of joists and subfloor.",
+          "tips": [
+            "Protect subfloor from weather",
+            "Check level before continuing",
+            "Use open-web joists for wire and conduit routing"
+          ]
+        },
+        "murs": {
+          "title": "Wall erection",
+          "description": "Construction and raising of exterior and load-bearing walls.",
+          "tips": [
+            "Respect openings shown in plans",
+            "Install headers above openings"
+          ]
+        },
+        "etage": {
+          "title": "Upper floor structure",
+          "description": "If applicable, construction of upper floor and walls.",
+          "tips": [
+            "Use open-web joists for wire and conduit routing"
+          ]
+        },
+        "fermes-toit": {
+          "title": "Roof truss installation",
+          "description": "Installation of prefabricated trusses or traditional framing.",
+          "documents": ["Certified truss plans"]
+        },
+        "pontage": {
+          "title": "Roof sheathing",
+          "description": "Plywood installation on roof trusses to close the structure.",
+          "tips": [
+            "Protect sheathing from weather quickly",
+            "Check panel alignment"
+          ]
+        },
+        "etancheite": {
+          "title": "Waterproofing",
+          "description": "Installation of waterproof membranes and infiltration protection.",
+          "tips": [
+            "Ensure all joints are well sealed",
+            "Check waterproofing around openings"
+          ]
+        }
+      }
+    },
+    "toiture": {
+      "title": "Roofing",
+      "description": "Installation of roofing membrane and covering.",
+      "duration": "2 days",
+      "tasks": {
+        "membrane": {
+          "title": "Membrane and shingles",
+          "description": "Installation of waterproof membrane and asphalt shingles.",
+          "tips": [
+            "Install flashings around chimneys and vents",
+            "Apply self-adhesive membrane in the first 4 feet of edges"
+          ]
+        }
+      }
+    },
+    "fenetres-portes": {
+      "title": "Windows and exterior doors",
+      "description": "Installation of windows and doors to close the envelope.",
+      "duration": "2 days",
+      "tasks": {
+        "fenetres": {
+          "title": "Window installation",
+          "description": "Window installation with perimeter insulation and sealing.",
+          "tips": [
+            "Use low-expansion foam insulation",
+            "Install window flashings correctly"
+          ]
+        },
+        "portes-ext": {
+          "title": "Exterior doors",
+          "description": "Installation of entry, garage, and patio doors."
+        }
+      }
+    },
+    "isolation": {
+      "title": "Insulation and vapor barrier",
+      "description": "Installation of thermal insulation and vapor barrier.",
+      "duration": "1-2 weeks",
+      "tasks": {
+        "isolation-murs": {
+          "title": "Wall insulation",
+          "description": "Installation of insulation in exterior walls.",
+          "tips": [
+            "R-24 minimum for walls in Quebec",
+            "Avoid thermal bridges"
+          ]
+        },
+        "isolation-toit": {
+          "title": "Roof/attic insulation",
+          "description": "Insulation of the top floor ceiling.",
+          "tips": [
+            "R-41 minimum for roofs in Quebec",
+            "Maintain adequate attic ventilation"
+          ]
+        },
+        "insonorisation": {
+          "title": "Soundproofing",
+          "description": "Installation of acoustic insulation between rooms.",
+          "tips": [
+            "Prioritize walls between bedrooms and bathrooms",
+            "Floor soundproofing reduces impact noise"
+          ]
+        },
+        "pare-vapeur": {
+          "title": "Vapor barrier",
+          "description": "Installation of 6 mil polyethylene on the warm side of insulation.",
+          "tips": [
+            "Seal all joints and penetrations",
+            "Blower door test will verify air tightness"
+          ],
+          "documents": ["Blower door test report"]
+        },
+        "fourrures-clouage": {
+          "title": "Furring strips and backing",
+          "description": "Installation of furring and backing for interior finishing attachment.",
+          "tips": [
+            "Ensure furring is level",
+            "Provide backing at cabinet locations"
+          ]
+        }
+      }
+    },
+    "plomberie-sous-dalle": {
+      "title": "Under-slab plumbing",
+      "description": "Installation of plumbing under the concrete slab before pouring.",
+      "duration": "1 day",
+      "tasks": {
+        "plomberie-sous-dalle-visite": {
+          "title": "Under-slab plumbing - first visit",
+          "description": "Installation of drains and plumbing pipes under the slab.",
+          "tips": [
+            "This step must be completed before slab pouring",
+            "Check drainage slopes and connections"
+          ]
+        }
+      }
+    },
+    "dalle-sous-sol": {
+      "title": "Basement slab pour",
+      "description": "Pouring of the basement concrete slab after rough plumbing installation.",
+      "duration": "2-3 days",
+      "tasks": {
+        "preparation-dalle": {
+          "title": "Ground preparation",
+          "description": "Leveling, compaction, and vapor barrier membrane installation.",
+          "tips": [
+            "Ensure drainage is in place",
+            "Install rigid insulation under the slab"
+          ]
+        },
+        "coulage-dalle": {
+          "title": "Concrete pouring",
+          "description": "Pouring and leveling of the concrete slab.",
+          "tips": [
+            "Plan control joints to prevent cracking",
+            "Concrete curing: keep moist for at least 7 days"
+          ]
+        }
+      }
+    },
+    "murs-division": {
+      "title": "Partition walls",
+      "description": "Construction of non-load-bearing interior partition walls.",
+      "duration": "2-3 days",
+      "tasks": {
+        "construire-escalier": {
+          "title": "Build stairs",
+          "description": "Construction and installation of interior stairs.",
+          "tips": [
+            "Follow Building Code standards",
+            "Provide temporary guardrail during construction"
+          ]
+        },
+        "ossature-murs": {
+          "title": "Wall framing",
+          "description": "Installation of framing for partition walls.",
+          "tips": [
+            "Use 2x4 studs for non-load-bearing walls",
+            "Plan door and opening locations"
+          ]
+        },
+        "cadrage-portes": {
+          "title": "Door framing",
+          "description": "Installation of door frames in partition walls.",
+          "tips": [
+            "Check level and plumb of frames",
+            "Allow space for sliding doors if desired"
+          ]
+        }
+      }
+    },
+    "plomberie-roughin": {
+      "title": "Plumbing - Rough-in",
+      "description": "Installation of rough plumbing before closing walls.",
+      "duration": "4 days",
+      "tasks": {
+        "plomberie-brute": {
+          "title": "Rough plumbing",
+          "description": "Installation of supply and drain pipes.",
+          "tips": [
+            "PEX is easier to install and less expensive than copper",
+            "Respect drainage slopes"
+          ]
+        },
+        "chauffe-eau": {
+          "title": "Water heater",
+          "description": "Water heater installation.",
+          "tips": [
+            "Install a drain pan connected to a drain"
+          ]
+        },
+        "conduite-gaz": {
+          "title": "Gas line",
+          "description": "Installation of gas lines for fireplace and stove.",
+          "tips": [
+            "Use a certified installer",
+            "Plan appliance locations before installation"
+          ]
+        },
+        "branchements": {
+          "title": "Municipal connections",
+          "description": "Connection to water and sewer systems.",
+          "documents": ["Connection permit", "Pressure test"]
+        }
+      }
+    },
+    "electricite-roughin": {
+      "title": "Electrical - Rough-in",
+      "description": "Installation of rough electrical wiring before closing walls.",
+      "duration": "4 days",
+      "tasks": {
+        "entree-electrique": {
+          "title": "Electrical service",
+          "description": "Installation of electrical panel and Hydro-Quebec connection.",
+          "tips": [
+            "Plan enough amperage for future needs",
+            "200A is standard for a modern home"
+          ],
+          "documents": ["Hydro-Quebec connection request"]
+        },
+        "filage": {
+          "title": "Rough wiring",
+          "description": "Running wires in walls before drywall installation.",
+          "tips": [
+            "Plan outlet and switch locations",
+            "Provide dedicated circuits (kitchen, laundry)"
+          ]
+        },
+        "inspection-electrique": {
+          "title": "Electrical inspection",
+          "description": "Mandatory inspection before closing walls.",
+          "tips": [
+            "Take photos of all electrical box locations"
+          ]
+        }
+      }
+    },
+    "hvac": {
+      "title": "Heating and ventilation",
+      "description": "Installation of heating, cooling, and ventilation systems.",
+      "duration": "2-3 days",
+      "tasks": {
+        "chauffage": {
+          "title": "Heating system",
+          "description": "Installation of baseboard heaters, radiant floor, or heat pump.",
+          "tips": [
+            "Position baseboards under windows",
+            "Calculate heating needs per room"
+          ]
+        },
+        "vrc": {
+          "title": "Heat recovery ventilator (HRV)",
+          "description": "Mandatory installation for air quality.",
+          "tips": [
+            "HRV is mandatory in new construction",
+            "Provide ducts to each room"
+          ]
+        },
+        "conduits": {
+          "title": "Ventilation ducts",
+          "description": "Installation of ducts for range hood, dryer, and bathroom fans.",
+          "tips": [
+            "Duct must be insulated in attic"
+          ]
+        }
+      }
+    },
+    "exterieur": {
+      "title": "Exterior cladding",
+      "description": "Finishing of the exterior building envelope.",
+      "duration": "3-4 weeks",
+      "tasks": {
+        "revetement": {
+          "title": "Exterior cladding",
+          "description": "Installation of siding (vinyl, fiber cement, brick, wood).",
+          "tips": [
+            "Install air barrier membrane before cladding",
+            "Always provide an air gap behind the cladding"
+          ]
+        },
+        "fascia-soffite": {
+          "title": "Fascia and soffit",
+          "description": "Installation of roof trim and attic ventilation."
+        },
+        "balcons-terrasses": {
+          "title": "Balconies and decks",
+          "description": "Construction of balconies, porches, and decks.",
+          "tips": [
+            "Apply waterproof membrane on sill plate"
+          ]
+        },
+        "amenagement": {
+          "title": "Landscaping",
+          "description": "Final grading, driveway, lawn, and plantings."
+        }
+      }
+    },
+    "gypse": {
+      "title": "Drywall and painting",
+      "description": "Finishing of interior walls and ceilings.",
+      "duration": "10-12 days",
+      "tasks": {
+        "pose-gypse": {
+          "title": "Drywall installation",
+          "description": "Installation of drywall panels on all walls and ceilings.",
+          "tips": [
+            "Use moisture-resistant drywall in bathrooms",
+            "5/8 drywall on garage walls is mandatory"
+          ]
+        },
+        "tirage-joints": {
+          "title": "Taping and mudding",
+          "description": "Application of joint compound and sanding.",
+          "tips": [
+            "3 coats minimum for a nice finish",
+            "Level 4 or 5 depending on desired finish"
+          ]
+        },
+        "peinture": {
+          "title": "Painting",
+          "description": "Application of primer and paint.",
+          "tips": [
+            "A good primer is essential",
+            "After primer, inspect all walls and repair defects"
+          ]
+        }
+      }
+    },
+    "revetements-sol": {
+      "title": "Flooring",
+      "description": "Installation of floors in all rooms.",
+      "duration": "5-7 days",
+      "tasks": {
+        "plancher-bois": {
+          "title": "Hardwood or laminate floor",
+          "description": "Installation in living areas.",
+          "tips": [
+            "Acclimate wood 48-72h before installation",
+            "Leave expansion gap at perimeter"
+          ]
+        },
+        "ceramique": {
+          "title": "Tile",
+          "description": "Tile installation in bathrooms, kitchen, and entry.",
+          "tips": [
+            "Add 5/8\" plywood before installation",
+            "Use waterproof membrane in shower"
+          ]
+        }
+      }
+    },
+    "cuisine-sdb": {
+      "title": "Cabinetry work",
+      "description": "Installation of cabinets, countertops, and plumbing fixtures.",
+      "duration": "3-5 days",
+      "tasks": {
+        "armoires": {
+          "title": "Kitchen cabinets and vanities",
+          "description": "Installation of cabinets and bathroom vanities.",
+          "tips": [
+            "Confirm measurements with your cabinet maker after drywall"
+          ]
+        },
+        "comptoirs": {
+          "title": "Countertops",
+          "description": "Installation of kitchen and bathroom countertops.",
+          "tips": [
+            "Measure after cabinet installation",
+            "Fabrication time: 2-4 weeks"
+          ]
+        }
+      }
+    },
+    "finitions-int": {
+      "title": "Interior finishing",
+      "description": "Final details to complete the interior.",
+      "duration": "1-2 weeks",
+      "tasks": {
+        "portes-int": {
+          "title": "Interior doors",
+          "description": "Installation of doors, frames, and hardware.",
+          "tips": [
+            "Provide fire door between garage and house"
+          ]
+        },
+        "moulures": {
+          "title": "Trim and baseboards",
+          "description": "Installation of baseboards, casings, and decorative trim."
+        },
+        "escalier": {
+          "title": "Stairs",
+          "description": "Stair finishing (treads, risers, railing)."
+        },
+        "peinture-finition": {
+          "title": "Finish painting",
+          "description": "Application of final paint coat.",
+          "tips": [
+            "This step allows touch-ups after trim installation"
+          ]
+        }
+      }
+    },
+    "electricite-finition": {
+      "title": "Electrical - Finishing",
+      "description": "Final installation of electrical devices.",
+      "duration": "3 days",
+      "tasks": {
+        "prises-interrupteurs": {
+          "title": "Outlets and switches",
+          "description": "Installation of outlet and switch plates.",
+          "tips": [
+            "Verify each circuit works",
+            "Use plates matching your decor"
+          ]
+        },
+        "luminaires": {
+          "title": "Light fixtures",
+          "description": "Installation of all light fixtures."
+        },
+        "appareils-electriques": {
+          "title": "Appliance connections",
+          "description": "Connection of appliances and equipment."
+        }
+      }
+    },
+    "plomberie-finition": {
+      "title": "Plumbing - Finishing",
+      "description": "Final installation of plumbing fixtures.",
+      "duration": "3 days",
+      "tasks": {
+        "robinetterie": {
+          "title": "Faucets",
+          "description": "Installation of faucets.",
+          "tips": [
+            "Check each connection for leaks",
+            "Choose reputable brands with lifetime warranty"
+          ]
+        },
+        "toilettes-lavabos": {
+          "title": "Toilets and sinks",
+          "description": "Installation of toilets, sinks, and vanities."
+        },
+        "douche-bain": {
+          "title": "Shower and bathtub",
+          "description": "Final connection of showers and bathtubs.",
+          "tips": [
+            "Use specialized installer for shower doors"
+          ]
+        }
+      }
+    },
+    "inspections-finales": {
+      "title": "Final inspections",
+      "description": "Final verifications and obtaining occupancy certificate.",
+      "duration": "2 days",
+      "tasks": {
+        "inspection-municipale": {
+          "title": "Final municipal inspection",
+          "description": "Mandatory inspection to obtain occupancy certificate.",
+          "documents": ["Occupancy certificate"]
+        },
+        "inspection-garantie": {
+          "title": "Pre-reception inspection",
+          "description": "Complete inspection to identify deficiencies.",
+          "tips": [
+            "Hire an independent inspector",
+            "Document everything with photos"
+          ]
+        },
+        "certificat-localisation": {
+          "title": "Final survey certificate",
+          "description": "Update of survey certificate with completed construction.",
+          "documents": ["Final survey certificate"]
+        }
+      }
+    }
+  },
+  "privacy": {
+    "lastUpdated": "Last updated: January 2026",
+    "title": "Privacy",
+    "titleHighlight": "Policy",
+    "subtitle": "At Monprojetmaison.ca, we take the protection of your personal information seriously.",
+    "contactTitle": "Contact us",
+    "contactDescription": "For any questions regarding this privacy policy or to exercise your personal information rights, please contact us:",
+    "email": "Email",
+    "address": "Address",
+    "companyAddress": "Monprojetmaison.ca\nLaval, Quebec, Canada",
+    "legalNote": "Note: This privacy policy complies with Quebec's Act Respecting the Protection of Personal Information in the Private Sector and Canada's Personal Information Protection and Electronic Documents Act (PIPEDA).",
+    "copyright": "© {{year}} Monprojetmaison.ca. All rights reserved.",
+    "sections": {
+      "1": {
+        "title": "Information collection",
+        "intro": "Monprojetmaison.ca collects personal information when you use our platform to plan your residential construction or renovation project. The information we collect may include:",
+        "items": [
+          "Your name, email address, and phone number",
+          "Details of your construction or renovation project",
+          "Your geographic location in Quebec",
+          "Your project preferences and specifications",
+          "Information about how you use our platform"
+        ]
+      },
+      "2": {
+        "title": "Use of information",
+        "intro": "We use your personal information for the following purposes:",
+        "items": [
+          "Providing and improving our project planning services",
+          "Connecting you with qualified contractors and professionals",
+          "Personalizing your experience on our platform",
+          "Sending you relevant communications about your project",
+          "Complying with our legal and regulatory obligations",
+          "Analyzing and optimizing platform usage"
+        ]
+      },
+      "3": {
+        "title": "Information sharing",
+        "intro": "Monprojetmaison.ca never sells your personal information. We may share your information in the following circumstances:",
+        "items": [
+          "With qualified contractors and professionals to carry out your project",
+          "With service providers who help us operate our platform",
+          "When required by law or to protect our legal rights",
+          "With your explicit consent for specific purposes"
+        ],
+        "footer": "All our partners are required to respect the confidentiality of your information and comply with applicable data protection laws."
+      },
+      "4": {
+        "title": "Information protection",
+        "intro": "We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, modification, disclosure, or destruction. These measures include:",
+        "items": [
+          "Encryption of sensitive data in transit and at rest",
+          "Strict access controls and secure authentication",
+          "Continuous monitoring of our security systems",
+          "Regular staff training on data protection",
+          "Periodic security audits"
+        ]
+      },
+      "5": {
+        "title": "International data transfers",
+        "intro": "Some of our service providers and technology partners may be located outside Canada, particularly in the United States. When your personal information is transferred internationally, we ensure that:",
+        "items": [
+          "Appropriate contractual protection measures are in place",
+          "Providers meet equivalent security standards",
+          "Transfers are limited to what is strictly necessary",
+          "Your rights remain protected under Canadian law"
+        ],
+        "footer": "By using our platform, you consent to these transfers under the conditions described above."
+      },
+      "6": {
+        "title": "Your rights",
+        "intro": "In accordance with Quebec and Canadian personal information protection laws, you have the following rights:",
+        "items": [
+          "Right of access: You may request a copy of the personal information we hold about you",
+          "Right of rectification: You may request correction of inaccurate or incomplete information",
+          "Right of deletion: You may request deletion of your personal information in certain circumstances",
+          "Right of objection: You may object to certain uses of your information",
+          "Right to withdraw consent: You may withdraw your consent at any time"
+        ],
+        "footer": "To exercise these rights, please contact us using the information provided below."
+      },
+      "7": {
+        "title": "Cookies and similar technologies",
+        "intro": "Our platform uses cookies and similar technologies to enhance your user experience, analyze site usage, and personalize content. You can manage your cookie preferences through your browser settings.",
+        "items": [],
+        "footer": "The cookies we use include essential cookies necessary for site operation, analytics cookies to understand how you use our platform, and performance cookies to optimize your experience."
+      },
+      "8": {
+        "title": "Data retention",
+        "intro": "We retain your personal information for as long as necessary to provide our services and meet our legal obligations. Retention periods vary by data type:",
+        "items": [
+          "Account data: For the duration of your active account plus 2 years after closure",
+          "Project data: For the duration of the project plus 7 years for reference and tax compliance",
+          "Communications: 3 years after the last interaction",
+          "Analytics data: In aggregated and anonymized form indefinitely",
+          "Legal documents: In accordance with applicable legal requirements (generally 7 years)"
+        ],
+        "footer": "After these periods, we securely delete or anonymize your information, unless we are legally required to retain it longer."
+      },
+      "9": {
+        "title": "Third-party services and integrations",
+        "intro": "Our platform may integrate or use third-party services to enhance your experience:",
+        "items": [
+          "Payment processors: To securely process transactions (e.g., Stripe, PayPal)",
+          "Analytics tools: To understand platform usage (e.g., Google Analytics)",
+          "Mapping services: To locate projects and contractors",
+          "Social networks: Share buttons that may transmit information to social platforms"
+        ],
+        "footer": "These third-party services have their own privacy policies. We encourage you to review them. Monprojetmaison.ca is not responsible for the privacy practices of these third parties."
+      },
+      "10": {
+        "title": "Use of artificial intelligence",
+        "intro": "Monprojetmaison.ca may use artificial intelligence technologies to improve our services, including:",
+        "items": [
+          "Recommending qualified contractors based on your project",
+          "Estimating project costs and timelines",
+          "Personalizing your platform experience",
+          "Detecting and preventing fraudulent activities"
+        ],
+        "footer": "Data used to train our AI models is aggregated and anonymized. We never share your identifiable personal information with external AI systems without your explicit consent."
+      },
+      "11": {
+        "title": "Security incident management",
+        "intro": "In the event of a data breach likely to pose a serious risk of harm, we commit to:",
+        "items": [
+          "Notifying you as soon as possible, in accordance with legal requirements",
+          "Informing the Privacy Commissioner of Canada if required",
+          "Providing information about the nature of the incident and corrective measures",
+          "Taking immediate action to limit damage and prevent future incidents",
+          "Advising you on actions you can take to protect your information"
+        ],
+        "footer": "We maintain an incident response plan that is regularly tested and updated."
+      },
+      "12": {
+        "title": "Protection of minors",
+        "intro": "Our services are not intended for persons under 18 years of age. We do not knowingly collect personal information from minors.",
+        "items": [],
+        "footer": "If we discover that a minor has provided us with personal information, we will immediately delete this information from our systems. If you believe a minor has provided us with personal information, please contact us immediately."
+      },
+      "13": {
+        "title": "\"Do Not Track\" (DNT) signal",
+        "intro": "Some browsers include a \"Do Not Track\" (DNT) feature that sends a signal to websites indicating that you do not wish to be tracked.",
+        "items": [],
+        "footer": "Currently, there is no recognized industry standard for responding to DNT signals. Therefore, we do not automatically respond to DNT signals. However, you can manage your cookie preferences through your browser settings and our consent banner."
+      },
+      "14": {
+        "title": "Policy modifications",
+        "intro": "We reserve the right to modify this privacy policy at any time. Any modifications will be posted on this page with a revised update date. We encourage you to regularly review this policy to stay informed about how we protect your information.",
+        "items": [],
+        "footer": "If we make significant changes, we will notify you by email or through a notification on our platform."
+      }
+    }
+  },
+  "terms": {
+    "effectiveDate": "Effective since: January 2026",
+    "title": "Terms",
+    "titleHighlight": "of Use",
+    "subtitle": "Please read these terms carefully before using the Monprojetmaison.ca platform.",
+    "legalAgreement": {
+      "title": "Legal Agreement",
+      "description": "By accessing and using the Monprojetmaison.ca platform (hereinafter \"the Platform\"), you agree to be bound by these Terms of Use. If you do not accept these terms, please do not use our Platform. These terms constitute a legally binding contract between you and Monprojetmaison.ca."
+    },
+    "contactTitle": "Questions about these terms",
+    "contactDescription": "If you have any questions regarding these Terms of Use, please contact us:",
+    "email": "Email",
+    "address": "Address",
+    "companyAddress": "Monprojetmaison.ca\nLaval, Quebec, Canada",
+    "copyright": "© {{year}} Monprojetmaison.ca. All rights reserved.",
+    "sections": {
+      "1": {
+        "title": "Definitions",
+        "intro": "In this document:",
+        "items": [
+          "\"Platform\" means the monprojetmaison.ca website and all associated services",
+          "\"User\" means any individual or legal entity using the Platform",
+          "\"Owner\" means a person planning a construction or renovation project",
+          "\"Professional\" means a contractor, architect, designer, or other professional registered on the Platform",
+          "\"Project\" means any residential construction, renovation, or improvement",
+          "\"Content\" means any text, image, video, document, or other material published on the Platform"
+        ]
+      },
+      "2": {
+        "title": "Description of services",
+        "intro": "Monprojetmaison.ca offers an online platform that allows you to:",
+        "items": [
+          "Plan and manage residential construction and renovation projects",
+          "Connect owners with qualified professionals",
+          "Estimate project costs and timelines",
+          "Access planning resources and tools",
+          "Communicate and collaborate on projects",
+          "Share and store project documents"
+        ],
+        "footer": "The Platform acts as an intermediary and does not directly provide construction or renovation services. Contracts for work are concluded directly between Owners and Professionals."
+      },
+      "3": {
+        "title": "Registration and user account",
+        "intro": "To use certain features of the Platform, you must create an account. You agree to:",
+        "items": [
+          "Provide accurate, complete, and up-to-date information",
+          "Maintain the confidentiality of your login credentials",
+          "Be at least 18 years old or have parental consent",
+          "Immediately notify Monprojetmaison.ca of any unauthorized use of your account",
+          "Use only one account per person or entity",
+          "Not share your account with others"
+        ],
+        "footer": "You are responsible for all activities performed under your account. Monprojetmaison.ca reserves the right to suspend or terminate any account in case of violation of these terms."
+      },
+      "4": {
+        "title": "User obligations",
+        "intro": "By using the Platform, you agree NOT to:",
+        "items": [
+          "Violate any law or regulation applicable in Quebec or Canada",
+          "Post illegal, offensive, defamatory, or fraudulent content",
+          "Impersonate another person or entity",
+          "Transmit viruses, malware, or any malicious code",
+          "Attempt to access Platform systems without authorization",
+          "Use robots, scrapers, or automated tools without permission",
+          "Harass, threaten, or intimidate other users",
+          "Post false reviews or testimonials",
+          "Circumvent Platform security measures",
+          "Use the Platform for unauthorized commercial purposes"
+        ],
+        "footer": "Any violation of these obligations may result in immediate suspension of your account and legal action if necessary."
+      },
+      "5": {
+        "title": "Professional responsibilities",
+        "intro": "Professionals registered on the Platform agree to:",
+        "items": [
+          "Hold all licenses, permits, and insurance required in Quebec",
+          "Provide truthful information about their qualifications and experience",
+          "Comply with applicable building codes and construction standards",
+          "Maintain adequate liability insurance",
+          "Communicate professionally and courteously",
+          "Honor quotes and commitments made to Owners",
+          "Disclose any potential conflicts of interest"
+        ],
+        "footer": "Monprojetmaison.ca does not exhaustively verify the qualifications of all Professionals. Owners are encouraged to conduct their own due diligence, including validation of RBQ licenses and references."
+      },
+      "6": {
+        "title": "Intellectual property",
+        "intro": "Monprojetmaison.ca content: All Platform content, including the logo, design, texts, graphics, software, and databases, is protected by copyright laws and belongs to Monprojetmaison.ca or its licensors. By posting content on the Platform, you:",
+        "items": [
+          "Retain all ownership rights to your content",
+          "Grant Monprojetmaison.ca a worldwide, non-exclusive, royalty-free license to use, display, reproduce, and distribute your content in connection with providing our services",
+          "Warrant that you hold all necessary rights to the posted content",
+          "Accept that your content may be visible to other users"
+        ],
+        "footer": "Monprojetmaison.ca respects intellectual property rights. If you believe content violates your rights, please contact us immediately."
+      },
+      "7": {
+        "title": "Payments and fees",
+        "intro": "The Platform may offer free and paid features. Applicable terms include:",
+        "items": [
+          "Subscription or service fees are clearly indicated before any purchase",
+          "Payments are processed through secure third-party processors",
+          "All fees are in Canadian dollars (CAD) unless otherwise indicated",
+          "Applicable taxes (GST/QST) will be added according to Quebec laws",
+          "Subscriptions are automatically renewed unless cancelled",
+          "Refunds are granted according to our refund policy"
+        ],
+        "footer": "Important: Payments between Owners and Professionals for work are made directly between the parties. Monprojetmaison.ca does not collect these payments and is not responsible for contractual disputes."
+      },
+      "8": {
+        "title": "Limitation of liability",
+        "intro": "TO THE MAXIMUM EXTENT PERMITTED BY LAW:",
+        "items": [
+          "The Platform is provided \"as is\" without warranty of any kind",
+          "Monprojetmaison.ca is not responsible for the quality, safety, or legality of services provided by Professionals",
+          "Monprojetmaison.ca does not guarantee that the Platform will be uninterrupted, secure, or error-free",
+          "Monprojetmaison.ca is not a party to contracts between Owners and Professionals",
+          "Monprojetmaison.ca will not be liable for indirect, consequential, special, or punitive damages",
+          "Monprojetmaison.ca's total liability to you will not exceed the amount you paid to use the Platform in the past 12 months"
+        ],
+        "footer": "Important notice: You are responsible for verifying the licenses, insurance, and references of any Professional before entering into a contract. Monprojetmaison.ca strongly recommends obtaining multiple quotes and consulting independent experts for major projects.",
+        "isWarning": true
+      },
+      "9": {
+        "title": "Indemnification",
+        "intro": "You agree to indemnify and hold harmless Monprojetmaison.ca, its officers, employees, and partners from any claim, loss, liability, damage, cost, or expense (including reasonable legal fees) arising from:",
+        "items": [
+          "Your use of the Platform",
+          "Your violation of these Terms of Use",
+          "Your violation of any third party's rights",
+          "Any content you post on the Platform",
+          "Any dispute between you and another user",
+          "Work performed by a Professional you hired through the Platform"
+        ]
+      },
+      "10": {
+        "title": "Dispute resolution",
+        "intro": "In case of a dispute regarding the use of the Platform:",
+        "items": [
+          "You agree to first attempt to resolve the dispute informally by contacting us",
+          "If the dispute cannot be resolved amicably, the parties may resort to mediation",
+          "These Terms are governed by the laws of the Province of Quebec and the federal laws of Canada",
+          "Any litigation will be submitted to the exclusive jurisdiction of the courts of Laval, Quebec"
+        ],
+        "footer": "Disputes between users: Disputes between Owners and Professionals regarding work must be resolved directly between the parties. Monprojetmaison.ca may facilitate communication but does not act as a mediator or arbitrator."
+      },
+      "11": {
+        "title": "Suspension and termination",
+        "intro": "Monprojetmaison.ca reserves the right to:",
+        "items": [
+          "Suspend or terminate your account at any time for violation of these Terms",
+          "Remove any content that violates these Terms or applicable laws",
+          "Modify or discontinue the Platform (in whole or in part) temporarily or permanently",
+          "Refuse service to anyone for any reason"
+        ],
+        "footer": "Termination by user: You may terminate your account at any time through your account settings or by contacting us. Termination does not affect your existing obligations to other users or Monprojetmaison.ca. Effect of termination: Upon termination, you lose access to your account and associated data. We will retain certain information in accordance with our Privacy Policy and legal requirements."
+      },
+      "12": {
+        "title": "Links to third-party sites",
+        "intro": "The Platform may contain links to third-party websites or services that are not owned or controlled by Monprojetmaison.ca.",
+        "items": [],
+        "footer": "Monprojetmaison.ca assumes no responsibility for the content, privacy policies, or practices of any third-party site or service. You acknowledge and agree that Monprojetmaison.ca will not be liable, directly or indirectly, for any damage caused by the use of these sites or services. We strongly recommend reading the terms of use and privacy policies of any third-party site you visit."
+      },
+      "13": {
+        "title": "Force majeure",
+        "intro": "Monprojetmaison.ca will not be held responsible for any delay or failure to perform resulting from causes beyond its reasonable control, including but not limited to:",
+        "items": [
+          "Natural disasters (floods, earthquakes, storms)",
+          "Acts of war, terrorism, or civil unrest",
+          "Computer or telecommunications system failures",
+          "Government acts, strikes, or labor disputes",
+          "Internet service or cloud infrastructure interruptions",
+          "Cyberattacks or security breaches"
+        ]
+      },
+      "14": {
+        "title": "Modifications to terms",
+        "intro": "Monprojetmaison.ca reserves the right to modify these Terms of Use at any time. Modifications take effect upon posting on the Platform. In case of significant modifications, we will notify you by:",
+        "items": [
+          "Email notification to the address associated with your account",
+          "Alert message on the Platform upon your next login",
+          "Posting a notice on the homepage"
+        ],
+        "footer": "Your continued use of the Platform after the posting of modifications constitutes your acceptance of the new terms. If you do not accept the modifications, you must stop using the Platform and terminate your account."
+      },
+      "15": {
+        "title": "General provisions",
+        "intro": "Important clauses:",
+        "items": [
+          "Entire agreement: These Terms constitute the entire agreement between you and Monprojetmaison.ca regarding the use of the Platform",
+          "Severability: If any provision of these Terms is found invalid or unenforceable, the other provisions will remain in effect",
+          "Waiver: Failure by Monprojetmaison.ca to exercise a right under these Terms does not constitute a waiver of that right",
+          "Assignment: You may not assign these Terms without our prior written consent. Monprojetmaison.ca may assign these Terms at any time",
+          "Language versions: These Terms are written in French. In case of translation, the French version will prevail in case of conflict"
+        ]
+      }
+    }
+  },
+  "cookies": {
+    "lastUpdated": "Last updated: January 2026",
+    "title": "Cookie",
+    "titleHighlight": "Policy",
+    "subtitle": "This policy explains how Monprojetmaison.ca uses cookies and similar technologies.",
+    "managePreferences": "Manage my cookie preferences",
+    "contactTitle": "Questions about cookies",
+    "contactDescription": "If you have any questions regarding our use of cookies, please contact us:",
+    "email": "Email",
+    "copyright": "© {{year}} Monprojetmaison.ca. All rights reserved.",
+    "sections": {
+      "1": {
+        "title": "What is a cookie?",
+        "content": "A cookie is a small text file stored on your device (computer, tablet, smartphone) when you visit a website. Cookies allow the site to remember your actions and preferences (such as language, font size, and other display preferences) for a period of time, so you don't have to re-enter them every time you return to the site or navigate from one page to another."
+      },
+      "2": {
+        "title": "Types of cookies used",
+        "intro": "We use different categories of cookies on Monprojetmaison.ca:",
+        "categories": {
+          "essential": {
+            "name": "Essential cookies",
+            "description": "These cookies are essential for the website to function. They enable navigation, access to secure areas, and the use of basic features. Without these cookies, the site cannot function properly.",
+            "examples": [
+              "User authentication and session",
+              "Security preferences",
+              "Shopping cart (if applicable)",
+              "Cookie consent storage"
+            ]
+          },
+          "analytics": {
+            "name": "Analytics cookies",
+            "description": "These cookies collect anonymous information about how visitors use our site. They help us improve our platform by understanding which pages are most visited and how users navigate.",
+            "examples": [
+              "Google Analytics",
+              "Page view statistics",
+              "Bounce rate and time spent on site",
+              "Traffic sources"
+            ]
+          },
+          "marketing": {
+            "name": "Marketing cookies",
+            "description": "These cookies are used to track visitors across different websites. Their purpose is to display relevant and personalized advertisements, making them more useful for publishers and third-party advertisers.",
+            "examples": [
+              "Targeted advertising",
+              "Remarketing",
+              "Tracking pixels",
+              "Campaign effectiveness measurement"
+            ]
+          },
+          "functional": {
+            "name": "Functional cookies",
+            "description": "These cookies enhance website functionality and personalize your experience. They may be set by us or by third-party providers whose services we have added to our pages.",
+            "examples": [
+              "Preferred language storage",
+              "Interface personalization",
+              "Live chat",
+              "Social media integrations"
+            ]
+          }
+        }
+      },
+      "3": {
+        "title": "Retention period",
+        "intro": "The cookies we use have different retention periods:",
+        "items": [
+          "Session cookies: Automatically deleted when you close your browser",
+          "Persistent cookies: Retained for a set period (generally 1 month to 2 years depending on their function)",
+          "Third-party cookies: Their duration depends on the policies of the third parties concerned"
+        ]
+      },
+      "4": {
+        "title": "Managing your preferences",
+        "intro": "You have full control over cookies. You can:",
+        "items": [
+          "Accept or refuse non-essential cookies via our consent banner",
+          "Modify your preferences at any time by clicking the button below",
+          "Configure your browser to block or delete cookies",
+          "Use browser extensions to manage cookies"
+        ],
+        "hasButton": true
+      },
+      "5": {
+        "title": "Browser configuration",
+        "intro": "You can also manage cookies directly from your browser. Here are links to instructions for the main browsers:",
+        "browsers": [
+          { "name": "Google Chrome", "url": "https://support.google.com/chrome/answer/95647" },
+          { "name": "Mozilla Firefox", "url": "https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-desktop" },
+          { "name": "Safari", "url": "https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac" },
+          { "name": "Microsoft Edge", "url": "https://support.microsoft.com/en-us/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" }
+        ]
+      },
+      "6": {
+        "title": "Third-party cookies",
+        "content": "Our site may contain cookies placed by third parties (partners, advertisers, social networks). These third parties have their own privacy and cookie policies. We have no control over these cookies and encourage you to consult these third parties' policies for more information."
+      },
+      "7": {
+        "title": "Legal compliance",
+        "intro": "Our use of cookies complies with the following regulations:",
+        "items": [
+          "Canada's Personal Information Protection and Electronic Documents Act (PIPEDA)",
+          "Quebec's Act Respecting the Protection of Personal Information in the Private Sector (Law 25)",
+          "European Union's General Data Protection Regulation (GDPR)",
+          "European Union's ePrivacy Directive"
+        ]
+      },
+      "8": {
+        "title": "Updates",
+        "content": "We may update this cookie policy from time to time to reflect changes in our use of cookies or legal requirements. We encourage you to regularly check this page. The date of the last update is indicated at the top of this page."
+      }
+    }
+  },
+  "steps": {
+    "phases": {
+      "preConstruction": "Pre-construction",
+      "grosOeuvre": "Structural Work",
+      "secondOeuvre": "Mechanical & Envelope",
+      "finitions": "Finishing"
+    },
+    "planification": {
+      "title": "Project Planning",
+      "description": "Define your needs, budget and goals before starting.",
+      "duration": "4-5 days",
+      "tasks": {
+        "besoins": {
+          "title": "Define your needs",
+          "description": "List the number of bedrooms, bathrooms, storage spaces and desired features.",
+          "tips": [
+            "Think about your future needs (growing family, working from home)",
+            "Visit model homes for inspiration"
+          ]
+        },
+        "budget-initial": {
+          "title": "Establish preliminary budget",
+          "description": "Calculate your financial capacity including land, construction and contingencies.",
+          "tips": [
+            "Plan for 10-15% of the budget for contingencies",
+            "Include connection fees (electricity, water, sewer)"
+          ]
+        },
+        "terrain": {
+          "title": "Land search and purchase",
+          "description": "Find land that meets your criteria and verify zoning.",
+          "tips": [
+            "Check municipal zoning regulations",
+            "Have a soil study done before purchase"
+          ],
+          "documents": ["Location certificate", "Deed of sale", "Geotechnical study"]
+        },
+        "preapprobation-planification": {
+          "title": "Mortgage pre-approval",
+          "description": "Get pre-approval from your financial institution to know your maximum borrowing capacity.",
+          "tips": [
+            "Compare offers from several banks and brokers",
+            "A pre-approval is generally valid for 90 to 120 days",
+            "Prepare your proof of income and bank statements"
+          ],
+          "documents": ["Pay stubs", "Tax assessment notice", "Bank statements"]
+        }
+      }
+    },
+    "plans-permis": {
+      "title": "Plans and Permits",
+      "description": "Have your plans prepared and obtain all necessary permits.",
+      "duration": "6-8 weeks",
+      "tasks": {
+        "plans-architecture": {
+          "title": "Architectural plans",
+          "description": "Hire an architect or technologist to draw your plans.",
+          "tips": [
+            "Consider purchasing pre-designed plans to speed up the process and reduce costs — several Quebec suppliers offer adaptable models",
+            "Ensure plans comply with the Building Code",
+            "Include structural and mechanical plans",
+            "As soon as you get your plans, start soliciting quotes to speed up project preparation"
+          ],
+          "documents": ["Architectural plans", "Structural plans", "Mechanical plans"]
+        },
+        "test-sol": {
+          "title": "Soil test (geotechnical study)",
+          "description": "Have a geotechnical study done to determine soil bearing capacity and required foundation type.",
+          "tips": [
+            "Required to obtain permit in many municipalities",
+            "Determines the appropriate foundation type",
+            "Identifies high water table risks"
+          ],
+          "documents": ["Geotechnical report", "Foundation recommendations"]
+        },
+        "services-publics": {
+          "title": "Services validation (water, sewer)",
+          "description": "Check availability of municipal services (water, sewer) or plan private installations (well, septic tank, drain field).",
+          "tips": [
+            "Contact the municipality to find out what services are available",
+            "If off-grid: plan soil study for septic installation",
+            "The drain field requires adequate land area",
+            "An artesian well may require multiple drillings"
+          ],
+          "documents": ["Septic compliance certificate", "Septic installation permit", "Water analysis (well)"]
+        },
+        "permis-construction": {
+          "title": "Building permit application",
+          "description": "Submit your application to the municipality with all required documents.",
+          "tips": [
+            "Processing time varies by municipality (2-8 weeks)",
+            "Some municipalities require a professional's commitment"
+          ],
+          "documents": ["Application form", "Certified plans", "Location certificate"]
+        }
+      }
+    },
+    "soumissions": {
+      "title": "Quotes",
+      "description": "Obtain and compare quotes from different trades.",
+      "duration": "2-3 weeks",
+      "tasks": {
+        "obtenir-soumissions": {
+          "title": "Obtain quotes",
+          "description": "Request detailed quotes from different trades.",
+          "tips": [
+            "Get at least 3 quotes per specialty",
+            "Don't choose solely based on the lowest price — use AI analysis to help you compare",
+            "Check contractor references",
+            "Request proof of liability insurance",
+            "Verify RBQ licenses of contractors (https://www.rbq.gouv.qc.ca/en/be/citizen/check-contractors-licence/)",
+            "Compare warranties and proposed timelines"
+          ],
+          "documents": ["Signed quotes", "Proof of insurance", "RBQ licenses"]
+        },
+        "assurance-chantier": {
+          "title": "Construction insurance",
+          "description": "Take out construction insurance to protect your project.",
+          "tips": [
+            "⚠️ IMPORTANT: Make sure coverage starts BEFORE the first shovel hits the ground",
+            "Construction insurance covers damage during construction",
+            "Verify coverage includes theft, vandalism and weather damage",
+            "Request proof of liability insurance from all your contractors",
+            "In case of injury on site, the owner-builder is held responsible — liability insurance is essential",
+            "Compare several brokers to get the best rate"
+          ],
+          "documents": ["Construction insurance policy", "Contractor insurance certificates"]
+        }
+      }
+    },
+    "financement": {
+      "title": "Financing",
+      "description": "Obtain your financing and prepare your financial plan.",
+      "duration": "2-4 weeks",
+      "tasks": {
+        "pret-construction": {
+          "title": "Construction loan",
+          "description": "Negotiate your construction loan with progressive disbursements.",
+          "tips": [
+            "Funds are released in stages based on progress",
+            "Plan for personal funds for initial expenses"
+          ],
+          "documents": ["Contractor quotes", "Plans and specifications", "Detailed budget"]
+        }
+      }
+    },
+    "excavation": {
+      "title": "Excavation",
+      "description": "Site preparation and digging for foundations.",
+      "duration": "3-5 days",
+      "tasks": {
+        "implantation": {
+          "title": "House staking",
+          "description": "The surveyor positions the house on the lot according to plans.",
+          "tips": [
+            "Respect required setbacks",
+            "Have it verified before excavation"
+          ],
+          "documents": ["Staking certificate"]
+        },
+        "deboisement": {
+          "title": "Land clearing",
+          "description": "Tree felling and clearing of the construction zone.",
+          "tips": [
+            "Check municipal regulations regarding tree cutting",
+            "Some municipalities require a cutting permit",
+            "Plan for transport or chipping of branches and stumps"
+          ]
+        },
+        "excavation-creusage": {
+          "title": "Digging and excavation",
+          "description": "Digging for basement and site preparation.",
+          "tips": [
+            "Plan for storage of excavated soil or budget for hauling",
+            "Protect excavation from rain and have a pump ready for water removal"
+          ]
+        }
+      }
+    },
+    "fondation": {
+      "title": "Foundation",
+      "description": "Foundation construction and waterproofing.",
+      "duration": "1-2 weeks",
+      "tasks": {
+        "coulage-fondation": {
+          "title": "Foundation pouring",
+          "description": "Installation of forms and concrete pouring for footings and walls.",
+          "tips": [
+            "Concrete curing: wait at least 21 days before loading",
+            "Waterproof foundation walls with tar membrane or Delta-MS membrane for optimal waterproofing"
+          ]
+        },
+        "drain-remblai": {
+          "title": "Drain and backfill",
+          "description": "Installation of French drain and backfilling around foundations.",
+          "tips": [
+            "Use perforated PVC drain with cleanouts for durable and easy maintenance drainage"
+          ],
+          "documents": ["Foundation inspection report"]
+        }
+      }
+    },
+    "structure": {
+      "title": "Structure and Framing",
+      "description": "Erection of the wood or steel structure of the house.",
+      "duration": "2-4 weeks",
+      "tasks": {
+        "plancher": {
+          "title": "Ground floor",
+          "description": "Installation of joists and subfloor.",
+          "tips": [
+            "Protect subfloor from weather during construction",
+            "Check level before continuing",
+            "Use open-web trusses to facilitate electrical and plumbing runs"
+          ]
+        },
+        "murs": {
+          "title": "Wall erection",
+          "description": "Construction and raising of exterior and load-bearing interior walls.",
+          "tips": [
+            "Respect openings shown on plans",
+            "Install headers above openings"
+          ]
+        },
+        "etage": {
+          "title": "Upper floor structure",
+          "description": "If applicable, construction of floor and walls of upper level.",
+          "tips": [
+            "Use open-web trusses to facilitate electrical and plumbing runs"
+          ]
+        },
+        "fermes-toit": {
+          "title": "Roof truss installation",
+          "description": "Installation of prefabricated trusses or traditional framing construction.",
+          "documents": ["Certified truss plans"]
+        },
+        "pontage": {
+          "title": "Roof sheathing",
+          "description": "Installation of plywood on roof trusses to close the structure.",
+          "tips": [
+            "Protect sheathing from weather quickly",
+            "Check panel alignment"
+          ]
+        },
+        "etancheite": {
+          "title": "Waterproofing",
+          "description": "Installation of waterproofing membranes and infiltration protection.",
+          "tips": [
+            "Ensure all joints are properly sealed",
+            "Check waterproofing around openings (windows, doors)"
+          ]
+        }
+      }
+    },
+    "toiture": {
+      "title": "Roofing",
+      "description": "Installation of membrane and roofing material.",
+      "duration": "2 days",
+      "tasks": {
+        "membrane": {
+          "title": "Membrane and shingles",
+          "description": "Installation of waterproof membrane and asphalt shingles or other covering.",
+          "tips": [
+            "Install flashing around chimneys and vents",
+            "Self-adhesive membrane is required in risk areas",
+            "Apply self-adhesive membrane in the first 4 feet of roof edges for better protection",
+            "Ensure good ventilation to release heat. Poor ventilation can prematurely deteriorate the covering",
+            "Have fascia starter strips installed under the self-adhesive membrane for proper water runoff in case of leak"
+          ]
+        }
+      }
+    },
+    "fenetres-portes": {
+      "title": "Windows and Exterior Doors",
+      "description": "Installation of windows and doors to close the envelope.",
+      "duration": "2 days",
+      "tasks": {
+        "fenetres": {
+          "title": "Window installation",
+          "description": "Window installation with insulation and perimeter sealing.",
+          "tips": [
+            "Use low-expansion foam insulation",
+            "Install window flashing correctly"
+          ]
+        },
+        "portes-ext": {
+          "title": "Exterior doors",
+          "description": "Installation of entry, garage and patio doors."
+        }
+      }
+    },
+    "isolation": {
+      "title": "Insulation and Vapor Barrier",
+      "description": "Installation of thermal insulation and vapor barrier.",
+      "duration": "1-2 weeks",
+      "tasks": {
+        "isolation-murs": {
+          "title": "Wall insulation",
+          "description": "Installation of insulation in exterior walls (batt, cellulose or foam).",
+          "tips": [
+            "R-24 minimum for walls in Quebec",
+            "Avoid thermal bridges"
+          ]
+        },
+        "isolation-toit": {
+          "title": "Roof/attic insulation",
+          "description": "Insulation of top floor ceiling or cathedral ceiling.",
+          "tips": [
+            "R-41 minimum for roofs in Quebec",
+            "Maintain adequate attic ventilation, use a deflector at the bottom of sheathing to maximize ventilation"
+          ]
+        },
+        "insonorisation": {
+          "title": "Soundproofing",
+          "description": "Installation of acoustic insulation between rooms and floors.",
+          "tips": [
+            "Good soundproofing of bedrooms and bathrooms improves comfort and privacy by reducing airborne noise through acoustic insulation and proper installation techniques",
+            "Prioritize walls between bedrooms and bathrooms",
+            "Use acoustic wool or specialized membranes",
+            "Floor soundproofing significantly reduces impact noise"
+          ]
+        },
+        "pare-vapeur": {
+          "title": "Vapor barrier",
+          "description": "Installation of 6 mil polyethylene on the warm side of insulation.",
+          "tips": [
+            "Seal all joints and penetrations",
+            "Blower door test will verify airtightness",
+            "Ensure there are no perforations in the vapor barrier, repair with vapor barrier tape"
+          ],
+          "documents": ["Blower door test report"]
+        },
+        "fourrures-clouage": {
+          "title": "Strapping and backing",
+          "description": "Installation of wood strapping and backing for interior finish attachment.",
+          "tips": [
+            "Ensure strapping is level",
+            "Plan backing at cabinet and wall accessory locations"
+          ]
+        }
+      }
+    },
+    "plomberie-sous-dalle": {
+      "title": "Under-Slab Plumbing",
+      "description": "Installation of plumbing under concrete slab before pouring.",
+      "duration": "1 day",
+      "tasks": {
+        "plomberie-sous-dalle-visite": {
+          "title": "Under-slab plumbing - first visit",
+          "description": "Installation of drains and plumbing pipes under the concrete slab.",
+          "tips": [
+            "This step must be completed before pouring the slab",
+            "Check drainage slopes and connections",
+            "Ensure all connections are accessible"
+          ]
+        }
+      }
+    },
+    "dalle-sous-sol": {
+      "title": "Basement Slab Pour",
+      "description": "Pouring of basement concrete slab after rough plumbing installation.",
+      "duration": "2-3 days",
+      "tasks": {
+        "preparation-dalle": {
+          "title": "Ground preparation",
+          "description": "Leveling, compaction and installation of vapor barrier membrane under slab.",
+          "tips": [
+            "Ensure drainage is in place before pouring",
+            "Install rigid insulation under slab and sealed vapor barrier to reduce heat loss and moisture"
+          ]
+        },
+        "coulage-dalle": {
+          "title": "Concrete pouring",
+          "description": "Pouring and leveling of concrete slab.",
+          "tips": [
+            "Plan control joints to prevent cracking",
+            "Concrete curing: keep moist for minimum 7 days"
+          ]
+        }
+      }
+    },
+    "murs-division": {
+      "title": "Partition Walls",
+      "description": "Construction of non-load-bearing interior partition walls.",
+      "duration": "2-3 days",
+      "tasks": {
+        "construire-escalier": {
+          "title": "Build stairs",
+          "description": "Construction and installation of interior stairs.",
+          "tips": [
+            "Follow Building Code standards for tread dimensions",
+            "Provide temporary guardrail during construction"
+          ]
+        },
+        "ossature-murs": {
+          "title": "Wall framing",
+          "description": "Installation of wood or steel framing for partition walls.",
+          "tips": [
+            "Use 2x4 studs for non-load-bearing walls",
+            "Plan for door and opening locations",
+            "Ensure walls are securely attached between floors and ceilings (poorly anchored walls can cause drywall cracking)",
+            "Use 2x6 walls for dryer venting and drain stack runs"
+          ]
+        },
+        "cadrage-portes": {
+          "title": "Door framing",
+          "description": "Installation of door frames in partition walls.",
+          "tips": [
+            "Check level and plumb of frames",
+            "Plan space for pocket doors if desired",
+            "Ensure correct door opening height based on floor covering thickness"
+          ]
+        }
+      }
+    },
+    "plomberie-roughin": {
+      "title": "Plumbing - Rough-in",
+      "description": "Rough plumbing installation before closing walls.",
+      "duration": "4 days",
+      "tasks": {
+        "plomberie-brute": {
+          "title": "Rough plumbing",
+          "description": "Installation of supply and drain pipes in walls.",
+          "tips": [
+            "It's best to run plumbing before electrical, as it's easier for electricians to work around pipes than vice versa",
+            "PEX is easier to install and less expensive than copper",
+            "Respect drainage slopes"
+          ]
+        },
+        "chauffe-eau": {
+          "title": "Water heater",
+          "description": "Installation of water heater (electric, gas or heat pump).",
+          "tips": [
+            "Install a drain pan connected to drain to catch water in case of leak and prevent water damage"
+          ]
+        },
+        "conduite-gaz": {
+          "title": "Gas line",
+          "description": "Installation of gas lines for fireplace and stove.",
+          "tips": [
+            "Use a certified installer for natural gas or propane",
+            "Plan appliance locations before installing lines"
+          ]
+        },
+        "branchements": {
+          "title": "Municipal connections",
+          "description": "Connection to water and sewer (or septic installation).",
+          "documents": ["Connection permit", "Pressure test"]
+        }
+      }
+    },
+    "electricite-roughin": {
+      "title": "Electrical - Rough-in",
+      "description": "Rough electrical wiring before closing walls.",
+      "duration": "4 days",
+      "tasks": {
+        "entree-electrique": {
+          "title": "Electrical service",
+          "description": "Installation of electrical panel and utility connection.",
+          "tips": [
+            "Plan for sufficient amperage for future needs",
+            "200A is standard for a modern home"
+          ],
+          "documents": ["Utility connection request"]
+        },
+        "filage": {
+          "title": "Rough wiring",
+          "description": "Running wires in walls before drywall installation.",
+          "tips": [
+            "Plan outlet and switch locations",
+            "Provide dedicated circuits (kitchen, laundry)"
+          ]
+        },
+        "inspection-electrique": {
+          "title": "Electrical inspection",
+          "description": "Mandatory inspection before closing walls.",
+          "tips": [
+            "Take photos of all electrical box locations with clear landmarks to locate forgotten boxes after drywall"
+          ]
+        }
+      }
+    },
+    "hvac": {
+      "title": "Heating and Ventilation",
+      "description": "Installation of heating, cooling and ventilation systems.",
+      "duration": "2-3 days",
+      "tasks": {
+        "chauffage": {
+          "title": "Heating system",
+          "description": "Installation of electric baseboards, radiant floor or heat pump.",
+          "tips": [
+            "Position electric baseboards under windows to neutralize cold air — windows often represent the biggest heat loss, even when new",
+            "Plan electric baseboards even if installing central or wall heat pump, as backup heating during extreme cold",
+            "Calculate heating needs per room",
+            "A heat pump can reduce your heating costs"
+          ]
+        },
+        "vrc": {
+          "title": "Heat Recovery Ventilator (HRV)",
+          "description": "Mandatory installation to ensure air quality.",
+          "tips": [
+            "HRV is mandatory in new construction",
+            "Plan ducts to each room"
+          ]
+        },
+        "conduits": {
+          "title": "Ventilation ducts",
+          "description": "Installation of ducts for range hood, dryer and bathroom fans.",
+          "tips": [
+            "Duct must be insulated at minimum for the first 24 inches from its exit through an exterior wall, even in a heated ceiling, and fully insulated in the attic"
+          ]
+        }
+      }
+    },
+    "exterieur": {
+      "title": "Exterior Cladding",
+      "description": "Finishing of the house's exterior envelope.",
+      "duration": "3-4 weeks",
+      "tasks": {
+        "revetement": {
+          "title": "Exterior cladding",
+          "description": "Installation of siding (vinyl, fiber cement, brick, wood).",
+          "tips": [
+            "Install air barrier membrane before cladding and ensure no perforations",
+            "Respect ventilation spacing",
+            "Always provide an air gap behind cladding for proper circulation. Never install horizontal wood strapping as it blocks air and water flow."
+          ]
+        },
+        "fascia-soffite": {
+          "title": "Fascia and soffit",
+          "description": "Installation of roof trim and attic ventilation."
+        },
+        "balcons-terrasses": {
+          "title": "Balconies and decks",
+          "description": "Construction of balconies, porches and decks.",
+          "tips": [
+            "Always apply self-healing waterproof membrane on sill plate (building belt). Provide air space between membrane and balcony structure to allow drying and prevent premature deterioration."
+          ]
+        },
+        "amenagement": {
+          "title": "Landscaping",
+          "description": "Final grading, driveway, lawn and plantings."
+        }
+      }
+    },
+    "gypse": {
+      "title": "Drywall and Painting",
+      "description": "Interior wall and ceiling finishing.",
+      "duration": "10-12 days",
+      "tasks": {
+        "pose-gypse": {
+          "title": "Drywall installation",
+          "description": "Installation of drywall panels on all walls and ceilings.",
+          "tips": [
+            "Use moisture-resistant drywall in bathrooms",
+            "5/8 drywall on garage walls mandatory for fire protection"
+          ]
+        },
+        "tirage-joints": {
+          "title": "Taping and mudding",
+          "description": "Application of joint compound and sanding for smooth finish.",
+          "tips": [
+            "3 coats minimum for a good finish",
+            "Level 4 or 5 depending on desired finish"
+          ]
+        },
+        "peinture": {
+          "title": "Painting",
+          "description": "Application of primer and paint on walls and ceilings.",
+          "tips": [
+            "A good primer is essential. After primer application, inspect all walls and repair visible defects with a light. Inspection is done at 3 feet from walls. Re-prime all repairs before applying finish coats.",
+            "At this stage, apply final paint on ceilings and a first finish coat on walls. Final wall finish coat will be applied after finishing work installation (trim, doors, etc.)."
+          ]
+        }
+      }
+    },
+    "revetements-sol": {
+      "title": "Floor Coverings",
+      "description": "Floor installation in all rooms.",
+      "duration": "5-7 days",
+      "tasks": {
+        "plancher-bois": {
+          "title": "Hardwood or laminate floor",
+          "description": "Installation in living areas.",
+          "tips": [
+            "Acclimate wood 48-72h before installation",
+            "Leave expansion gap at perimeter"
+          ]
+        },
+        "ceramique": {
+          "title": "Ceramic tile",
+          "description": "Tile installation in bathrooms, kitchen and entry.",
+          "tips": [
+            "Add 5/8\" plywood screwed every 6 inches before floor tile installation. Minimum 1 1/4\" substrate is recommended.",
+            "Use waterproof membrane in shower",
+            "Have you considered heated floor option?"
+          ]
+        }
+      }
+    },
+    "cuisine-sdb": {
+      "title": "Cabinetry Work",
+      "description": "Installation of cabinets, countertops and fixtures.",
+      "duration": "3-5 days",
+      "tasks": {
+        "armoires": {
+          "title": "Kitchen cabinets and vanities",
+          "description": "Installation of cabinets and vanity units.",
+          "tips": [
+            "Validate measurements with your cabinet maker once drywall stages are complete"
+          ]
+        },
+        "comptoirs": {
+          "title": "Countertops",
+          "description": "Installation of kitchen and bathroom countertops.",
+          "tips": [
+            "Measurement after cabinet installation",
+            "Fabrication lead time: 2-4 weeks"
+          ]
+        }
+      }
+    },
+    "finitions-int": {
+      "title": "Interior Finishing",
+      "description": "Final details to complete the interior.",
+      "duration": "1-2 weeks",
+      "tasks": {
+        "portes-int": {
+          "title": "Interior doors",
+          "description": "Installation of doors, frames and hardware.",
+          "tips": [
+            "Plan a fire-rated self-closing door between garage and house (building code requirement)"
+          ]
+        },
+        "moulures": {
+          "title": "Trim and baseboards",
+          "description": "Installation of baseboards, casings and decorative moldings."
+        },
+        "escalier": {
+          "title": "Staircase",
+          "description": "Staircase finishing (treads, risers, railing)."
+        },
+        "peinture-finition": {
+          "title": "Finish painting",
+          "description": "Application of final paint coat on walls after finishing work installation.",
+          "tips": [
+            "This step allows correcting touch-ups needed after trim, door and other finishing element installation"
+          ]
+        }
+      }
+    },
+    "electricite-finition": {
+      "title": "Electrical - Finishing",
+      "description": "Final installation of electrical devices after interior finishing.",
+      "duration": "3 days",
+      "tasks": {
+        "prises-interrupteurs": {
+          "title": "Outlets and switches",
+          "description": "Installation of outlet and switch cover plates.",
+          "tips": [
+            "Check operation of each circuit",
+            "Use plates matching your decor"
+          ]
+        },
+        "luminaires": {
+          "title": "Light fixtures",
+          "description": "Installation of all light fixtures (ceiling, wall-mounted, etc.)."
+        },
+        "appareils-electriques": {
+          "title": "Appliance hookup",
+          "description": "Connection of appliances and equipment (range, dryer, etc.)."
+        }
+      }
+    },
+    "plomberie-finition": {
+      "title": "Plumbing - Finishing",
+      "description": "Final installation of fixtures after interior finishing.",
+      "duration": "3 days",
+      "tasks": {
+        "robinetterie": {
+          "title": "Faucets",
+          "description": "Installation of faucets (kitchen, bathrooms, laundry).",
+          "tips": [
+            "Check each connection for leaks",
+            "Choose recognized brand faucets with lifetime warranty. Before purchase, verify replacement parts availability from local distributors: this will facilitate future repairs and avoid the cost of complete replacement long-term."
+          ]
+        },
+        "toilettes-lavabos": {
+          "title": "Toilets and sinks",
+          "description": "Installation of toilets, sinks and vanities."
+        },
+        "douche-bain": {
+          "title": "Shower and bathtub",
+          "description": "Final connection of showers and bathtubs.",
+          "tips": [
+            "Plan a specialized installer for shower doors and bath enclosures"
+          ]
+        }
+      }
+    },
+    "inspections-finales": {
+      "title": "Final Inspections",
+      "description": "Final verifications and obtaining certificate of occupancy.",
+      "duration": "2 days",
+      "tasks": {
+        "inspection-municipale": {
+          "title": "Final municipal inspection",
+          "description": "Mandatory inspection to obtain certificate of occupancy.",
+          "documents": ["Certificate of occupancy"]
+        },
+        "inspection-garantie": {
+          "title": "Pre-reception inspection",
+          "description": "Complete inspection to identify deficiencies.",
+          "tips": [
+            "Hire an independent inspector",
+            "Document everything with photos"
+          ]
+        },
+        "certificat-localisation": {
+          "title": "Final location certificate",
+          "description": "New certificate showing completed construction.",
+          "documents": ["Final location certificate"]
+        }
+      }
+    }
+  },
+  "chatAssistant": {
+    "welcomeBubble": "👋 Hi! I'm the MonProjetMaison assistant! I can help you with just one click!",
+    "close": "Close",
+    "title": "MonProjetMaison Assistant",
+    "welcomeTitle": "👋 Welcome to MonProjetMaison.ca!",
+    "welcomeMessage": "I can help you use the site. Click on an option or write to me directly.",
+    "inputPlaceholder": "Write your message...",
+    "connectionError": "Connection error",
+    "errorMessage": "Sorry, an error occurred. Please try again in a moment.",
+    "quickActions": {
+      "createProject": "Create a project",
+      "uploadQuote": "Upload a quote",
+      "understandAnalysis": "Understand my analysis",
+      "technicalIssue": "Technical issue"
+    }
+  }
+}
