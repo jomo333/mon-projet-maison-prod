@@ -1872,16 +1872,16 @@ export function CategorySubmissionsDialog({
                         {t("categorySubmissions.taskSubmissions.diyModeDescription")}
                       </p>
                     </div>
-                    <SubCategoryManager
-                      subCategories={subCategories}
-                      onAddSubCategory={handleAddSubCategory}
-                      onRemoveSubCategory={handleRemoveSubCategory}
-                      onSelectSubCategory={handleSelectSubCategory}
-                      activeSubCategoryId={activeSubCategoryId}
+                    <DIYItemsTable
+                      items={diyItems}
+                      onAddItem={handleAddDIYItem}
+                      onRemoveItem={handleRemoveDIYItem}
+                      onUpdateItem={handleUpdateDIYItem}
+                      onAddQuote={handleAddQuote}
+                      onRemoveQuote={handleRemoveQuote}
+                      onAnalyzeItem={projectPlans.length > 0 ? handleAnalyzeDIYItem : undefined}
+                      analyzingItemId={analyzingDIYItemId}
                       categoryName={categoryName}
-                      projectPlans={projectPlans}
-                      onAnalyzeDIY={analyzeDIYMaterials}
-                      analyzingDIY={analyzingDIY}
                     />
                   </TabsContent>
                 </Tabs>
