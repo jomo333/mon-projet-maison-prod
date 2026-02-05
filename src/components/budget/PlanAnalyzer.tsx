@@ -1737,7 +1737,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
               <div className="flex flex-col items-end">
                 <Badge variant="secondary" className="text-lg px-4 py-1">
                   <DollarSign className="h-4 w-4 mr-1" />
-                  {Math.round(analysis.estimatedTotal * 0.90).toLocaleString()} $ à {Math.round(analysis.estimatedTotal * 1.10).toLocaleString()} $
+                  {formatCurrency(Math.round(analysis.estimatedTotal * 0.90))} à {formatCurrency(Math.round(analysis.estimatedTotal * 1.10))}
                 </Badge>
                 <span className="text-xs text-muted-foreground mt-1">{t("planAnalyzer.rangeNote")}</span>
               </div>
