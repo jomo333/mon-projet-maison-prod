@@ -388,6 +388,9 @@ export const useProjectSchedule = (projectId: string | null) => {
         contactPerson?: string;
         supplierLeadDays?: number;
         isCompleted?: boolean;
+        isDIY?: boolean;
+        orderLeadDays?: number;
+        subCategoryName?: string;
       };
 
       try {
@@ -396,21 +399,57 @@ export const useProjectSchedule = (projectId: string | null) => {
         continue;
       }
 
-      // Skip if no supplier selected or no lead days
+      // Extract trade ID from task_id (e.g., "soumission-chauffage-et-ventilation" -> "chauffage-et-ventilation")
+      const fullTradeId = soumission.task_id.replace("soumission-", "");
+      
+      // Handle DIY sub-categories with order lead days
+      if (fullTradeId.includes("-sub-") && notes.isDIY && notes.orderLeadDays && notes.orderLeadDays > 0) {
+        // Extract the base trade ID (e.g., "electricite-sub-abc123" -> "electricite")
+        const baseTradeId = fullTradeId.split("-sub-")[0];
+        
+        // Map to schedule step_id
+        const stepId = soumissionTradeToStepId[baseTradeId];
+        if (!stepId) {
+          console.log(`No step mapping for DIY trade: ${baseTradeId}`);
+          continue;
+        }
+
+        // Find the corresponding schedule
+        const schedule = schedules.find(s => s.step_id === stepId);
+        if (!schedule || !schedule.start_date) {
+          continue;
+        }
+
+        // Calculate alert date for material order
+        const startDate = parseISO(schedule.start_date);
+        const alertDate = subBusinessDays(startDate, notes.orderLeadDays);
+        const formattedStartDate = format(startDate, "d MMMM yyyy", { locale: fr });
+        const itemName = notes.subCategoryName || "matériaux DIY";
+
+        alertsToCreate.push({
+          project_id: projectId,
+          schedule_id: schedule.id,
+          alert_type: "material_order",
+          alert_date: format(alertDate, "yyyy-MM-dd"),
+          message: `🛒 Commander les matériaux pour "${itemName}" (${schedule.step_name}) - Début des travaux prévu le ${formattedStartDate} (préavis de ${notes.orderLeadDays} jours)`,
+          is_dismissed: false,
+        });
+        
+        continue;
+      }
+      
+      // Skip sub-categories for regular supplier alerts
+      if (fullTradeId.includes("-sub-")) continue;
+
+      // Skip if no supplier selected or no lead days (for regular suppliers)
       if (!notes.supplierName || !notes.supplierLeadDays || notes.supplierLeadDays <= 0) {
         continue;
       }
 
-      // Extract trade ID from task_id (e.g., "soumission-chauffage-et-ventilation" -> "chauffage-et-ventilation")
-      const tradeId = soumission.task_id.replace("soumission-", "");
-      
-      // Skip sub-categories
-      if (tradeId.includes("-sub-")) continue;
-
       // Map to schedule step_id
-      const stepId = soumissionTradeToStepId[tradeId];
+      const stepId = soumissionTradeToStepId[fullTradeId];
       if (!stepId) {
-        console.log(`No step mapping for trade: ${tradeId}`);
+        console.log(`No step mapping for trade: ${fullTradeId}`);
         continue;
       }
 
@@ -448,14 +487,23 @@ export const useProjectSchedule = (projectId: string | null) => {
       });
     }
 
-    // 4. Delete existing supplier_call alerts and recreate
+    // 4. Delete existing supplier_call and material_order alerts and recreate
     const scheduleIds = schedules.map(s => s.id);
     if (scheduleIds.length > 0) {
+      // Delete supplier_call alerts
       await supabase
         .from("schedule_alerts")
         .delete()
         .eq("project_id", projectId)
         .eq("alert_type", "supplier_call")
+        .in("schedule_id", scheduleIds);
+      
+      // Delete material_order alerts
+      await supabase
+        .from("schedule_alerts")
+        .delete()
+        .eq("project_id", projectId)
+        .eq("alert_type", "material_order")
         .in("schedule_id", scheduleIds);
     }
 
