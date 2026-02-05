@@ -114,7 +114,7 @@ export function TaskSubmissionsTabs({
         {grandTotal > 0 && (
           <Badge variant="secondary" className="bg-primary/10 text-primary">
             <DollarSign className="h-3 w-3 mr-1" />
-            {grandTotal.toLocaleString("fr-CA")} $
+            {formatCurrency(grandTotal)}
           </Badge>
         )}
       </div>
