@@ -1601,9 +1601,9 @@ export function CategorySubmissionsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="relative flex-1 min-h-0">
-          <ScrollArea className="h-[60vh] pr-4">
-            <div className="space-y-6">
+        <div className="relative flex-1 min-h-0 flex flex-col">
+          <ScrollArea className="flex-1 pr-4">
+            <div className="space-y-6 pb-4">
             {/* Budget Section - Only show on main view */}
             {!viewingSubCategory && (
               <div className="space-y-3">
