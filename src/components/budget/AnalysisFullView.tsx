@@ -211,7 +211,7 @@ export function AnalysisFullView({
                                 <div className="flex justify-between items-center">
                                   <span className="font-medium text-sm">{option.name}</span>
                                   <span className="font-bold text-primary">
-                                    {parseAmount(option.amount).toLocaleString('fr-CA')} $
+                                    {formatCurrency(parseAmount(option.amount))}
                                   </span>
                                 </div>
                                 {option.description && (
