@@ -1126,7 +1126,7 @@ const Budget = () => {
                                       {supplier.amount && (
                                         <div className="flex items-center gap-2 font-medium">
                                           <DollarSign className="h-4 w-4 text-muted-foreground" />
-                                          <span>{parseFloat(supplier.amount).toLocaleString("fr-CA")} $</span>
+                                          <span>{formatCurrency(parseFloat(supplier.amount))}</span>
                                         </div>
                                       )}
                                     </div>
