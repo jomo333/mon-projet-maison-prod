@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { formatCurrency } from "@/lib/i18n";
 
 const data = [
   { name: "Permis", prevu: 5000, reel: 4800 },
