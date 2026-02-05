@@ -128,12 +128,13 @@ const Budget = () => {
       "agrandissement": "extension",
       "garage détaché": "detachedGarage",
       "garage detache": "detachedGarage",
+      "garage-detache": "detachedGarage",
       "chalet": "cottage",
     };
     const normalizedType = type.toLowerCase().trim();
     const key = typeMap[normalizedType];
     if (key) {
-      return t(`start.projectTypes.${key}`);
+      return t(`startProject.projectTypes.${key}`);
     }
     return type;
   };
