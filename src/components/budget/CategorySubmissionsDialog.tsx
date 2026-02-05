@@ -362,6 +362,19 @@ export function CategorySubmissionsDialog({
   useEffect(() => {
     if (savedSubCategories.length > 0) {
       setSubCategories(savedSubCategories);
+      
+      // Also sync to DIY items format
+      const diyItemsFromDb: DIYItem[] = savedSubCategories
+        .filter(sc => sc.isDIY)
+        .map(sc => ({
+          id: sc.id,
+          name: sc.name,
+          totalAmount: sc.amount || 0,
+          quotes: [], // Will be loaded from notes
+          orderLeadDays: sc.orderLeadDays,
+          hasAnalysis: sc.hasAnalysis,
+        }));
+      setDiyItems(diyItemsFromDb);
     }
   }, [savedSubCategories]);
   
