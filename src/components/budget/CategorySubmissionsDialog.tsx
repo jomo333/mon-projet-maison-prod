@@ -2060,7 +2060,7 @@ export function CategorySubmissionsDialog({
                     <div className="text-right">
                       <div className="text-sm text-muted-foreground">Coût retenu</div>
                       <div className="font-bold text-2xl text-primary">
-                        {parseInt(spent || selectedAmount || '0').toLocaleString('fr-CA')} $
+                        {formatCurrency(parseInt(spent || selectedAmount || '0'))}
                       </div>
                     </div>
                   </div>
