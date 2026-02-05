@@ -878,7 +878,7 @@ export function CategorySubmissionsDialog({
       if (costMatch) {
         const estimatedCost = parseFloat(costMatch[1].replace(/[\s,]/g, '')) || 0;
         if (estimatedCost > 0) {
-          toast.info(t("toasts.estimatedMaterialCost", { amount: Math.round(estimatedCost).toLocaleString('fr-CA') }), {
+          toast.info(t("toasts.estimatedMaterialCost", { amount: formatCurrency(Math.round(estimatedCost)) }), {
             duration: 5000,
           });
         }
