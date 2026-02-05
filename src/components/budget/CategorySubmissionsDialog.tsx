@@ -146,8 +146,8 @@ export function CategorySubmissionsDialog({
   
   const queryClient = useQueryClient();
   const { user, session } = useAuth();
-  const [budget, setBudget] = useState(currentBudget.toString());
-  const [spent, setSpent] = useState(currentSpent.toString());
+  const [budget, setBudget] = useState(Math.round(currentBudget * 100) / 100 + "");
+  const [spent, setSpent] = useState(Math.round(currentSpent * 100) / 100 + "");
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
