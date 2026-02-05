@@ -1884,6 +1884,100 @@ export function CategorySubmissionsDialog({
                       </span>
                     </div>
                   )}
+                  
+                  {/* Préavis de commande matériaux */}
+                  <div className="pt-3 mt-3 border-t border-amber-200 dark:border-amber-800">
+                    <div className="p-3 bg-amber-500/10 border border-amber-500/40 rounded-lg">
+                      <div className="flex items-start gap-3">
+                        <div className="p-1.5 bg-amber-500/20 rounded-full shrink-0">
+                          <Phone className="h-4 w-4 text-amber-600" />
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h5 className="font-medium text-amber-700 dark:text-amber-400 text-sm">
+                              {t("categorySubmissions.orderNotice.title", "Préavis de commande")}
+                            </h5>
+                            <Badge variant="outline" className="text-xs border-amber-500/50 text-amber-600 dark:text-amber-400">
+                              Important
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-amber-700/70 dark:text-amber-300/70">
+                            {t("categorySubmissions.orderNotice.description", "Indique le délai requis pour commander les matériaux avant le début de cette étape. Le système créera une alerte pour te rappeler de passer la commande à temps.")}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="number"
+                              min={0}
+                              value={currentSubCat.orderLeadDays ?? ""}
+                              onChange={(e) => {
+                                const days = e.target.value ? parseInt(e.target.value) : null;
+                                setSubCategories(prev => prev.map(sc =>
+                                  sc.id === activeSubCategoryId
+                                    ? { ...sc, orderLeadDays: days ?? undefined }
+                                    : sc
+                                ));
+                              }}
+                              placeholder={t("categorySubmissions.orderNotice.placeholder", "Ex: 14")}
+                              className="max-w-[120px] h-8 text-sm border-amber-500/50 focus:border-amber-500"
+                            />
+                            <span className="text-xs text-muted-foreground">{t("categorySubmissions.orderNotice.label", "jours avant le début des travaux")}</span>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                              const currentSubCat = subCategories.find(sc => sc.id === activeSubCategoryId);
+                              if (!currentSubCat) return;
+                              
+                              const orderLeadDays = currentSubCat.orderLeadDays ?? null;
+                              const materialCost = currentSubCat.materialCostOnly || 0;
+                              
+                              // Save to database
+                              const existingNotes = supplierStatus || {};
+                              const updatedNotes = JSON.stringify({
+                                ...existingNotes,
+                                subCategoryName: currentSubCat.name,
+                                amount: materialCost.toString(),
+                                materialCostOnly: materialCost,
+                                isDIY: true,
+                                hasDIYAnalysis: !!diyAnalysisResult,
+                                orderLeadDays: orderLeadDays,
+                              });
+                              
+                              await supabase
+                                .from('task_dates')
+                                .upsert({
+                                  project_id: projectId,
+                                  step_id: 'soumissions',
+                                  task_id: currentTaskId,
+                                  notes: updatedNotes,
+                                }, { onConflict: 'project_id,step_id,task_id' });
+                              
+                              queryClient.invalidateQueries({ queryKey: ['sub-categories', projectId, tradeId] });
+                              queryClient.invalidateQueries({ queryKey: ['supplier-status', projectId, currentTaskId] });
+                              
+                              // Sync alerts to create the material order alert
+                              if (orderLeadDays && orderLeadDays > 0) {
+                                try {
+                                  await syncAlertsFromSoumissions();
+                                  toast.success(t("toasts.orderNoticeCreated", "Préavis de commande enregistré - Alerte créée"));
+                                } catch (e) {
+                                  console.error("Error syncing alerts:", e);
+                                  toast.success(t("toasts.orderNoticeSaved", "Préavis de commande enregistré"));
+                                }
+                              } else {
+                                toast.success(t("toasts.orderNoticeSaved", "Préavis de commande enregistré"));
+                              }
+                            }}
+                            className="gap-2 border-amber-500/50 text-amber-700 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-950/50"
+                          >
+                            <Save className="h-4 w-4" />
+                            {t("categorySubmissions.orderNotice.save", "Enregistrer le préavis")}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               );
             })()}
