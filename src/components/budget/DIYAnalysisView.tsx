@@ -132,16 +132,20 @@ const extractSuppliers = (analysisResult: string): ExtractedContact[] => {
     );
   };
 
-  // Helper to extract the best amount from a text block
+  // Helper to extract the best amount from a text block - PRIORITIZE "avant taxes" for budget coherence
   const extractBestAmount = (text: string): string => {
-    // Priority patterns for totals - look for the final/grand total first
+    // Priority patterns - AVANT TAXES first (budget is excluding taxes)
     const priorityPatterns = [
-      /(?:Grand\s*)?Total\s*(?:TTC|avec\s*taxes)\s*:?\s*\*?\*?\s*([0-9\s,\.]+)\s*\$?\*?\*?/i,
-      /\*\*\s*(?:Grand\s*)?Total\s*:?\s*([0-9\s,\.]+)\s*\$\s*\*\*/i,
+      // Highest priority: explicit "avant taxes" / "HT" amounts
+      /Sous-total\s*(?:avant\s*taxes|HT)\s*:?\s*\*?\*?\s*([0-9\s,\.]+)\s*\$?\*?\*?/i,
+      /Montant\s*(?:total\s*)?avant\s*taxes\s*:?\s*\*?\*?\s*([0-9\s,\.]+)\s*\$?\*?\*?/i,
+      /Prix\s*(?:total\s*)?avant\s*taxes\s*:?\s*\*?\*?\s*([0-9\s,\.]+)\s*\$?\*?\*?/i,
+      /Total\s*(?:avant\s*taxes|HT)\s*:?\s*\*?\*?\s*([0-9\s,\.]+)\s*\$?\*?\*?/i,
+      /Sous-total\s*:?\s*\*?\*?\s*([0-9\s,\.]+)\s*\$?\*?\*?/i,
+      // Emoji pattern (often shows pre-tax)
       /💰\s*\*?\*?\s*([0-9]{1,3}(?:[\s,][0-9]{3})*(?:[,\.][0-9]{2})?)\s*\$?\*?\*?/,
-      /Sous-total\s*avant\s*taxes\s*:?\s*\*?\*?\s*([0-9\s,\.]+)\s*\$?\*?\*?/i,
-      /Montant\s*avant\s*taxes\s*:?\s*\*?\*?\s*([0-9\s,\.]+)\s*\$?\*?\*?/i,
-      /Total\s*HT\s*:?\s*\*?\*?\s*([0-9\s,\.]+)\s*\$?\*?\*?/i,
+      // Generic total (avoid TTC/avec taxes)
+      /\*\*\s*Total\s*:?\s*([0-9\s,\.]+)\s*\$\s*\*\*/i,
       /Total\s*:?\s*\*?\*?\s*([0-9\s,\.]+)\s*\$\s*\*?\*?/i,
     ];
     
