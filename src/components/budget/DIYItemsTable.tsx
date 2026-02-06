@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { formatCurrency } from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -137,9 +137,20 @@ export function DIYItemsTable({
     amount: 0,
   });
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const prevItemsLengthRef = useRef(items.length);
 
   const suggestions = defaultItemSuggestions[categoryName] || [];
   const totalAmount = items.reduce((sum, item) => sum + (item.totalAmount || 0), 0);
+
+  // Auto-expand newly added items
+  useEffect(() => {
+    if (items.length > prevItemsLengthRef.current && items.length > 0) {
+      // A new item was added - expand it automatically
+      const newestItem = items[items.length - 1];
+      setExpandedItemId(newestItem.id);
+    }
+    prevItemsLengthRef.current = items.length;
+  }, [items]);
 
   const handleUpdateSupplierField = (field: keyof DIYSelectedSupplier, value: string | number | undefined) => {
     if (onUpdateSupplier) {
