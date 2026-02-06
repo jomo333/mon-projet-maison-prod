@@ -145,8 +145,8 @@ export function DIYAnalysisView({
           <div className="w-[350px] min-w-[350px] flex flex-col bg-amber-50/30 dark:bg-amber-950/10">
             <div className="p-4 border-b bg-background">
               <h3 className="font-semibold flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                <DollarSign className="h-5 w-5" />
-                Sommaire des coûts
+                <ShoppingCart className="h-5 w-5" />
+                Fournisseur à retenir
               </h3>
             </div>
             
