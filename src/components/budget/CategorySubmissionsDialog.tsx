@@ -182,6 +182,9 @@ export function CategorySubmissionsDialog({
   const [diyItems, setDiyItems] = useState<DIYItem[]>([]);
   const [analyzingDIYItemId, setAnalyzingDIYItemId] = useState<string | null>(null);
   
+  // DIY independent supplier (separate from single/task mode suppliers)
+  const [diySupplier, setDiySupplier] = useState<DIYSelectedSupplier>({ name: "", phone: "", orderLeadDays: undefined });
+  
   // Task-based organization state
   // 'single' = one submission for all tasks, 'tasks' = per-task, 'subcategories' = custom sub-categories
   const [viewMode, setViewMode] = useState<'single' | 'subcategories' | 'tasks'>('single');
