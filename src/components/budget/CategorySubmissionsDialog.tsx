@@ -64,7 +64,7 @@ import { AnalysisFullView } from "./AnalysisFullView";
 import { DIYAnalysisView } from "./DIYAnalysisView";
 import { SubCategoryManager, type SubCategory } from "./SubCategoryManager";
 import { TaskSubmissionsTabs, getTasksForCategory } from "./TaskSubmissionsTabs";
-import { DIYItemsTable, type DIYItem, type DIYSupplierQuote } from "./DIYItemsTable";
+import { DIYItemsTable, type DIYItem, type DIYSupplierQuote, type DIYSelectedSupplier } from "./DIYItemsTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface CategorySubmissionsDialogProps {
@@ -181,6 +181,9 @@ export function CategorySubmissionsDialog({
   // DIY Items state (new simplified table view)
   const [diyItems, setDiyItems] = useState<DIYItem[]>([]);
   const [analyzingDIYItemId, setAnalyzingDIYItemId] = useState<string | null>(null);
+  
+  // DIY independent supplier (separate from single/task mode suppliers)
+  const [diySupplier, setDiySupplier] = useState<DIYSelectedSupplier>({ name: "", phone: "", orderLeadDays: undefined });
   
   // Task-based organization state
   // 'single' = one submission for all tasks, 'tasks' = per-task, 'subcategories' = custom sub-categories
@@ -486,6 +489,43 @@ export function CategorySubmissionsDialog({
     },
     enabled: !!projectId && open,
   });
+
+  // Fetch DIY supplier (independent from single/task modes)
+  const diySupplierTaskId = `soumission-${tradeId}-diy-supplier`;
+  const { data: diySupplierStatus } = useQuery({
+    queryKey: ['diy-supplier-status', projectId, diySupplierTaskId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('task_dates')
+        .select('*')
+        .eq('project_id', projectId)
+        .eq('step_id', 'soumissions')
+        .eq('task_id', diySupplierTaskId)
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (data?.notes) {
+        try {
+          return JSON.parse(data.notes);
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    },
+    enabled: !!projectId && open,
+  });
+
+  // Set DIY supplier info from saved status
+  useEffect(() => {
+    if (diySupplierStatus) {
+      setDiySupplier({
+        name: diySupplierStatus.name || "",
+        phone: diySupplierStatus.phone || "",
+        orderLeadDays: diySupplierStatus.orderLeadDays,
+      });
+    }
+  }, [diySupplierStatus]);
 
   // Set supplier info from saved status when changing category/sub-category
   useEffect(() => {
@@ -847,6 +887,38 @@ export function CategorySubmissionsDialog({
     }
     
     toast.success(t("common.save") + " ✓");
+  };
+
+  // Handler to update DIY supplier (independent from other modes)
+  const handleUpdateDIYSupplier = async (supplier: DIYSelectedSupplier) => {
+    setDiySupplier(supplier);
+    
+    const notes = JSON.stringify({
+      name: supplier.name,
+      phone: supplier.phone,
+      orderLeadDays: supplier.orderLeadDays,
+      isDIYSupplier: true,
+    });
+    
+    await supabase
+      .from('task_dates')
+      .upsert({
+        project_id: projectId,
+        step_id: 'soumissions',
+        task_id: diySupplierTaskId,
+        notes,
+      }, { onConflict: 'project_id,step_id,task_id' });
+    
+    // Sync alerts if order lead days set
+    if (supplier.orderLeadDays && supplier.orderLeadDays > 0) {
+      try {
+        await syncAlertsFromSoumissions();
+      } catch (e) {
+        console.error("Error syncing DIY supplier alerts:", e);
+      }
+    }
+    
+    queryClient.invalidateQueries({ queryKey: ['diy-supplier-status', projectId, diySupplierTaskId] });
   };
   
   const handleAddQuote = (itemId: string, quote: Omit<DIYSupplierQuote, "id">) => {
@@ -1922,6 +1994,8 @@ export function CategorySubmissionsDialog({
                       onAnalyzeItem={projectPlans.length > 0 ? handleAnalyzeDIYItem : undefined}
                       analyzingItemId={analyzingDIYItemId}
                       categoryName={categoryName}
+                      selectedSupplier={diySupplier}
+                      onUpdateSupplier={handleUpdateDIYSupplier}
                     />
                   </TabsContent>
                 </Tabs>

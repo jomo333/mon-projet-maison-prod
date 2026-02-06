@@ -3842,6 +3842,13 @@
     "description": "Description",
     "amount": "Amount",
     "storePlaceholder": "E.g., Canac, Home Depot...",
-    "descPlaceholder": "E.g., 12x24 ceramic"
+    "descPlaceholder": "E.g., 12x24 ceramic",
+    "selectedSupplier": "Main supplier",
+    "supplierName": "Supplier name",
+    "supplierNamePlaceholder": "E.g., Canac, Home Depot, Lowe's...",
+    "supplierPhone": "Phone",
+    "supplierPhonePlaceholder": "E.g., 450-123-4567",
+    "orderLeadDays": "Order lead time",
+    "orderLeadHint": "An alert will be created X days before the step start to order your materials."
   }
 }
