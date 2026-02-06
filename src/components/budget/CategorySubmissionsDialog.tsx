@@ -1061,21 +1061,86 @@ export function CategorySubmissionsDialog({
   
   const handleAnalyzeDIYItem = async (itemId: string) => {
     const item = diyItems.find(i => i.id === itemId);
-    if (!item) return;
+    if (!item || !item.documents || item.documents.length === 0) {
+      toast.error(t("diyItems.noDocumentsToAnalyze", "Téléchargez d'abord des soumissions à analyser"));
+      return;
+    }
     
-    // Set active sub-category for analysis
-    setActiveSubCategoryId(itemId);
     setAnalyzingDIYItemId(itemId);
     
-    // Trigger the existing DIY analysis
-    await analyzeDIYMaterials();
-    
-    // Mark as analyzed
-    setDiyItems(prev => prev.map(i => 
-      i.id === itemId ? { ...i, hasAnalysis: true } : i
-    ));
-    
-    setAnalyzingDIYItemId(null);
+    try {
+      // Get signed URLs for the documents
+      const documentUrls: string[] = [];
+      for (const doc of item.documents) {
+        // Extract path from file_url for signed URL
+        const bucketMarker = "/task-attachments/";
+        const markerIndex = doc.file_url.indexOf(bucketMarker);
+        if (markerIndex >= 0) {
+          const path = doc.file_url.slice(markerIndex + bucketMarker.length).split("?")[0];
+          const signedUrl = await getSignedUrl("task-attachments", path);
+          if (signedUrl) {
+            documentUrls.push(signedUrl);
+          }
+        } else {
+          documentUrls.push(doc.file_url);
+        }
+      }
+      
+      if (documentUrls.length === 0) {
+        toast.error(t("diyItems.noDocumentsToAnalyze", "Téléchargez d'abord des soumissions à analyser"));
+        return;
+      }
+      
+      // Call the analyze-soumissions edge function
+      const response = await supabase.functions.invoke("analyze-soumissions", {
+        body: {
+          documentUrls,
+          categoryName,
+          subCategoryName: item.name,
+          lang: t("common.langCode") || "fr",
+        },
+      });
+      
+      if (response.error) throw new Error(response.error.message);
+      
+      const analysisData = response.data;
+      
+      // If analysis extracted supplier contacts, create a quote from the first one
+      if (analysisData?.contacts && analysisData.contacts.length > 0) {
+        const firstContact = analysisData.contacts[0];
+        const amount = parseFloat(String(firstContact.amount || "0").replace(/[^0-9.,]/g, "").replace(",", ".")) || 0;
+        
+        // Add as a quote to the item
+        const quoteId = Date.now().toString();
+        setDiyItems(prev => prev.map(i => {
+          if (i.id === itemId) {
+            const newQuote: DIYSupplierQuote = {
+              id: quoteId,
+              storeName: firstContact.supplierName || "Fournisseur",
+              description: analysisData.comparaison_json?.description_projet || "",
+              amount: amount,
+            };
+            const updatedQuotes = [...i.quotes, newQuote];
+            const newTotal = updatedQuotes.reduce((sum, q) => sum + (q.amount || 0), 0);
+            return { ...i, quotes: updatedQuotes, totalAmount: newTotal, hasAnalysis: true };
+          }
+          return i;
+        }));
+        
+        toast.success(t("toasts.analysisComplete", "Analyse terminée - Devis ajouté"));
+      } else {
+        // Just mark as analyzed
+        setDiyItems(prev => prev.map(i => 
+          i.id === itemId ? { ...i, hasAnalysis: true } : i
+        ));
+        toast.success(t("toasts.analysisComplete", "Analyse terminée"));
+      }
+    } catch (error) {
+      console.error("Analysis error:", error);
+      toast.error(t("toasts.analysisError", "Erreur lors de l'analyse"));
+    } finally {
+      setAnalyzingDIYItemId(null);
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
