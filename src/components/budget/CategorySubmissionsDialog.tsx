@@ -2380,8 +2380,8 @@ export function CategorySubmissionsDialog({
             </div>
 
             {/* Selected Supplier Summary - Show when supplier is chosen - PRIORITY DISPLAY */}
-            {/* Hide in DIY mode (subcategories tab) since DIY items don't have suppliers */}
-            {supplierName && viewMode !== 'subcategories' && !subCategories.find(sc => sc.id === activeSubCategoryId)?.isDIY && (
+            {/* Hide in DIY mode (subcategories tab) since DIY items have their own independent supplier card */}
+            {supplierName && viewMode !== 'subcategories' && !viewingSubCategory && !subCategories.find(sc => sc.id === activeSubCategoryId)?.isDIY && (
               <div className="rounded-xl border-2 border-primary bg-primary/5 p-4 space-y-3 sticky top-0 z-10 backdrop-blur-sm">
                 <div className="flex items-center justify-between">
                   <h4 className="font-semibold flex items-center gap-2 text-lg text-primary">
@@ -2632,8 +2632,8 @@ export function CategorySubmissionsDialog({
             )}
 
             {/* Manual Supplier Entry or Selected Supplier Details */}
-            {/* Hide in DIY mode (subcategories tab) since DIY items don't have suppliers */}
-            {viewMode !== 'subcategories' && !subCategories.find(sc => sc.id === activeSubCategoryId)?.isDIY && (
+            {/* Hide in DIY mode (subcategories tab) since DIY items have their own independent supplier card */}
+            {viewMode !== 'subcategories' && !viewingSubCategory && !subCategories.find(sc => sc.id === activeSubCategoryId)?.isDIY && (
             <div className="space-y-3">
               <h4 className="font-medium flex items-center gap-2">
                 <User className="h-4 w-4" />
