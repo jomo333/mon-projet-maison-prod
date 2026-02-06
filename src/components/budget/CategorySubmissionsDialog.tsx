@@ -1051,6 +1051,7 @@ export function CategorySubmissionsDialog({
         return item;
       }));
       
+      queryClient.invalidateQueries({ queryKey: ['sub-category-docs', projectId, tradeId] });
       toast.success(t("attachments.deleteSuccess"));
     } catch (error) {
       console.error("Delete error:", error);
