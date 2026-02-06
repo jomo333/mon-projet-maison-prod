@@ -2481,7 +2481,7 @@ export function CategorySubmissionsDialog({
                         </div>
                         <div className="text-right">
                           <div className="font-bold text-lg text-primary">
-                            {formatCurrency(parseFloat(supplier.amount.replace(/[\s,]/g, '')) || 0)}
+                            {formatCurrency(parseFloat(supplier.amount.replace(/[\s\u00A0]/g, '').replace(',', '.').replace(/[^\d.]/g, '')) || 0)}
                           </div>
                           <div className="text-xs text-muted-foreground">avant taxes</div>
                         </div>
