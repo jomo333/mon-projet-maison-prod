@@ -1243,26 +1243,49 @@ export function CategorySubmissionsDialog({
   const handleSelectSupplier = (index: number) => {
     setSelectedSupplierIndex(index);
     setSelectedOptionIndex(null);
+
     const supplier = extractedSuppliers[index];
-    if (supplier) {
-      setSupplierName(supplier.supplierName);
-      setSupplierPhone(supplier.phone);
-      // Parse amount: remove spaces, keep digits and decimal point, then parse as float and round
-      const cleanAmount = Math.round(parseFloat(supplier.amount.replace(/[\s,]/g, '').replace(/[^\d.]/g, '')) || 0).toString();
-      setSelectedAmount(cleanAmount);
-      setSpent(cleanAmount);
+    if (!supplier) return;
+
+    // In DIY mode, selecting a supplier should populate the DIY supplier card,
+    // and MUST NOT overwrite the single submission fields (supplierName/spent).
+    if (viewMode === 'subcategories') {
+      void handleUpdateDIYSupplier({
+        name: supplier.supplierName,
+        phone: supplier.phone,
+        orderLeadDays: diySupplier?.orderLeadDays,
+      });
+      return;
     }
+
+    // Non-DIY modes (single / tasks / non-DIY subcategory): populate the retained supplier fields
+    setSupplierName(supplier.supplierName);
+    setSupplierPhone(supplier.phone);
+
+    // Parse amount: remove spaces, keep digits and decimal point, then parse as float and round
+    const cleanAmount = Math.round(
+      parseFloat(supplier.amount.replace(/[\s,]/g, '').replace(/[^\d.]/g, '')) || 0
+    ).toString();
+    setSelectedAmount(cleanAmount);
+    setSpent(cleanAmount);
   };
 
   // Handle option selection
   const handleSelectOption = (optionIndex: number) => {
     setSelectedOptionIndex(optionIndex);
+
+    // Options are only relevant for non-DIY retained supplier amounts.
+    // In DIY mode we do not want to overwrite totals.
+    if (viewMode === 'subcategories') return;
+
     if (selectedSupplierIndex !== null) {
       const supplier = extractedSuppliers[selectedSupplierIndex];
       const option = supplier?.options?.[optionIndex];
       if (option) {
         // Parse amount: remove spaces, keep digits and decimal point, then parse as float and round
-        const cleanAmount = Math.round(parseFloat(option.amount.replace(/[\s,]/g, '').replace(/[^\d.]/g, '')) || 0).toString();
+        const cleanAmount = Math.round(
+          parseFloat(option.amount.replace(/[\s,]/g, '').replace(/[^\d.]/g, '')) || 0
+        ).toString();
         setSelectedAmount(cleanAmount);
         setSpent(cleanAmount);
       }
