@@ -163,12 +163,21 @@ export const categoryTaskMappings: CategoryTaskMappings = {
         "fenêtre", "vitrage", "pvc", "aluminium", "fenêtres", "vitres",
         "double vitrage", "triple vitrage", "châssis", "fenestration"
       ],
+      exclusions: ["porte", "garage"]
     },
     {
       taskTitle: "Portes extérieures",
       keywords: [
-        "porte", "entrée", "garage", "patio", "porte-patio", "porte garage",
+        "porte", "entrée", "patio", "porte-patio",
         "porte extérieure", "porte d'entrée", "portail"
+      ],
+      exclusions: ["garage", "porte garage", "porte de garage"]
+    },
+    {
+      taskTitle: "Porte de garage",
+      keywords: [
+        "garage", "porte garage", "porte de garage", "porte sectionnelle",
+        "ouvre-porte", "motorisation garage", "liftmaster", "chamberlain"
       ],
     },
   ],
