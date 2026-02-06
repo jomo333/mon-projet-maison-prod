@@ -3834,7 +3834,7 @@
     "suggestions": "Suggestions",
     "notesLabel": "Notes / Description",
     "notesPlaceholder": "Ex: Céramique 12x24 gris pour salle de bain, modèle X de chez Canac...",
-    "orderLeadLabel": "Préavis commande",
+    "orderLeadLabel": "Préavis de commande",
     "quotesLabel": "Devis fournisseurs",
     "addQuote": "Ajouter devis",
     "noQuotes": "Aucun devis ajouté",
@@ -3842,6 +3842,13 @@
     "description": "Description",
     "amount": "Montant",
     "storePlaceholder": "Ex: Canac, Rona...",
-    "descPlaceholder": "Ex: Céramique 12x24"
+    "descPlaceholder": "Ex: Céramique 12x24",
+    "selectedSupplier": "Fournisseur principal",
+    "supplierName": "Nom du fournisseur",
+    "supplierNamePlaceholder": "Ex: Canac, Rona, Réno-Dépôt...",
+    "supplierPhone": "Téléphone",
+    "supplierPhonePlaceholder": "Ex: 450-123-4567",
+    "orderLeadDays": "Préavis de commande",
+    "orderLeadHint": "Une alerte sera créée X jours avant le début de l'étape pour commander vos matériaux."
   }
 }
