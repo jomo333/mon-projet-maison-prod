@@ -3233,19 +3233,20 @@ export function CategorySubmissionsDialog({
         categoryName={categoryName}
         subCategoryName={analyzedDIYItemName || currentSubCategoryName || ''}
         analysisResult={diyAnalysisResult || ''}
-        onApplyEstimate={(amount) => {
+        initialSupplier={diySupplier?.name ? { name: diySupplier.name, phone: diySupplier.phone || '' } : undefined}
+        onApplyEstimate={(amount, supplier) => {
           // If we analyzed a DIY item, update that item
           if (analyzedDIYItemName) {
             const itemToUpdate = diyItems.find(i => i.name === analyzedDIYItemName);
             if (itemToUpdate) {
-              // Add the amount as a quote to the item
+              // Add the amount as a quote to the item with supplier info
               const quoteId = Date.now().toString();
               setDiyItems(prev => prev.map(i => {
                 if (i.id === itemToUpdate.id) {
                   const newQuote: DIYSupplierQuote = {
                     id: quoteId,
-                    storeName: t("diyItems.aiExtracted", "Extrait de l'analyse IA"),
-                    description: "",
+                    storeName: supplier?.name || t("diyItems.aiExtracted", "Extrait de l'analyse IA"),
+                    description: supplier?.phone || "",
                     amount: amount,
                   };
                   const updatedQuotes = [...i.quotes, newQuote];
@@ -3254,13 +3255,29 @@ export function CategorySubmissionsDialog({
                 }
                 return i;
               }));
-              toast.success(`${t("diyItems.costApplied", "Coût appliqué")}: ${formatCurrency(amount)}`);
+              
+              // Also update DIY supplier info if provided
+              if (supplier?.name) {
+                setDiySupplier(prev => ({
+                  ...prev,
+                  name: supplier.name,
+                  phone: supplier.phone || prev.phone,
+                }));
+              }
+              
+              toast.success(`${t("diyItems.costApplied", "Coût appliqué")}: ${formatCurrency(amount)}${supplier?.name ? ` - ${supplier.name}` : ''}`);
             }
           } else if (activeSubCategoryId) {
             // Original behavior for sub-categories
             setSubCategories(prev => prev.map(sc =>
               sc.id === activeSubCategoryId
-                ? { ...sc, materialCostOnly: amount, amount }
+                ? { 
+                    ...sc, 
+                    materialCostOnly: amount, 
+                    amount,
+                    supplierName: supplier?.name || sc.supplierName,
+                    supplierPhone: supplier?.phone || sc.supplierPhone,
+                  }
                 : sc
             ));
             
@@ -3270,7 +3287,16 @@ export function CategorySubmissionsDialog({
               .reduce((sum, amt) => sum + (amt || 0), 0);
             setSpent(newTotalSpent.toString());
             
-            toast.success(`${t("diyItems.costApplied", "Coût appliqué")}: ${formatCurrency(amount)}`);
+            // Also update DIY supplier info if provided
+            if (supplier?.name) {
+              setDiySupplier(prev => ({
+                ...prev,
+                name: supplier.name,
+                phone: supplier.phone || prev.phone,
+              }));
+            }
+            
+            toast.success(`${t("diyItems.costApplied", "Coût appliqué")}: ${formatCurrency(amount)}${supplier?.name ? ` - ${supplier.name}` : ''}`);
           }
           setShowDIYAnalysis(false);
           setAnalyzedDIYItemName(""); // Reset
