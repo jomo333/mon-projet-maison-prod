@@ -390,13 +390,13 @@ export function CategorySubmissionsDialog({
     }
   }, [savedSubCategories]);
   
-  // Check documents count for sub-categories
+  // Check documents for sub-categories (DIY items)
   const { data: subCategoryDocs = [] } = useQuery({
-    queryKey: ['sub-category-docs-count', projectId, tradeId],
+    queryKey: ['sub-category-docs', projectId, tradeId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('task_attachments')
-        .select('task_id')
+        .select('id, task_id, file_name, file_url')
         .eq('project_id', projectId)
         .eq('step_id', 'soumissions')
         .like('task_id', `soumission-${tradeId}-sub-%`)
@@ -405,21 +405,28 @@ export function CategorySubmissionsDialog({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!projectId && open && subCategories.length > 0,
+    enabled: !!projectId && open,
   });
   
-  // Update sub-categories with document info
+  // Update DIY items with document info
   useEffect(() => {
-    if (subCategoryDocs.length > 0 && subCategories.length > 0) {
-      const docsMap = subCategoryDocs.reduce((acc, doc) => {
+    if (subCategoryDocs.length > 0 && diyItems.length > 0) {
+      const docsMap: Record<string, Array<{ id: string; file_name: string; file_url: string }>> = {};
+      subCategoryDocs.forEach((doc) => {
         const subId = doc.task_id.replace(`soumission-${tradeId}-sub-`, '');
-        acc[subId] = (acc[subId] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+        if (!docsMap[subId]) docsMap[subId] = [];
+        docsMap[subId].push({ id: doc.id, file_name: doc.file_name, file_url: doc.file_url });
+      });
       
+      setDiyItems(prev => prev.map(item => ({
+        ...item,
+        documents: docsMap[item.id] || item.documents || [],
+      })));
+      
+      // Also update subCategories for document count
       setSubCategories(prev => prev.map(sc => ({
         ...sc,
-        hasDocuments: (docsMap[sc.id] || 0) > 0,
+        hasDocuments: (docsMap[sc.id] || []).length > 0,
       })));
     }
   }, [subCategoryDocs, tradeId]);
