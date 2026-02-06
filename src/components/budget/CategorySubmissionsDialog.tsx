@@ -1317,11 +1317,11 @@ export function CategorySubmissionsDialog({
         const options: SupplierOption[] = [];
         
         // Look for option patterns like "Option A: X $" or "Forfait Premium: X $"
-        const optionMatches = block.matchAll(/(?:Option|Forfait|Package|OPTION)\s*(?:SÉPARÉE\s*:?\s*)?([A-Za-zÀ-ÿ0-9\s]+?)\s*:?\s*([0-9\s,]+(?:\.[0-9]+)?)\s*\$/gi);
+        const optionMatches = block.matchAll(/(?:Option|Forfait|Package|OPTION)\s*(?:SÉPARÉE\s*:?\s*)?([A-Za-zÀ-ÿ0-9\s]+?)\s*:?\s*([0-9\s,\.]+)\s*\$/gi);
         for (const match of optionMatches) {
           options.push({
             name: match[1].trim(),
-            amount: match[2].replace(/[\s,]/g, ''),
+            amount: parseCurrencyAmount(match[2]),
           });
         }
         
