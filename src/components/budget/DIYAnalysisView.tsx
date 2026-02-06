@@ -499,43 +499,46 @@ export function DIYAnalysisView({
                     <div
                       key={index}
                       onClick={() => handleSelectSupplier(index)}
-                      className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      className={`p-3 rounded-xl border-2 cursor-pointer transition-all overflow-hidden ${
                         selectedSupplierIndex === index
                           ? 'border-amber-500 bg-amber-100/50 dark:bg-amber-900/30 shadow-lg'
                           : 'border-amber-200 dark:border-amber-800 hover:border-amber-400 hover:bg-white dark:hover:bg-background'
                       }`}
                     >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-2 flex-1 min-w-0">
-                          <div className="font-semibold text-foreground flex items-center gap-2">
-                            {selectedSupplierIndex === index && (
-                              <CheckCircle2 className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
-                            )}
-                            <span className="truncate">🏢 {supplier.supplierName}</span>
-                          </div>
-                          {/* Show product name to help distinguish same supplier with different products */}
-                          {supplier.productName && (
-                            <div className="text-sm text-amber-700 dark:text-amber-300 flex items-center gap-2 bg-amber-100/50 dark:bg-amber-900/30 px-2 py-1 rounded">
-                              <span className="text-base">📦</span>
-                              <span className="font-medium truncate">{supplier.productName}</span>
-                            </div>
+                      {/* Header row with supplier name and amount */}
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          {selectedSupplierIndex === index && (
+                            <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
                           )}
-                          {supplier.phone && (
-                            <div className="text-sm text-muted-foreground flex items-center gap-2">
-                              <Phone className="h-4 w-4 shrink-0" />
-                              <span>{supplier.phone}</span>
-                            </div>
-                          )}
+                          <span className="font-semibold text-foreground text-sm leading-tight line-clamp-2">
+                            🏢 {supplier.supplierName}
+                          </span>
                         </div>
                         <div className="text-right shrink-0">
-                          <div className="font-bold text-xl text-amber-600 dark:text-amber-400">
+                          <div className="font-bold text-lg text-amber-600 dark:text-amber-400 whitespace-nowrap">
                             {formatCurrency(parseAmount(supplier.amount))}
                           </div>
-                          {parseAmount(supplier.amount) > 0 && (
-                            <div className="text-xs text-muted-foreground">avant taxes</div>
-                          )}
                         </div>
                       </div>
+                      
+                      {/* Product name - full width below for visibility */}
+                      {supplier.productName && (
+                        <div className="text-xs text-amber-700 dark:text-amber-300 bg-amber-100/70 dark:bg-amber-900/40 px-2 py-1.5 rounded mb-2">
+                          <div className="flex items-start gap-1.5">
+                            <span className="shrink-0">📦</span>
+                            <span className="font-medium leading-tight line-clamp-2">{supplier.productName}</span>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Phone number */}
+                      {supplier.phone && (
+                        <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+                          <Phone className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{supplier.phone}</span>
+                        </div>
+                      )}
 
                       {/* Options for selected supplier */}
                       {selectedSupplierIndex === index && supplier.options && supplier.options.length > 0 && (
