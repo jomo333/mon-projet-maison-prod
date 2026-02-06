@@ -69,13 +69,18 @@ const extractSupplierInfo = (analysisResult: string): SupplierInfo => {
   let name = "";
   let phone = "";
   
-  // Patterns for supplier name extraction
+  // Patterns for supplier name extraction - ordered by priority
   const namePatterns = [
+    // Format from analyze-soumissions: **🏢 Centre de Carreaux Céramique Italien Inc. (via Éco Dépôt Céramique)**
+    /\*\*🏢\s*([^*\n(]+?)(?:\s*\([^)]+\))?\s*[-–—]/i,
+    /\*\*🏢\s*([^*\n(]+?)(?:\s*\([^)]+\))?\*\*/i,
+    // Without emoji: **Entreprise Name**
+    /\*\*([A-ZÀ-Ü][^*\n]{2,50}(?:Inc\.|Ltée|Ltd|Enr\.)?)(?:\s*\([^)]+\))?\*\*/,
     // Table format: | Fournisseur | Canac |
     /\|\s*(?:\*\*)?Fournisseur(?:\*\*)?\s*\|\s*(?:\*\*)?([^|*\n]+?)(?:\*\*)?\s*\|/i,
-    // Markdown bold: **Fournisseur:** Canac or **Fournisseur :** Canac
+    // Markdown bold: **Fournisseur:** Canac
     /\*\*Fournisseur\s*:?\*\*\s*:?\s*([^\n*]+)/i,
-    // Simple format: Fournisseur: Canac or Fournisseur : Canac
+    // Simple format: Fournisseur: Canac
     /Fournisseur\s*:\s*([^\n|]+)/i,
     // Magasin format
     /\*\*Magasin\s*:?\*\*\s*:?\s*([^\n*]+)/i,
@@ -99,16 +104,18 @@ const extractSupplierInfo = (analysisResult: string): SupplierInfo => {
     }
   }
   
-  // Patterns for phone extraction
+  // Patterns for phone extraction - ordered by priority
   const phonePatterns = [
+    // Format from analyze-soumissions: - 📞 Téléphone: 514 323-8936
+    /📞\s*T[ée]l[ée]phone\s*:\s*([0-9\s\-().]+)/i,
+    // List format: - Téléphone: 514 323-8936
+    /-\s*T[ée]l[ée]phone\s*:\s*([0-9\s\-().]+)/i,
     // Table format: | Téléphone | (418) 123-4567 |
     /\|\s*(?:\*\*)?T[ée]l[ée]phone(?:\*\*)?\s*\|\s*(?:\*\*)?([^|*\n]+?)(?:\*\*)?\s*\|/i,
     // Markdown bold: **Téléphone:** (418) 123-4567
     /\*\*T[ée]l[ée]phone\s*:?\*\*\s*:?\s*([^\n*]+)/i,
     // Simple format: Téléphone: (418) 123-4567
-    /T[ée]l[ée]phone\s*:\s*([^\n|]+)/i,
-    // Phone number pattern in parentheses format
-    /\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/,
+    /T[ée]l[ée]phone\s*:\s*([0-9\s\-().]+)/i,
   ];
   
   for (const pattern of phonePatterns) {
