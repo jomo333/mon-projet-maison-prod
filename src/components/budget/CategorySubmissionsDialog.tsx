@@ -490,6 +490,43 @@ export function CategorySubmissionsDialog({
     enabled: !!projectId && open,
   });
 
+  // Fetch DIY supplier (independent from single/task modes)
+  const diySupplierTaskId = `soumission-${tradeId}-diy-supplier`;
+  const { data: diySupplierStatus } = useQuery({
+    queryKey: ['diy-supplier-status', projectId, diySupplierTaskId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('task_dates')
+        .select('*')
+        .eq('project_id', projectId)
+        .eq('step_id', 'soumissions')
+        .eq('task_id', diySupplierTaskId)
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (data?.notes) {
+        try {
+          return JSON.parse(data.notes);
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    },
+    enabled: !!projectId && open,
+  });
+
+  // Set DIY supplier info from saved status
+  useEffect(() => {
+    if (diySupplierStatus) {
+      setDiySupplier({
+        name: diySupplierStatus.name || "",
+        phone: diySupplierStatus.phone || "",
+        orderLeadDays: diySupplierStatus.orderLeadDays,
+      });
+    }
+  }, [diySupplierStatus]);
+
   // Set supplier info from saved status when changing category/sub-category
   useEffect(() => {
     if (supplierStatus) {
