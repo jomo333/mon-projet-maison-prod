@@ -1337,10 +1337,10 @@ export function CategorySubmissionsDialog({
     
     // Try to extract amounts from comparison table for suppliers without amounts
     const tableAmounts: Record<string, string> = {};
-    const tableRows = analysisResult.matchAll(/\|\s*\*?\*?([^|*]+)\*?\*?\s*\|\s*\*?\*?([0-9\s,]+)\s*\$\*?\*?\s*\|/g);
+    const tableRows = analysisResult.matchAll(/\|\s*\*?\*?([^|*]+)\*?\*?\s*\|\s*\*?\*?([0-9\s,\.]+)\s*\$\*?\*?\s*\|/g);
     for (const row of tableRows) {
       const name = row[1].trim();
-      const amt = row[2].replace(/[\s,]/g, '');
+      const amt = parseCurrencyAmount(row[2]);
       if (name && !name.includes('Entreprise') && !name.includes('---') && !name.includes('Critère') && amt) {
         tableAmounts[name.toLowerCase()] = amt;
       }
