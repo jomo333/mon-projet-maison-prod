@@ -7,7 +7,7 @@ import {
   CheckCircle2, Clock, ArrowRight, Calendar, 
   TrendingUp, ListTodo, AlertCircle
 } from "lucide-react";
-import { constructionSteps } from "@/data/constructionSteps";
+import { useConstructionSteps } from "@/hooks/useConstructionSteps";
 import { useTranslation } from "react-i18next";
 
 interface ScheduleData {
