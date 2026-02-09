@@ -7,7 +7,7 @@ import {
   CheckCircle2, Clock, ArrowRight, Calendar, 
   TrendingUp, ListTodo, AlertCircle
 } from "lucide-react";
-import { constructionSteps } from "@/data/constructionSteps";
+import { useConstructionSteps } from "@/hooks/useConstructionSteps";
 import { useTranslation } from "react-i18next";
 
 interface ScheduleData {
@@ -24,7 +24,7 @@ interface ProjectOverviewTabProps {
 
 export const ProjectOverviewTab = ({ schedules, onNavigateToStep }: ProjectOverviewTabProps) => {
   const { t } = useTranslation();
-  
+  const constructionSteps = useConstructionSteps();
   // Calculate progress statistics
   const stats = useMemo(() => {
     const totalSteps = constructionSteps.length;
