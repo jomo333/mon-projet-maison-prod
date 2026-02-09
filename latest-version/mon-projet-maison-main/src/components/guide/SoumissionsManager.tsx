@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "@/lib/i18n";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { tradeTypes } from "@/data/tradeTypes";
@@ -713,7 +714,7 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
         
         toast({
           title: "Fournisseur et budget enregistrés",
-          description: `${inputs.name} sélectionné. Montant de ${amountValue.toLocaleString('fr-CA')} $ ajouté au budget.`,
+          description: `${inputs.name} sélectionné. Montant de ${formatCurrency(amountValue)} ajouté au budget.`,
         });
       } else {
         toast({
@@ -1235,7 +1236,7 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
                               )}
                               {contact.amount && (
                                 <span className="bg-accent text-accent-foreground px-2 py-0.5 rounded">
-                                  {parseFloat(contact.amount).toLocaleString('fr-CA')} $
+                                  {formatCurrency(parseFloat(contact.amount))}
                                 </span>
                               )}
                             </div>
@@ -1278,7 +1279,7 @@ export function SoumissionsManager({ projectId }: SoumissionsManagerProps) {
                             <div className="flex items-center justify-between gap-2">
                               <span className="text-sm font-medium">{option.optionName}</span>
                               <span className="text-sm font-semibold text-primary shrink-0">
-                                {parseFloat(option.amount).toLocaleString('fr-CA')} $
+                                {formatCurrency(parseFloat(option.amount))}
                               </span>
                             </div>
                             {option.description && (

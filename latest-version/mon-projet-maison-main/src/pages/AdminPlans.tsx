@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { formatCurrency } from "@/lib/i18n";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -223,12 +224,7 @@ export default function AdminPlans() {
     }
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("fr-CA", {
-      style: "currency",
-      currency: "CAD",
-    }).format(value);
-  };
+  // Use centralized formatCurrency from i18n (already imported at top)
 
   return (
     <AdminGuard>

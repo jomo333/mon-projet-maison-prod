@@ -64,6 +64,7 @@
     "membraneShingles": "Membrane et bardeaux",
     "windowInstallation": "Installation des fenêtres",
     "exteriorDoors": "Portes extérieures",
+    "garageDoor": "Porte de garage",
     "wallInsulation": "Isolation des murs",
     "atticRoofInsulation": "Isolation du toit/comble",
     "soundproofing": "Insonorisation",
@@ -580,6 +581,9 @@
     "estimatedRemaining": "Restant estimé",
     "estimatedBudget": "Budget estimé",
     "budgetRange": "Fourchette ±10%",
+    "budgetIncludes": "Hors taxes (TPS+TVQ) et hors contingence",
+    "spentIncludes": "Montants réels des soumissions retenues",
+    "remainingIncludes": "Restant estimé (hors taxes et contingence, avant vos soumissions)",
     "noAnalysis": "Aucune analyse effectuée",
     "percentUsed": "du budget utilisé",
     "categories": "Catégories",
@@ -695,7 +699,10 @@
       "resetCategoryTitle": "Réinitialiser cette catégorie ?",
       "resetCategoryDescription": "Cette action supprimera toutes les données de soumissions pour cette catégorie : documents, fournisseur sélectionné, montants et analyses. Cette action est irréversible.",
       "resetCategoryConfirm": "Oui, réinitialiser",
-      "resetCategorySuccess": "Catégorie réinitialisée avec succès"
+      "resetCategorySuccess": "Catégorie réinitialisée avec succès",
+      "resetSingleSuccess": "Mode 'Soumission unique' réinitialisé",
+      "resetTasksSuccess": "Mode 'Par tâche' réinitialisé",
+      "resetDIYSuccess": "Mode 'Fait par moi-même' réinitialisé"
     }
   },
   "analysisFullView": {
@@ -1403,6 +1410,10 @@
     "currentStageHelp": "Sélectionnez l'étape actuelle de votre projet",
     "targetDate": "Quand souhaitez-vous commencer les travaux?",
     "targetDateHelp": "Cette date nous permettra de créer un échéancier préliminaire",
+    "targetDateWarning": {
+      "title": "Date trop tôt",
+      "description": "Avec les étapes de préparation restantes, l'excavation ne pourra pas commencer avant le {{earliest}}."
+    },
     "selectADate": "Sélectionner une date",
     "skipForNow": "Passer pour l'instant",
     "dateSelectedFor": "Date sélectionnée pour",
@@ -3810,5 +3821,38 @@
       "understandAnalysis": "Comprendre mon analyse",
       "technicalIssue": "Problème technique"
     }
+  },
+  "diyItems": {
+    "title": "Matériaux à acheter (DIY)",
+    "addItem": "Ajouter un item",
+    "noItems": "Aucun item DIY",
+    "addHint": "Ajoutez les matériaux que vous achetez vous-même (ex: Céramique, Luminaires...)",
+    "item": "Item",
+    "quotes": "Devis",
+    "leadTime": "Préavis",
+    "total": "Total",
+    "totalMaterials": "Total matériaux DIY",
+    "addDialogTitle": "Ajouter un item DIY",
+    "itemName": "Nom de l'item",
+    "itemPlaceholder": "Ex: Céramique salle de bain, Luminaires...",
+    "suggestions": "Suggestions",
+    "notesLabel": "Notes / Description",
+    "notesPlaceholder": "Ex: Céramique 12x24 gris pour salle de bain, modèle X de chez Canac...",
+    "orderLeadLabel": "Préavis de commande",
+    "quotesLabel": "Devis fournisseurs",
+    "addQuote": "Ajouter devis",
+    "noQuotes": "Aucun devis ajouté",
+    "store": "Magasin",
+    "description": "Description",
+    "amount": "Montant",
+    "storePlaceholder": "Ex: Canac, Rona...",
+    "descPlaceholder": "Ex: Céramique 12x24",
+    "selectedSupplier": "Fournisseur principal",
+    "supplierName": "Nom du fournisseur",
+    "supplierNamePlaceholder": "Ex: Canac, Rona, Réno-Dépôt...",
+    "supplierPhone": "Téléphone",
+    "supplierPhonePlaceholder": "Ex: 450-123-4567",
+    "orderLeadDays": "Préavis de commande",
+    "orderLeadHint": "Une alerte sera créée X jours avant le début de l'étape pour commander vos matériaux."
   }
 }

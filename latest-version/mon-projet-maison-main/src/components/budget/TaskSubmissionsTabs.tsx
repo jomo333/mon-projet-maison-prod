@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "@/lib/i18n";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -113,7 +114,7 @@ export function TaskSubmissionsTabs({
         {grandTotal > 0 && (
           <Badge variant="secondary" className="bg-primary/10 text-primary">
             <DollarSign className="h-3 w-3 mr-1" />
-            {grandTotal.toLocaleString("fr-CA")} $
+            {formatCurrency(grandTotal)}
           </Badge>
         )}
       </div>
@@ -185,7 +186,7 @@ export function TaskSubmissionsTabs({
                       <div className="text-right">
                         <span className="text-muted-foreground">Montant:</span>
                         <span className="ml-2 font-bold text-primary">
-                          {submission.amount.toLocaleString("fr-CA")} $
+                          {formatCurrency(submission.amount)}
                         </span>
                       </div>
                     )}
@@ -247,7 +248,7 @@ export function TaskSubmissionsTabs({
                     <span className="font-medium">{sub?.supplierName}</span>
                     {sub?.amount && sub.amount > 0 && (
                       <span className="text-primary font-bold">
-                        {sub.amount.toLocaleString("fr-CA")} $
+                        {formatCurrency(sub.amount)}
                       </span>
                     )}
                   </div>
@@ -256,7 +257,7 @@ export function TaskSubmissionsTabs({
           </div>
           <div className="flex justify-between font-bold text-sm pt-2 mt-2 border-t border-primary/20">
             <span>Total</span>
-            <span className="text-primary">{grandTotal.toLocaleString("fr-CA")} $</span>
+            <span className="text-primary">{formatCurrency(grandTotal)}</span>
           </div>
         </div>
       )}

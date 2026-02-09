@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { formatCurrency } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
@@ -63,6 +64,7 @@ import { AnalysisFullView } from "./AnalysisFullView";
 import { DIYAnalysisView } from "./DIYAnalysisView";
 import { SubCategoryManager, type SubCategory } from "./SubCategoryManager";
 import { TaskSubmissionsTabs, getTasksForCategory } from "./TaskSubmissionsTabs";
+import { DIYItemsTable, type DIYItem, type DIYSupplierQuote, type DIYSelectedSupplier } from "./DIYItemsTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface CategorySubmissionsDialogProps {
@@ -146,8 +148,8 @@ export function CategorySubmissionsDialog({
   
   const queryClient = useQueryClient();
   const { user, session } = useAuth();
-  const [budget, setBudget] = useState(currentBudget.toString());
-  const [spent, setSpent] = useState(currentSpent.toString());
+  const [budget, setBudget] = useState(Math.round(currentBudget * 100) / 100 + "");
+  const [spent, setSpent] = useState(Math.round(currentSpent * 100) / 100 + "");
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
@@ -175,6 +177,15 @@ export function CategorySubmissionsDialog({
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [activeSubCategoryId, setActiveSubCategoryId] = useState<string | null>(null);
   const [viewingSubCategory, setViewingSubCategory] = useState(false);
+  
+  // DIY Items state (new simplified table view)
+  const [diyItems, setDiyItems] = useState<DIYItem[]>([]);
+  const [analyzingDIYItemId, setAnalyzingDIYItemId] = useState<string | null>(null);
+  const [uploadingDIYItemId, setUploadingDIYItemId] = useState<string | null>(null);
+  const [analyzedDIYItemName, setAnalyzedDIYItemName] = useState<string>(""); // Name of the item being analyzed
+  
+  // DIY independent supplier (separate from single/task mode suppliers)
+  const [diySupplier, setDiySupplier] = useState<DIYSelectedSupplier>({ name: "", phone: "", orderLeadDays: undefined });
   
   // Task-based organization state
   // 'single' = one submission for all tasks, 'tasks' = per-task, 'subcategories' = custom sub-categories
@@ -214,8 +225,8 @@ export function CategorySubmissionsDialog({
   // Reset state when dialog opens
   useEffect(() => {
     if (open) {
-      setBudget(currentBudget.toString());
-      setSpent(currentSpent.toString());
+      setBudget((Math.round(currentBudget * 100) / 100).toString());
+      setSpent((Math.round(currentSpent * 100) / 100).toString());
       setAnalysisResult(null);
       setExtractedSuppliers([]);
       setSelectedSupplierIndex(null);
@@ -257,7 +268,11 @@ export function CategorySubmissionsDialog({
           hasAnalysis: notes.hasAnalysis || false,
           isDIY: notes.isDIY || false,
           materialCostOnly: notes.materialCostOnly ? parseFloat(notes.materialCostOnly) : 0,
-        } as SubCategory;
+          orderLeadDays: notes.orderLeadDays ?? null,
+          // Include quotes and itemNotes from saved data
+          quotes: notes.quotes || [],
+          itemNotes: notes.itemNotes || '',
+        } as SubCategory & { quotes?: DIYSupplierQuote[]; itemNotes?: string };
       });
     },
     enabled: !!projectId && open,
@@ -355,16 +370,34 @@ export function CategorySubmissionsDialog({
   useEffect(() => {
     if (savedSubCategories.length > 0) {
       setSubCategories(savedSubCategories);
+      
+      // Also sync to DIY items format with quotes from saved data
+      const diyItemsFromDb: DIYItem[] = savedSubCategories
+        .filter(sc => sc.isDIY)
+        .map(sc => {
+          // Cast to access extended properties
+          const scWithExtras = sc as SubCategory & { quotes?: DIYSupplierQuote[]; itemNotes?: string };
+          return {
+            id: sc.id,
+            name: sc.name,
+            totalAmount: sc.amount || 0,
+            quotes: scWithExtras.quotes || [],
+            orderLeadDays: sc.orderLeadDays,
+            hasAnalysis: sc.hasAnalysis,
+            notes: scWithExtras.itemNotes || '',
+          };
+        });
+      setDiyItems(diyItemsFromDb);
     }
   }, [savedSubCategories]);
   
-  // Check documents count for sub-categories
+  // Check documents for sub-categories (DIY items)
   const { data: subCategoryDocs = [] } = useQuery({
-    queryKey: ['sub-category-docs-count', projectId, tradeId],
+    queryKey: ['sub-category-docs', projectId, tradeId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('task_attachments')
-        .select('task_id')
+        .select('id, task_id, file_name, file_url')
         .eq('project_id', projectId)
         .eq('step_id', 'soumissions')
         .like('task_id', `soumission-${tradeId}-sub-%`)
@@ -373,21 +406,28 @@ export function CategorySubmissionsDialog({
       if (error) throw error;
       return data || [];
     },
-    enabled: !!projectId && open && subCategories.length > 0,
+    enabled: !!projectId && open,
   });
   
-  // Update sub-categories with document info
+  // Update DIY items with document info
   useEffect(() => {
-    if (subCategoryDocs.length > 0 && subCategories.length > 0) {
-      const docsMap = subCategoryDocs.reduce((acc, doc) => {
+    if (subCategoryDocs.length > 0 && diyItems.length > 0) {
+      const docsMap: Record<string, Array<{ id: string; file_name: string; file_url: string }>> = {};
+      subCategoryDocs.forEach((doc) => {
         const subId = doc.task_id.replace(`soumission-${tradeId}-sub-`, '');
-        acc[subId] = (acc[subId] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+        if (!docsMap[subId]) docsMap[subId] = [];
+        docsMap[subId].push({ id: doc.id, file_name: doc.file_name, file_url: doc.file_url });
+      });
       
+      setDiyItems(prev => prev.map(item => ({
+        ...item,
+        documents: docsMap[item.id] || item.documents || [],
+      })));
+      
+      // Also update subCategories for document count
       setSubCategories(prev => prev.map(sc => ({
         ...sc,
-        hasDocuments: (docsMap[sc.id] || 0) > 0,
+        hasDocuments: (docsMap[sc.id] || []).length > 0,
       })));
     }
   }, [subCategoryDocs, tradeId]);
@@ -459,6 +499,43 @@ export function CategorySubmissionsDialog({
     enabled: !!projectId && open,
   });
 
+  // Fetch DIY supplier (independent from single/task modes)
+  const diySupplierTaskId = `soumission-${tradeId}-diy-supplier`;
+  const { data: diySupplierStatus } = useQuery({
+    queryKey: ['diy-supplier-status', projectId, diySupplierTaskId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('task_dates')
+        .select('*')
+        .eq('project_id', projectId)
+        .eq('step_id', 'soumissions')
+        .eq('task_id', diySupplierTaskId)
+        .maybeSingle();
+      
+      if (error) throw error;
+      if (data?.notes) {
+        try {
+          return JSON.parse(data.notes);
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    },
+    enabled: !!projectId && open,
+  });
+
+  // Set DIY supplier info from saved status
+  useEffect(() => {
+    if (diySupplierStatus) {
+      setDiySupplier({
+        name: diySupplierStatus.name || "",
+        phone: diySupplierStatus.phone || "",
+        orderLeadDays: diySupplierStatus.orderLeadDays,
+      });
+    }
+  }, [diySupplierStatus]);
+
   // Set supplier info from saved status when changing category/sub-category
   useEffect(() => {
     if (supplierStatus) {
@@ -493,13 +570,24 @@ export function CategorySubmissionsDialog({
       .replace(/_+/g, '_'); // Replace multiple underscores with single
   };
 
+  // Sanitize path segment for storage (remove accents and special characters)
+  const sanitizePathSegment = (segment: string): string => {
+    return segment
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Remove accents
+      .replace(/[^a-zA-Z0-9-]/g, '-') // Replace special chars with hyphen
+      .replace(/-+/g, '-') // Replace multiple hyphens with single
+      .toLowerCase();
+  };
+
   // Upload mutation - uses currentTaskId for sub-category support
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
       if (!user) throw new Error("Non authentifié");
       
       const sanitizedName = sanitizeFileName(file.name);
-      const subPath = activeSubCategoryId ? `${tradeId}/sub-${activeSubCategoryId}` : tradeId;
+      const sanitizedTradeId = sanitizePathSegment(tradeId);
+      const subPath = activeSubCategoryId ? `${sanitizedTradeId}/sub-${activeSubCategoryId}` : sanitizedTradeId;
       // Path format: user_id/project_id/soumissions/trade/filename
       const fileName = `${user.id}/${projectId}/soumissions/${subPath}/${Date.now()}_${sanitizedName}`;
       
@@ -703,6 +791,407 @@ export function CategorySubmissionsDialog({
     setDiyAnalysisResult(null);
     setShowDIYAnalysis(false);
   };
+  
+  // DIY Items handlers (new simplified table)
+  const handleAddDIYItem = async (name: string) => {
+    const id = Date.now().toString();
+    const newItem: DIYItem = {
+      id,
+      name,
+      totalAmount: 0,
+      quotes: [],
+      hasAnalysis: false,
+    };
+    
+    // Save to database
+    const notes = JSON.stringify({
+      subCategoryName: name,
+      amount: "0",
+      isDIY: true,
+      materialCostOnly: 0,
+      quotes: [],
+    });
+    
+    await supabase
+      .from('task_dates')
+      .insert({
+        project_id: projectId,
+        step_id: 'soumissions',
+        task_id: `soumission-${tradeId}-sub-${id}`,
+        notes,
+      });
+    
+    setDiyItems(prev => [...prev, newItem]);
+    queryClient.invalidateQueries({ queryKey: ['sub-categories', projectId, tradeId] });
+    toast.success(t("toasts.subCategoryAddedDiy", { name }));
+  };
+  
+  const handleRemoveDIYItem = async (id: string) => {
+    await supabase
+      .from('task_dates')
+      .delete()
+      .eq('project_id', projectId)
+      .eq('step_id', 'soumissions')
+      .eq('task_id', `soumission-${tradeId}-sub-${id}`);
+    
+    const removedItem = diyItems.find(item => item.id === id);
+    setDiyItems(prev => prev.filter(item => item.id !== id));
+    
+    if (removedItem) {
+      const newTotalSpent = diyItems
+        .filter(item => item.id !== id)
+        .reduce((sum, item) => sum + (item.totalAmount || 0), 0);
+      setSpent(newTotalSpent.toString());
+    }
+    
+    queryClient.invalidateQueries({ queryKey: ['sub-categories', projectId, tradeId] });
+    toast.success(t("toasts.subcategoryDeleted"));
+  };
+  
+  const handleUpdateDIYItem = async (updatedItem: DIYItem) => {
+    // Calculate total from quotes
+    const quotesTotal = updatedItem.quotes.reduce((sum, q) => sum + (q.amount || 0), 0);
+    updatedItem.totalAmount = quotesTotal;
+    
+    setDiyItems(prev => prev.map(item => 
+      item.id === updatedItem.id ? updatedItem : item
+    ));
+    
+    // Save to database
+    const notes = JSON.stringify({
+      subCategoryName: updatedItem.name,
+      amount: updatedItem.totalAmount.toString(),
+      isDIY: true,
+      materialCostOnly: updatedItem.totalAmount,
+      quotes: updatedItem.quotes,
+      orderLeadDays: updatedItem.orderLeadDays,
+      hasAnalysis: updatedItem.hasAnalysis,
+      itemNotes: updatedItem.notes,
+    });
+    
+    await supabase
+      .from('task_dates')
+      .upsert({
+        project_id: projectId,
+        step_id: 'soumissions',
+        task_id: `soumission-${tradeId}-sub-${updatedItem.id}`,
+        notes,
+      }, { onConflict: 'project_id,step_id,task_id' });
+    
+    // Update total spent
+    const newTotalSpent = diyItems
+      .map(item => item.id === updatedItem.id ? updatedItem.totalAmount : item.totalAmount)
+      .reduce((sum, amt) => sum + (amt || 0), 0);
+    setSpent(newTotalSpent.toString());
+    
+    queryClient.invalidateQueries({ queryKey: ['sub-categories', projectId, tradeId] });
+    
+    // Sync alerts if order lead days set
+    if (updatedItem.orderLeadDays && updatedItem.orderLeadDays > 0) {
+      try {
+        await syncAlertsFromSoumissions();
+      } catch (e) {
+        console.error("Error syncing alerts:", e);
+      }
+    }
+    
+    toast.success(t("common.save") + " ✓");
+  };
+
+  // Handler to update DIY supplier (independent from other modes)
+  const handleUpdateDIYSupplier = async (supplier: DIYSelectedSupplier) => {
+    setDiySupplier(supplier);
+    
+    const notes = JSON.stringify({
+      name: supplier.name,
+      phone: supplier.phone,
+      orderLeadDays: supplier.orderLeadDays,
+      isDIYSupplier: true,
+    });
+    
+    await supabase
+      .from('task_dates')
+      .upsert({
+        project_id: projectId,
+        step_id: 'soumissions',
+        task_id: diySupplierTaskId,
+        notes,
+      }, { onConflict: 'project_id,step_id,task_id' });
+    
+    // Sync alerts if order lead days set
+    if (supplier.orderLeadDays && supplier.orderLeadDays > 0) {
+      try {
+        await syncAlertsFromSoumissions();
+      } catch (e) {
+        console.error("Error syncing DIY supplier alerts:", e);
+      }
+    }
+    
+    queryClient.invalidateQueries({ queryKey: ['diy-supplier-status', projectId, diySupplierTaskId] });
+  };
+  
+  const handleAddQuote = (itemId: string, quote: Omit<DIYSupplierQuote, "id">) => {
+    const quoteId = Date.now().toString();
+    const newQuote: DIYSupplierQuote = { ...quote, id: quoteId };
+    
+    setDiyItems(prev => prev.map(item => {
+      if (item.id === itemId) {
+        const updatedQuotes = [...item.quotes, newQuote];
+        const newTotal = updatedQuotes.reduce((sum, q) => sum + (q.amount || 0), 0);
+        return { ...item, quotes: updatedQuotes, totalAmount: newTotal };
+      }
+      return item;
+    }));
+  };
+  
+  const handleRemoveQuote = (itemId: string, quoteId: string) => {
+    setDiyItems(prev => prev.map(item => {
+      if (item.id === itemId) {
+        const updatedQuotes = item.quotes.filter(q => q.id !== quoteId);
+        const newTotal = updatedQuotes.reduce((sum, q) => sum + (q.amount || 0), 0);
+        return { ...item, quotes: updatedQuotes, totalAmount: newTotal };
+      }
+      return item;
+    }));
+  };
+
+  // Handler for uploading documents to a DIY item
+  const handleUploadDIYDocument = async (itemId: string, file: File) => {
+    if (!user) return;
+    setUploadingDIYItemId(itemId);
+    
+    try {
+      const fileExt = file.name.split(".").pop();
+      const uniqueId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+      // Sanitize tradeId to remove accents and special characters
+      const sanitizedTradeId = sanitizePathSegment(tradeId);
+      const fileName = `${user.id}/diy-items/${sanitizedTradeId}/${itemId}/${uniqueId}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from("task-attachments")
+        .upload(fileName, file);
+      
+      if (uploadError) throw uploadError;
+      
+      // Get signed URL
+      const signedUrl = await getSignedUrl("task-attachments", fileName);
+      if (!signedUrl) throw new Error("Failed to generate signed URL");
+      
+      // Insert into task_attachments table
+      const { data: insertedDoc, error: dbError } = await supabase
+        .from("task_attachments")
+        .insert({
+          project_id: projectId,
+          step_id: "soumissions",
+          task_id: `soumission-${tradeId}-sub-${itemId}`,
+          file_name: file.name,
+          file_url: signedUrl,
+          file_type: file.type,
+          file_size: file.size,
+          category: "soumission",
+        })
+        .select()
+        .single();
+      
+      if (dbError) throw dbError;
+      
+      // Update local state with the new document
+      setDiyItems(prev => prev.map(item => {
+        if (item.id === itemId) {
+          const currentDocs = item.documents || [];
+          return {
+            ...item,
+            documents: [...currentDocs, { id: insertedDoc.id, file_name: file.name, file_url: signedUrl }],
+          };
+        }
+        return item;
+      }));
+      
+      queryClient.invalidateQueries({ queryKey: ['sub-category-docs', projectId, tradeId] });
+      toast.success(t("attachments.uploadSuccess"));
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error(t("attachments.uploadError"));
+    } finally {
+      setUploadingDIYItemId(null);
+    }
+  };
+
+  // Handler for deleting documents from a DIY item
+  const handleDeleteDIYDocument = async (itemId: string, docId: string) => {
+    try {
+      // First get the document to find the file path
+      const { data: doc } = await supabase
+        .from("task_attachments")
+        .select("file_url")
+        .eq("id", docId)
+        .single();
+      
+      if (doc) {
+        // Extract path from file_url
+        const bucketMarker = "/task-attachments/";
+        const markerIndex = doc.file_url.indexOf(bucketMarker);
+        if (markerIndex >= 0) {
+          const path = doc.file_url.slice(markerIndex + bucketMarker.length).split("?")[0];
+          await supabase.storage.from("task-attachments").remove([path]);
+        }
+      }
+      
+      // Delete from database
+      await supabase
+        .from("task_attachments")
+        .delete()
+        .eq("id", docId);
+      
+      // Update local state
+      setDiyItems(prev => prev.map(item => {
+        if (item.id === itemId) {
+          return {
+            ...item,
+            documents: (item.documents || []).filter(d => d.id !== docId),
+          };
+        }
+        return item;
+      }));
+      
+      queryClient.invalidateQueries({ queryKey: ['sub-category-docs', projectId, tradeId] });
+      toast.success(t("attachments.deleteSuccess"));
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error(t("attachments.deleteError"));
+    }
+  };
+  
+  const handleAnalyzeDIYItem = async (itemId: string) => {
+    const item = diyItems.find(i => i.id === itemId);
+    if (!item || !item.documents || item.documents.length === 0) {
+      toast.error(t("diyItems.noDocumentsToAnalyze", "Téléchargez d'abord des soumissions à analyser"));
+      return;
+    }
+    
+    setAnalyzingDIYItemId(itemId);
+    setDiyAnalysisResult(""); // Reset analysis result
+    setAnalyzedDIYItemName(item.name); // Set the item name for the analysis view
+    
+    try {
+      // Build documents array with file_name and signed file_url (format expected by edge function)
+      const documents: { file_name: string; file_url: string }[] = [];
+      for (const doc of item.documents) {
+        // Extract path from file_url for signed URL
+        const bucketMarker = "/task-attachments/";
+        const markerIndex = doc.file_url.indexOf(bucketMarker);
+        if (markerIndex >= 0) {
+          const path = doc.file_url.slice(markerIndex + bucketMarker.length).split("?")[0];
+          const signedUrl = await getSignedUrl("task-attachments", path);
+          if (signedUrl) {
+            documents.push({ file_name: doc.file_name, file_url: signedUrl });
+          }
+        } else {
+          documents.push({ file_name: doc.file_name, file_url: doc.file_url });
+        }
+      }
+      
+      if (documents.length === 0) {
+        toast.error(t("diyItems.noDocumentsToAnalyze", "Téléchargez d'abord des soumissions à analyser"));
+        return;
+      }
+      
+      // Get the auth session for the authorization header
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error(t("auth.notAuthenticated", "Veuillez vous connecter"));
+        return;
+      }
+      
+      // Use fetch with streaming (like analyzeDIYMaterials does)
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-soumissions`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            tradeName: categoryName,
+            tradeDescription: item.name,
+            documents,
+          }),
+        }
+      );
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 429) {
+          toast.error(t("toasts.rateLimit", "Limite de requêtes atteinte"));
+          return;
+        }
+        if (response.status === 402) {
+          toast.error(t("toasts.insufficientCredits", "Crédits insuffisants"));
+          return;
+        }
+        throw new Error(errorData.error || "Erreur lors de l'analyse");
+      }
+      
+      if (!response.body) {
+        throw new Error("Pas de réponse du serveur");
+      }
+      
+      // Read the streaming response
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+      let result = "";
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+        
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+          
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+          
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+          
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              result += content;
+              setDiyAnalysisResult(result);
+            }
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
+      
+      // Set final result and show analysis view
+      setDiyAnalysisResult(result);
+      setShowDIYAnalysis(true);
+      
+      // Mark item as analyzed
+      setDiyItems(prev => prev.map(i => 
+        i.id === itemId ? { ...i, hasAnalysis: true } : i
+      ));
+      
+      toast.success(t("toasts.analysisComplete", "Analyse terminée"));
+    } catch (error) {
+      console.error("Analysis error:", error);
+      toast.error(t("toasts.analysisError", "Erreur lors de l'analyse"));
+    } finally {
+      setAnalyzingDIYItemId(null);
+    }
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -866,7 +1355,7 @@ export function CategorySubmissionsDialog({
       if (costMatch) {
         const estimatedCost = parseFloat(costMatch[1].replace(/[\s,]/g, '')) || 0;
         if (estimatedCost > 0) {
-          toast.info(t("toasts.estimatedMaterialCost", { amount: Math.round(estimatedCost).toLocaleString('fr-CA') }), {
+          toast.info(t("toasts.estimatedMaterialCost", { amount: formatCurrency(Math.round(estimatedCost)) }), {
             duration: 5000,
           });
         }
@@ -982,26 +1471,49 @@ export function CategorySubmissionsDialog({
   const handleSelectSupplier = (index: number) => {
     setSelectedSupplierIndex(index);
     setSelectedOptionIndex(null);
+
     const supplier = extractedSuppliers[index];
-    if (supplier) {
-      setSupplierName(supplier.supplierName);
-      setSupplierPhone(supplier.phone);
-      // Parse amount: remove spaces, keep digits and decimal point, then parse as float and round
-      const cleanAmount = Math.round(parseFloat(supplier.amount.replace(/[\s,]/g, '').replace(/[^\d.]/g, '')) || 0).toString();
-      setSelectedAmount(cleanAmount);
-      setSpent(cleanAmount);
+    if (!supplier) return;
+
+    // In DIY mode, selecting a supplier should populate the DIY supplier card,
+    // and MUST NOT overwrite the single submission fields (supplierName/spent).
+    if (viewMode === 'subcategories') {
+      void handleUpdateDIYSupplier({
+        name: supplier.supplierName,
+        phone: supplier.phone,
+        orderLeadDays: diySupplier?.orderLeadDays,
+      });
+      return;
     }
+
+    // Non-DIY modes (single / tasks / non-DIY subcategory): populate the retained supplier fields
+    setSupplierName(supplier.supplierName);
+    setSupplierPhone(supplier.phone);
+
+    // Parse amount: remove spaces, keep digits and decimal point, then parse as float and round
+    const cleanAmount = Math.round(
+      parseFloat(supplier.amount.replace(/[\s,]/g, '').replace(/[^\d.]/g, '')) || 0
+    ).toString();
+    setSelectedAmount(cleanAmount);
+    setSpent(cleanAmount);
   };
 
   // Handle option selection
   const handleSelectOption = (optionIndex: number) => {
     setSelectedOptionIndex(optionIndex);
+
+    // Options are only relevant for non-DIY retained supplier amounts.
+    // In DIY mode we do not want to overwrite totals.
+    if (viewMode === 'subcategories') return;
+
     if (selectedSupplierIndex !== null) {
       const supplier = extractedSuppliers[selectedSupplierIndex];
       const option = supplier?.options?.[optionIndex];
       if (option) {
         // Parse amount: remove spaces, keep digits and decimal point, then parse as float and round
-        const cleanAmount = Math.round(parseFloat(option.amount.replace(/[\s,]/g, '').replace(/[^\d.]/g, '')) || 0).toString();
+        const cleanAmount = Math.round(
+          parseFloat(option.amount.replace(/[\s,]/g, '').replace(/[^\d.]/g, '')) || 0
+        ).toString();
         setSelectedAmount(cleanAmount);
         setSpent(cleanAmount);
       }
@@ -1011,6 +1523,39 @@ export function CategorySubmissionsDialog({
   // Parse contacts from AI analysis - supports multiple formats
   const parseExtractedContacts = (analysisResult: string): ExtractedContact[] => {
     const contacts: ExtractedContact[] = [];
+    
+    // Helper to parse French/English currency formats
+    // French: "8 353,79" (space=thousand, comma=decimal)
+    // English: "8,353.79" (comma=thousand, period=decimal)
+    const parseCurrencyAmount = (rawAmount: string): string => {
+      let cleaned = rawAmount.trim();
+      
+      // Remove spaces (thousand separators in French)
+      cleaned = cleaned.replace(/\s/g, '');
+      
+      const hasComma = cleaned.includes(',');
+      const hasPeriod = cleaned.includes('.');
+      
+      if (hasComma && !hasPeriod) {
+        // French format: comma is decimal (e.g., "8353,79")
+        cleaned = cleaned.replace(',', '.');
+      } else if (hasComma && hasPeriod) {
+        // Mixed format - determine by position
+        const commaPos = cleaned.lastIndexOf(',');
+        const periodPos = cleaned.lastIndexOf('.');
+        
+        if (commaPos > periodPos) {
+          // French: "8.353,79" -> remove periods, comma to period
+          cleaned = cleaned.replace(/\./g, '').replace(',', '.');
+        } else {
+          // English: "8,353.79" -> just remove commas
+          cleaned = cleaned.replace(/,/g, '');
+        }
+      }
+      // If only period, already correct format
+      
+      return cleaned;
+    };
     
     // Helper to normalize supplier names for comparison
     const normalizeSupplierName = (name: string): string => {
@@ -1069,38 +1614,37 @@ export function CategorySubmissionsDialog({
       
       const nameMatch = block.match(/🏢\s*\*?\*?([^*\n]+)/);
       const phoneMatch = block.match(/📞\s*(?:Téléphone\s*:?\s*)?([0-9\-\.\s\(\)]+)/);
-      
       // Multiple patterns for amounts - more flexible matching (supports decimals and spaces)
       let amount = '';
       
-      // Pattern 1: Montant avant taxes: 30 833.04 $ or Montant avant taxes: 30 833 $
-      const amountMatch1 = block.match(/Montant\s*avant\s*taxes\s*:?\s*([0-9\s,]+(?:\.[0-9]+)?)\s*\$/i);
+      // Pattern 1: Montant avant taxes: 30 833.04 $ or 8 353,79 $
+      const amountMatch1 = block.match(/Montant\s*avant\s*taxes\s*:?\s*([0-9\s,\.]+)\s*\$/i);
       // Pattern 2: Prix avant taxes: X $ 
-      const amountMatch2 = block.match(/Prix\s*avant\s*taxes\s*:?\s*([0-9\s,]+(?:\.[0-9]+)?)\s*\$/i);
+      const amountMatch2 = block.match(/Prix\s*avant\s*taxes\s*:?\s*([0-9\s,\.]+)\s*\$/i);
       // Pattern 3: Sous-total: X $
-      const amountMatch3 = block.match(/Sous-total\s*:?\s*([0-9\s,]+(?:\.[0-9]+)?)\s*\$/i);
+      const amountMatch3 = block.match(/Sous-total\s*:?\s*([0-9\s,\.]+)\s*\$/i);
       // Pattern 4: Total avec taxes: X $ (fallback - will use net price if available)
-      const amountMatch4 = block.match(/Total\s*avec\s*taxes\s*:?\s*\*?\*?([0-9\s,]+(?:\.[0-9]+)?)\s*\$\*?\*?/i);
+      const amountMatch4 = block.match(/Total\s*avec\s*taxes\s*:?\s*\*?\*?([0-9\s,\.]+)\s*\$\*?\*?/i);
       // Pattern 5: Any number followed by $ in the pricing section
-      const amountMatch5 = block.match(/💰[^$]*?([0-9]{1,3}(?:[\s,][0-9]{3})*(?:\.[0-9]+)?)\s*\$/);
+      const amountMatch5 = block.match(/💰[^$]*?([0-9]{1,3}(?:[\s,][0-9]{3})*(?:[,\.][0-9]+)?)\s*\$/);
       
       // Priority: before taxes > subtotal > with taxes
-      if (amountMatch1) amount = amountMatch1[1].replace(/[\s,]/g, '');
-      else if (amountMatch2) amount = amountMatch2[1].replace(/[\s,]/g, '');
-      else if (amountMatch3) amount = amountMatch3[1].replace(/[\s,]/g, '');
-      else if (amountMatch5) amount = amountMatch5[1].replace(/[\s,]/g, '');
-      else if (amountMatch4) amount = amountMatch4[1].replace(/[\s,]/g, '');
+      if (amountMatch1) amount = parseCurrencyAmount(amountMatch1[1]);
+      else if (amountMatch2) amount = parseCurrencyAmount(amountMatch2[1]);
+      else if (amountMatch3) amount = parseCurrencyAmount(amountMatch3[1]);
+      else if (amountMatch5) amount = parseCurrencyAmount(amountMatch5[1]);
+      else if (amountMatch4) amount = parseCurrencyAmount(amountMatch4[1]);
       
       if (nameMatch) {
         // Try to extract options from the block
         const options: SupplierOption[] = [];
         
         // Look for option patterns like "Option A: X $" or "Forfait Premium: X $"
-        const optionMatches = block.matchAll(/(?:Option|Forfait|Package|OPTION)\s*(?:SÉPARÉE\s*:?\s*)?([A-Za-zÀ-ÿ0-9\s]+?)\s*:?\s*([0-9\s,]+(?:\.[0-9]+)?)\s*\$/gi);
+        const optionMatches = block.matchAll(/(?:Option|Forfait|Package|OPTION)\s*(?:SÉPARÉE\s*:?\s*)?([A-Za-zÀ-ÿ0-9\s]+?)\s*:?\s*([0-9\s,\.]+)\s*\$/gi);
         for (const match of optionMatches) {
           options.push({
             name: match[1].trim(),
-            amount: match[2].replace(/[\s,]/g, ''),
+            amount: parseCurrencyAmount(match[2]),
           });
         }
         
@@ -1116,10 +1660,10 @@ export function CategorySubmissionsDialog({
     
     // Try to extract amounts from comparison table for suppliers without amounts
     const tableAmounts: Record<string, string> = {};
-    const tableRows = analysisResult.matchAll(/\|\s*\*?\*?([^|*]+)\*?\*?\s*\|\s*\*?\*?([0-9\s,]+)\s*\$\*?\*?\s*\|/g);
+    const tableRows = analysisResult.matchAll(/\|\s*\*?\*?([^|*]+)\*?\*?\s*\|\s*\*?\*?([0-9\s,\.]+)\s*\$\*?\*?\s*\|/g);
     for (const row of tableRows) {
       const name = row[1].trim();
-      const amt = row[2].replace(/[\s,]/g, '');
+      const amt = parseCurrencyAmount(row[2]);
       if (name && !name.includes('Entreprise') && !name.includes('---') && !name.includes('Critère') && amt) {
         tableAmounts[name.toLowerCase()] = amt;
       }
@@ -1471,76 +2015,241 @@ export function CategorySubmissionsDialog({
     }
   };
   
-  // Reset all data for this category
-
+  // Reset data for the currently active mode only (single, tasks, or subcategories/DIY)
   const handleResetCategory = async () => {
     setResetting(true);
     try {
-      // 1. Delete all documents for this category (main + sub-categories + tasks)
-      const { data: allDocs } = await supabase
-        .from('task_attachments')
-        .select('id, file_url')
-        .eq('project_id', projectId)
-        .eq('step_id', 'soumissions')
-        .like('task_id', `soumission-${tradeId}%`);
-      
-      if (allDocs && allDocs.length > 0) {
-        // Delete from storage
-        for (const doc of allDocs) {
-          const bucketMarker = "/task-attachments/";
-          const markerIndex = doc.file_url.indexOf(bucketMarker);
-          if (markerIndex >= 0) {
-            const path = doc.file_url.slice(markerIndex + bucketMarker.length).split("?")[0];
-            await supabase.storage.from('task-attachments').remove([path]);
+      const parseNumberOr = (value: string, fallback: number) => {
+        const n = parseFloat(String(value));
+        return Number.isFinite(n) ? n : fallback;
+      };
+
+      // If we're currently inside a DIY sub-category view, treat reset as DIY reset
+      const currentSubCat =
+        viewingSubCategory && activeSubCategoryId
+          ? subCategories.find((sc) => sc.id === activeSubCategoryId)
+          : null;
+
+      const effectiveViewMode: typeof viewMode = currentSubCat?.isDIY
+        ? "subcategories"
+        : viewMode;
+
+      let resetMessage = t(
+        "categorySubmissions.taskSubmissions.resetCategory",
+        "Réinitialisé"
+      );
+
+      if (effectiveViewMode === "single") {
+        // Only reset the main category task (soumission-{tradeId} exactly)
+        const taskId = `soumission-${tradeId}`;
+        resetMessage = t(
+          "categorySubmissions.taskSubmissions.resetSingleSuccess",
+          "Mode 'Soumission unique' réinitialisé"
+        );
+
+        // Delete documents for single mode only (exact match)
+        const { data: singleDocs } = await supabase
+          .from("task_attachments")
+          .select("id, file_url")
+          .eq("project_id", projectId)
+          .eq("step_id", "soumissions")
+          .eq("task_id", taskId);
+
+        if (singleDocs && singleDocs.length > 0) {
+          for (const doc of singleDocs) {
+            const bucketMarker = "/task-attachments/";
+            const markerIndex = doc.file_url.indexOf(bucketMarker);
+            if (markerIndex >= 0) {
+              const path = doc.file_url
+                .slice(markerIndex + bucketMarker.length)
+                .split("?")[0];
+              await supabase.storage.from("task-attachments").remove([path]);
+            }
           }
+          await supabase
+            .from("task_attachments")
+            .delete()
+            .eq("project_id", projectId)
+            .eq("step_id", "soumissions")
+            .eq("task_id", taskId);
         }
-        
-        // Delete from database
+
+        // Delete task_dates for single mode only
         await supabase
-          .from('task_attachments')
+          .from("task_dates")
           .delete()
-          .eq('project_id', projectId)
-          .eq('step_id', 'soumissions')
-          .like('task_id', `soumission-${tradeId}%`);
+          .eq("project_id", projectId)
+          .eq("step_id", "soumissions")
+          .eq("task_id", taskId);
+
+        // Reset local state for single mode
+        setSupplierName("");
+        setSupplierPhone("");
+        setContactPerson("");
+        setContactPersonPhone("");
+        setSupplierLeadDays(null);
+        setSelectedAmount("");
+        setAnalysisResult(null);
+        setExtractedSuppliers([]);
+        setSelectedSupplierIndex(null);
+        setSelectedOptionIndex(null);
+
+        // Also reset the category spent (DB + UI)
+        setSpent("0");
+        const budgetValue = parseNumberOr(budget, currentBudget);
+        onSave(budgetValue, 0, undefined, { closeDialog: false });
+      } else if (effectiveViewMode === "tasks") {
+        // Reset all task-based submissions (soumission-{tradeId}-task-*)
+        const taskIdPattern = `soumission-${tradeId}-task-%`;
+        resetMessage = t(
+          "categorySubmissions.taskSubmissions.resetTasksSuccess",
+          "Mode 'Par tâche' réinitialisé"
+        );
+
+        // Delete documents for tasks mode
+        const { data: taskDocs } = await supabase
+          .from("task_attachments")
+          .select("id, file_url")
+          .eq("project_id", projectId)
+          .eq("step_id", "soumissions")
+          .like("task_id", taskIdPattern);
+
+        if (taskDocs && taskDocs.length > 0) {
+          for (const doc of taskDocs) {
+            const bucketMarker = "/task-attachments/";
+            const markerIndex = doc.file_url.indexOf(bucketMarker);
+            if (markerIndex >= 0) {
+              const path = doc.file_url
+                .slice(markerIndex + bucketMarker.length)
+                .split("?")[0];
+              await supabase.storage.from("task-attachments").remove([path]);
+            }
+          }
+          await supabase
+            .from("task_attachments")
+            .delete()
+            .eq("project_id", projectId)
+            .eq("step_id", "soumissions")
+            .like("task_id", taskIdPattern);
+        }
+
+        // Delete task_dates for tasks mode
+        await supabase
+          .from("task_dates")
+          .delete()
+          .eq("project_id", projectId)
+          .eq("step_id", "soumissions")
+          .like("task_id", taskIdPattern);
+
+        // Reset local state for tasks mode
+        setActiveTaskTitle(categoryTasks.length > 0 ? categoryTasks[0].taskTitle : null);
+        setAnalysisResult(null);
+        setExtractedSuppliers([]);
+        setSelectedSupplierIndex(null);
+        setSelectedOptionIndex(null);
+      } else if (effectiveViewMode === "subcategories") {
+        // Reset all DIY/subcategory submissions
+        resetMessage = t(
+          "categorySubmissions.taskSubmissions.resetDIYSuccess",
+          "Mode 'Fait par moi-même' réinitialisé"
+        );
+
+        // Delete documents for DIY items (sub-*)
+        const { data: subDocs } = await supabase
+          .from("task_attachments")
+          .select("id, file_url")
+          .eq("project_id", projectId)
+          .eq("step_id", "soumissions")
+          .like("task_id", `soumission-${tradeId}-sub-%`);
+
+        const removeFiles = async (
+          docs: Array<{ id: string; file_url: string }> | null | undefined
+        ) => {
+          if (!docs || docs.length === 0) return;
+          for (const doc of docs) {
+            const bucketMarker = "/task-attachments/";
+            const markerIndex = doc.file_url.indexOf(bucketMarker);
+            if (markerIndex >= 0) {
+              const path = doc.file_url
+                .slice(markerIndex + bucketMarker.length)
+                .split("?")[0];
+              await supabase.storage.from("task-attachments").remove([path]);
+            }
+          }
+        };
+
+        await removeFiles(subDocs as any);
+
+        if (subDocs && subDocs.length > 0) {
+          await supabase
+            .from("task_attachments")
+            .delete()
+            .eq("project_id", projectId)
+            .eq("step_id", "soumissions")
+            .like("task_id", `soumission-${tradeId}-sub-%`);
+        }
+
+        // Also delete documents attached to the DIY supplier card (if any)
+        const { data: diySupplierDocs } = await supabase
+          .from("task_attachments")
+          .select("id, file_url")
+          .eq("project_id", projectId)
+          .eq("step_id", "soumissions")
+          .eq("task_id", diySupplierTaskId);
+
+        await removeFiles(diySupplierDocs as any);
+
+        if (diySupplierDocs && diySupplierDocs.length > 0) {
+          await supabase
+            .from("task_attachments")
+            .delete()
+            .eq("project_id", projectId)
+            .eq("step_id", "soumissions")
+            .eq("task_id", diySupplierTaskId);
+        }
+
+        // Delete task_dates for DIY items (sub-* entries)
+        await supabase
+          .from("task_dates")
+          .delete()
+          .eq("project_id", projectId)
+          .eq("step_id", "soumissions")
+          .like("task_id", `soumission-${tradeId}-sub-%`);
+
+        // Also delete the DIY supplier entry
+        await supabase
+          .from("task_dates")
+          .delete()
+          .eq("project_id", projectId)
+          .eq("step_id", "soumissions")
+          .eq("task_id", diySupplierTaskId);
+
+        // Reset local state for DIY mode
+        setSubCategories([]);
+        setDiyItems([]);
+        setDiySupplier({ name: "", phone: "", orderLeadDays: undefined });
+        setActiveSubCategoryId(null);
+        setViewingSubCategory(false);
+        setDiyAnalysisResult(null);
+        setShowDIYAnalysis(false);
+
+        // Also reset the category spent (DB + UI)
+        setSpent("0");
+        const budgetValue = parseNumberOr(budget, currentBudget);
+        onSave(budgetValue, 0, undefined, { closeDialog: false });
       }
-      
-      // 2. Delete all task_dates entries for this category
-      await supabase
-        .from('task_dates')
-        .delete()
-        .eq('project_id', projectId)
-        .eq('step_id', 'soumissions')
-        .like('task_id', `soumission-${tradeId}%`);
-      
-      // 3. Reset local state
-      setSupplierName("");
-      setSupplierPhone("");
-      setContactPerson("");
-      setContactPersonPhone("");
-      setSupplierLeadDays(null);
-      setSelectedAmount("");
-      setAnalysisResult(null);
-      setExtractedSuppliers([]);
-      setSelectedSupplierIndex(null);
-      setSelectedOptionIndex(null);
-      setSubCategories([]);
-      setActiveSubCategoryId(null);
-      setActiveTaskTitle(null);
-      setViewMode('single');
-      setSpent("0");
-      setDiyAnalysisResult(null);
-      
-      // 4. Update the category spent to 0
-      onSave(parseFloat(budget) || 0, 0, undefined, { closeDialog: false });
-      
-      // 5. Invalidate all queries
-      queryClient.invalidateQueries({ queryKey: ['supplier-status', projectId] });
-      queryClient.invalidateQueries({ queryKey: ['category-docs', projectId] });
-      queryClient.invalidateQueries({ queryKey: ['sub-categories', projectId, tradeId] });
-      queryClient.invalidateQueries({ queryKey: ['task-submissions', projectId, tradeId] });
-      queryClient.invalidateQueries({ queryKey: ['sub-category-docs-count', projectId, tradeId] });
-      
-      toast.success(t("categorySubmissions.taskSubmissions.resetCategorySuccess"));
+
+      // Invalidate relevant queries
+      queryClient.invalidateQueries({ queryKey: ["supplier-status", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["category-docs", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["sub-categories", projectId, tradeId] });
+      queryClient.invalidateQueries({ queryKey: ["task-submissions", projectId, tradeId] });
+      queryClient.invalidateQueries({
+        queryKey: ["sub-category-docs-count", projectId, tradeId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["diy-supplier-status", projectId] });
+
+      toast.success(resetMessage);
     } catch (error) {
       console.error("Error resetting category:", error);
       toast.error("Erreur lors de la réinitialisation");
@@ -1589,9 +2298,9 @@ export function CategorySubmissionsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="relative flex-1 min-h-0">
-          <ScrollArea className="h-[60vh] pr-4">
-            <div className="space-y-6">
+        <div className="relative flex-1 min-h-0 flex flex-col">
+          <ScrollArea className="flex-1 pr-4">
+            <div className="space-y-6 pb-4">
             {/* Budget Section - Only show on main view */}
             {!viewingSubCategory && (
               <div className="space-y-3">
@@ -1691,16 +2400,21 @@ export function CategorySubmissionsDialog({
                         {t("categorySubmissions.taskSubmissions.diyModeDescription")}
                       </p>
                     </div>
-                    <SubCategoryManager
-                      subCategories={subCategories}
-                      onAddSubCategory={handleAddSubCategory}
-                      onRemoveSubCategory={handleRemoveSubCategory}
-                      onSelectSubCategory={handleSelectSubCategory}
-                      activeSubCategoryId={activeSubCategoryId}
+                    <DIYItemsTable
+                      items={diyItems}
+                      onAddItem={handleAddDIYItem}
+                      onRemoveItem={handleRemoveDIYItem}
+                      onUpdateItem={handleUpdateDIYItem}
+                      onAddQuote={handleAddQuote}
+                      onRemoveQuote={handleRemoveQuote}
+                      onAnalyzeItem={handleAnalyzeDIYItem}
+                      analyzingItemId={analyzingDIYItemId}
                       categoryName={categoryName}
-                      projectPlans={projectPlans}
-                      onAnalyzeDIY={analyzeDIYMaterials}
-                      analyzingDIY={analyzingDIY}
+                      selectedSupplier={diySupplier}
+                      onUpdateSupplier={handleUpdateDIYSupplier}
+                      onUploadDocument={handleUploadDIYDocument}
+                      onDeleteDocument={handleDeleteDIYDocument}
+                      uploadingItemId={uploadingDIYItemId}
                     />
                   </TabsContent>
                 </Tabs>
@@ -1871,11 +2585,106 @@ export function CategorySubmissionsDialog({
                       </span>
                     </div>
                   )}
+                  
+                  {/* Préavis de commande matériaux */}
+                  <div className="pt-3 mt-3 border-t border-amber-200 dark:border-amber-800">
+                    <div className="p-3 bg-amber-500/10 border border-amber-500/40 rounded-lg">
+                      <div className="flex items-start gap-3">
+                        <div className="p-1.5 bg-amber-500/20 rounded-full shrink-0">
+                          <Phone className="h-4 w-4 text-amber-600" />
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h5 className="font-medium text-amber-700 dark:text-amber-400 text-sm">
+                              {t("categorySubmissions.orderNotice.title", "Préavis de commande")}
+                            </h5>
+                            <Badge variant="outline" className="text-xs border-amber-500/50 text-amber-600 dark:text-amber-400">
+                              Important
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-amber-700/70 dark:text-amber-300/70">
+                            {t("categorySubmissions.orderNotice.description", "Indique le délai requis pour commander les matériaux avant le début de cette étape. Le système créera une alerte pour te rappeler de passer la commande à temps.")}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="number"
+                              min={0}
+                              value={currentSubCat.orderLeadDays ?? ""}
+                              onChange={(e) => {
+                                const days = e.target.value ? parseInt(e.target.value) : null;
+                                setSubCategories(prev => prev.map(sc =>
+                                  sc.id === activeSubCategoryId
+                                    ? { ...sc, orderLeadDays: days ?? undefined }
+                                    : sc
+                                ));
+                              }}
+                              placeholder={t("categorySubmissions.orderNotice.placeholder", "Ex: 14")}
+                              className="max-w-[120px] h-8 text-sm border-amber-500/50 focus:border-amber-500"
+                            />
+                            <span className="text-xs text-muted-foreground">{t("categorySubmissions.orderNotice.label", "jours avant le début des travaux")}</span>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                              const currentSubCat = subCategories.find(sc => sc.id === activeSubCategoryId);
+                              if (!currentSubCat) return;
+                              
+                              const orderLeadDays = currentSubCat.orderLeadDays ?? null;
+                              const materialCost = currentSubCat.materialCostOnly || 0;
+                              
+                              // Save to database
+                              const existingNotes = supplierStatus || {};
+                              const updatedNotes = JSON.stringify({
+                                ...existingNotes,
+                                subCategoryName: currentSubCat.name,
+                                amount: materialCost.toString(),
+                                materialCostOnly: materialCost,
+                                isDIY: true,
+                                hasDIYAnalysis: !!diyAnalysisResult,
+                                orderLeadDays: orderLeadDays,
+                              });
+                              
+                              await supabase
+                                .from('task_dates')
+                                .upsert({
+                                  project_id: projectId,
+                                  step_id: 'soumissions',
+                                  task_id: currentTaskId,
+                                  notes: updatedNotes,
+                                }, { onConflict: 'project_id,step_id,task_id' });
+                              
+                              queryClient.invalidateQueries({ queryKey: ['sub-categories', projectId, tradeId] });
+                              queryClient.invalidateQueries({ queryKey: ['supplier-status', projectId, currentTaskId] });
+                              
+                              // Sync alerts to create the material order alert
+                              if (orderLeadDays && orderLeadDays > 0) {
+                                try {
+                                  await syncAlertsFromSoumissions();
+                                  toast.success(t("toasts.orderNoticeCreated", "Préavis de commande enregistré - Alerte créée"));
+                                } catch (e) {
+                                  console.error("Error syncing alerts:", e);
+                                  toast.success(t("toasts.orderNoticeSaved", "Préavis de commande enregistré"));
+                                }
+                              } else {
+                                toast.success(t("toasts.orderNoticeSaved", "Préavis de commande enregistré"));
+                              }
+                            }}
+                            className="gap-2 border-amber-500/50 text-amber-700 hover:bg-amber-100 dark:text-amber-400 dark:hover:bg-amber-950/50"
+                          >
+                            <Save className="h-4 w-4" />
+                            {t("categorySubmissions.orderNotice.save", "Enregistrer le préavis")}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               );
             })()}
 
-            {/* Documents Section */}
+            {/* Documents Section - Hidden in DIY mode since DIY items have their own table */}
+            {viewMode !== 'subcategories' && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium flex items-center gap-2">
@@ -1989,9 +2798,11 @@ export function CategorySubmissionsDialog({
                 </div>
               )}
             </div>
+            )}
 
             {/* Selected Supplier Summary - Show when supplier is chosen - PRIORITY DISPLAY */}
-            {supplierName && (
+            {/* Hide in DIY mode (subcategories tab) since DIY items have their own independent supplier card */}
+            {supplierName && viewMode !== 'subcategories' && !viewingSubCategory && !subCategories.find(sc => sc.id === activeSubCategoryId)?.isDIY && (
               <div className="rounded-xl border-2 border-primary bg-primary/5 p-4 space-y-3 sticky top-0 z-10 backdrop-blur-sm">
                 <div className="flex items-center justify-between">
                   <h4 className="font-semibold flex items-center gap-2 text-lg text-primary">
@@ -2048,7 +2859,42 @@ export function CategorySubmissionsDialog({
                     <div className="text-right">
                       <div className="text-sm text-muted-foreground">Coût retenu</div>
                       <div className="font-bold text-2xl text-primary">
-                        {parseInt(spent || selectedAmount || '0').toLocaleString('fr-CA')} $
+                        {formatCurrency(parseFloat(spent || selectedAmount || '0') || 0)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Supplier Notice Section - Integrated in supplier card */}
+                <div className="pt-3 mt-3 border-t border-primary/20">
+                  <div className="p-3 bg-amber-500/10 border border-amber-500/40 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <div className="p-1.5 bg-amber-500/20 rounded-full shrink-0">
+                        <Phone className="h-4 w-4 text-amber-600" />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h5 className="font-medium text-amber-700 dark:text-amber-400 text-sm">
+                            {t("categorySubmissions.supplierNotice.title")}
+                          </h5>
+                          <Badge variant="outline" className="text-xs border-amber-500/50 text-amber-600 dark:text-amber-400">
+                            Important
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-amber-700/70 dark:text-amber-300/70">
+                          {t("categorySubmissions.supplierNotice.description")}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number"
+                            min={0}
+                            value={supplierLeadDays ?? ""}
+                            onChange={(e) => setSupplierLeadDays(e.target.value ? parseInt(e.target.value) : null)}
+                            placeholder={t("categorySubmissions.supplierNotice.placeholder")}
+                            className="max-w-[120px] h-8 text-sm border-amber-500/50 focus:border-amber-500"
+                          />
+                          <span className="text-xs text-muted-foreground">{t("categorySubmissions.supplierNotice.label")}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2114,7 +2960,7 @@ export function CategorySubmissionsDialog({
                           const total = extractedSuppliers.reduce((sum, s) => sum + parseInt(s.amount || '0'), 0);
                           const average = Math.round(total / extractedSuppliers.length);
                           setBudget(average.toString());
-                          toast.success(`Budget estimé mis à jour: ${average.toLocaleString('fr-CA')} $`);
+                          toast.success(`Budget estimé mis à jour: ${formatCurrency(average)}`);
                         }}
                         className="gap-2 shrink-0"
                       >
@@ -2162,7 +3008,7 @@ export function CategorySubmissionsDialog({
                         </div>
                         <div className="text-right">
                           <div className="font-bold text-lg text-primary">
-                            {parseInt(supplier.amount).toLocaleString('fr-CA')} $
+                            {formatCurrency(parseFloat(supplier.amount.replace(/[\s,]/g, '')) || 0)}
                           </div>
                           <div className="text-xs text-muted-foreground">avant taxes</div>
                         </div>
@@ -2189,7 +3035,7 @@ export function CategorySubmissionsDialog({
                                 <div className="flex justify-between items-center">
                                   <span className="font-medium">{option.name}</span>
                                   <span className="font-bold text-primary">
-                                    {parseInt(option.amount).toLocaleString('fr-CA')} $
+                                    {formatCurrency(parseFloat(option.amount.replace(/[\s,]/g, '')) || 0)}
                                   </span>
                                 </div>
                                 {option.description && (
@@ -2207,6 +3053,8 @@ export function CategorySubmissionsDialog({
             )}
 
             {/* Manual Supplier Entry or Selected Supplier Details */}
+            {/* Hide in DIY mode (subcategories tab) since DIY items have their own independent supplier card */}
+            {viewMode !== 'subcategories' && !viewingSubCategory && !subCategories.find(sc => sc.id === activeSubCategoryId)?.isDIY && (
             <div className="space-y-3">
               <h4 className="font-medium flex items-center gap-2">
                 <User className="h-4 w-4" />
@@ -2302,46 +3150,6 @@ export function CategorySubmissionsDialog({
                   </div>
                 </div>
 
-                {/* Supplier Notice Section - Only show when supplier is selected */}
-                {supplierName && (
-                  <div className="mt-4 p-4 bg-amber-500/10 border-2 border-amber-500/50 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-amber-500/20 rounded-full shrink-0">
-                        <Phone className="h-5 w-5 text-amber-600" />
-                      </div>
-                      <div className="flex-1 space-y-3">
-                        <div>
-                          <h4 className="font-semibold text-amber-700 dark:text-amber-400 text-base">
-                            {t("categorySubmissions.supplierNotice.title")}
-                          </h4>
-                          <p className="text-sm text-amber-700/80 dark:text-amber-300/80 mt-1">
-                            {t("categorySubmissions.supplierNotice.description")}
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="supplier-lead-days" className="text-amber-700 dark:text-amber-400 font-medium">
-                            {t("categorySubmissions.supplierNotice.label")}
-                          </Label>
-                          <div className="relative max-w-xs">
-                            <Input
-                              id="supplier-lead-days"
-                              type="number"
-                              min={0}
-                              value={supplierLeadDays ?? ""}
-                              onChange={(e) => setSupplierLeadDays(e.target.value ? parseInt(e.target.value) : null)}
-                              placeholder={t("categorySubmissions.supplierNotice.placeholder")}
-                              className="border-amber-500/50 focus:border-amber-500 focus:ring-amber-500/30"
-                            />
-                          </div>
-                          <p className="text-xs text-amber-600/80 dark:text-amber-400/70">
-                            {t("categorySubmissions.supplierNotice.tooltip")}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {supplierStatus?.isCompleted && (
                   <Badge variant="secondary" className="w-fit bg-success/10 text-success">
                     <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -2350,6 +3158,9 @@ export function CategorySubmissionsDialog({
                 )}
               </div>
             </div>
+            )}
+            {/* Extra padding at the bottom to ensure visibility */}
+            <div className="h-2" />
           </div>
           </ScrollArea>
         </div>
@@ -2420,14 +3231,53 @@ export function CategorySubmissionsDialog({
         open={showDIYAnalysis}
         onOpenChange={setShowDIYAnalysis}
         categoryName={categoryName}
-        subCategoryName={currentSubCategoryName || ''}
+        subCategoryName={analyzedDIYItemName || currentSubCategoryName || ''}
         analysisResult={diyAnalysisResult || ''}
-        onApplyEstimate={(amount) => {
-          // Update the material cost
-          if (activeSubCategoryId) {
+        initialSupplier={diySupplier?.name ? { name: diySupplier.name, phone: diySupplier.phone || '' } : undefined}
+        onApplyEstimate={(amount, supplier) => {
+          // If we analyzed a DIY item, update that item
+          if (analyzedDIYItemName) {
+            const itemToUpdate = diyItems.find(i => i.name === analyzedDIYItemName);
+            if (itemToUpdate) {
+              // Add the amount as a quote to the item with supplier info
+              const quoteId = Date.now().toString();
+              setDiyItems(prev => prev.map(i => {
+                if (i.id === itemToUpdate.id) {
+                  const newQuote: DIYSupplierQuote = {
+                    id: quoteId,
+                    storeName: supplier?.name || t("diyItems.aiExtracted", "Extrait de l'analyse IA"),
+                    description: supplier?.phone || "",
+                    amount: amount,
+                  };
+                  const updatedQuotes = [...i.quotes, newQuote];
+                  const newTotal = updatedQuotes.reduce((sum, q) => sum + (q.amount || 0), 0);
+                  return { ...i, quotes: updatedQuotes, totalAmount: newTotal };
+                }
+                return i;
+              }));
+              
+              // Also update DIY supplier info if provided
+              if (supplier?.name) {
+                setDiySupplier(prev => ({
+                  ...prev,
+                  name: supplier.name,
+                  phone: supplier.phone || prev.phone,
+                }));
+              }
+              
+              toast.success(`${t("diyItems.costApplied", "Coût appliqué")}: ${formatCurrency(amount)}${supplier?.name ? ` - ${supplier.name}` : ''}`);
+            }
+          } else if (activeSubCategoryId) {
+            // Original behavior for sub-categories
             setSubCategories(prev => prev.map(sc =>
               sc.id === activeSubCategoryId
-                ? { ...sc, materialCostOnly: amount, amount }
+                ? { 
+                    ...sc, 
+                    materialCostOnly: amount, 
+                    amount,
+                    supplierName: supplier?.name || sc.supplierName,
+                    supplierPhone: supplier?.phone || sc.supplierPhone,
+                  }
                 : sc
             ));
             
@@ -2437,9 +3287,19 @@ export function CategorySubmissionsDialog({
               .reduce((sum, amt) => sum + (amt || 0), 0);
             setSpent(newTotalSpent.toString());
             
-            toast.success(`Coût appliqué: ${amount.toLocaleString('fr-CA')} $`);
+            // Also update DIY supplier info if provided
+            if (supplier?.name) {
+              setDiySupplier(prev => ({
+                ...prev,
+                name: supplier.name,
+                phone: supplier.phone || prev.phone,
+              }));
+            }
+            
+            toast.success(`${t("diyItems.costApplied", "Coût appliqué")}: ${formatCurrency(amount)}${supplier?.name ? ` - ${supplier.name}` : ''}`);
           }
           setShowDIYAnalysis(false);
+          setAnalyzedDIYItemName(""); // Reset
         }}
       />
     </Dialog>

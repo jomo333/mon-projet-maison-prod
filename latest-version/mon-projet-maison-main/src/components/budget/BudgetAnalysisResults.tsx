@@ -61,6 +61,7 @@ import {
   Legend,
 } from "recharts";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/i18n";
 import { groupItemsByTask, getTasksForCategory, OTHER_ITEMS_KEY } from "@/lib/budgetTaskMapping";
 import { translateBudgetTaskTitle } from "@/lib/budgetTaskTitleI18n";
 import { translateBudgetItemName, translateNoItemsMessage } from "@/lib/budgetItemI18n";
@@ -188,14 +189,7 @@ export function BudgetAnalysisResults({
 
   const translatedProjectSummary = translateProjectSummary(analysis.projectSummary);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("fr-CA", {
-      style: "currency",
-      currency: "CAD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  // Use centralized formatCurrency from i18n (already imported)
 
   const toggleCategory = (index: number) => {
     const newExpanded = new Set(expandedCategories);

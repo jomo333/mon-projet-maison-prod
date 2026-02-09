@@ -128,12 +128,13 @@ const Budget = () => {
       "agrandissement": "extension",
       "garage détaché": "detachedGarage",
       "garage detache": "detachedGarage",
+      "garage-detache": "detachedGarage",
       "chalet": "cottage",
     };
     const normalizedType = type.toLowerCase().trim();
     const key = typeMap[normalizedType];
     if (key) {
-      return t(`start.projectTypes.${key}`);
+      return t(`startProject.projectTypes.${key}`);
     }
     return type;
   };
@@ -567,37 +568,45 @@ const Budget = () => {
       )
     );
     
-    // Immediately save to database
-    const updatedCategories = budgetCategories.map(cat => 
-      cat.name === editingCategory.name 
-        ? { ...cat, budget, spent }
-        : cat
-    );
-    
-    // Delete existing and insert updated
-    await supabase
+    // Persist only this category row (avoid deleting/reinserting all categories)
+    const categoryRow = editingCategory;
+
+    const { data: updatedRows, error: updateError } = await supabase
       .from("project_budgets")
-      .delete()
+      .update({ budget, spent })
+      .eq("project_id", selectedProjectId)
+      .eq("category_name", editingCategory.name)
+      .select("id");
+
+    if (updateError) throw updateError;
+
+    // If the row didn't exist yet (edge case), insert it
+    if (!updatedRows || updatedRows.length === 0) {
+      const { error: insertError } = await supabase.from("project_budgets").insert({
+        project_id: selectedProjectId,
+        category_name: categoryRow.name,
+        budget,
+        spent,
+        color: categoryRow.color,
+        description: categoryRow.description || null,
+        items: JSON.parse(JSON.stringify(categoryRow.items || [])) as Json,
+      });
+      if (insertError) throw insertError;
+    }
+
+    // Recompute total budget from DB (prevents stale-state bugs)
+    const { data: allBudgets, error: sumError } = await supabase
+      .from("project_budgets")
+      .select("budget")
       .eq("project_id", selectedProjectId);
 
-    const budgetData = updatedCategories.map(cat => ({
-      project_id: selectedProjectId,
-      category_name: cat.name,
-      budget: cat.name === editingCategory.name ? budget : cat.budget,
-      spent: cat.name === editingCategory.name ? spent : cat.spent,
-      color: cat.color,
-      description: cat.description || null,
-      items: JSON.parse(JSON.stringify(cat.items || [])) as Json,
-    }));
+    if (sumError) throw sumError;
 
-    await supabase
-      .from("project_budgets")
-      .insert(budgetData);
-
-    // Update project total budget
-    const totalBudget = updatedCategories.reduce((acc, cat) => 
-      acc + (cat.name === editingCategory.name ? budget : cat.budget), 0
+    const totalBudget = (allBudgets || []).reduce(
+      (acc, row) => acc + Number((row as any).budget || 0),
+      0
     );
+
     await supabase
       .from("projects")
       .update({ total_budget: totalBudget, updated_at: new Date().toISOString() })
@@ -762,6 +771,7 @@ const Budget = () => {
                       {formatCurrency(Math.round(displayBudget * 0.90))} à {formatCurrency(Math.round(displayBudget * 1.10))}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">{t("budget.budgetRange")}</p>
+                    <p className="text-xs text-muted-foreground/70 mt-0.5 italic">{t("budget.budgetIncludes")}</p>
                   </>
                 ) : (
                   <>
@@ -787,6 +797,9 @@ const Budget = () => {
                 <p className="text-xs text-muted-foreground mt-1">
                   {percentUsed.toFixed(1)}% {t("budget.percentUsed")}
                 </p>
+                {totalSpent > 0 && (
+                  <p className="text-xs text-muted-foreground/70 mt-0.5 italic">{t("budget.spentIncludes")}</p>
+                )}
               </CardContent>
             </Card>
 
@@ -799,9 +812,12 @@ const Budget = () => {
               </CardHeader>
               <CardContent>
                 {hasAnalyzedBudget ? (
-                  <div className="text-xl font-bold font-display text-success">
-                    {formatCurrency(Math.round(displayRemaining * 0.90))} à {formatCurrency(Math.round(displayRemaining * 1.10))}
-                  </div>
+                  <>
+                    <div className="text-xl font-bold font-display text-success">
+                      {formatCurrency(Math.round(displayRemaining * 0.90))} à {formatCurrency(Math.round(displayRemaining * 1.10))}
+                    </div>
+                    <p className="text-xs text-muted-foreground/70 mt-1 italic">{t("budget.remainingIncludes")}</p>
+                  </>
                 ) : (
                   <div className="text-2xl font-bold font-display text-muted-foreground">{formatCurrency(0)}</div>
                 )}
@@ -932,10 +948,10 @@ const Budget = () => {
                                 </div>
                                 <div className="text-right shrink-0 min-w-[140px]">
                                   <div className="text-base font-bold text-foreground">
-                                    {category.spent.toLocaleString()} $
+                                    {formatCurrency(category.spent)}
                                   </div>
                                   <div className="text-xs text-muted-foreground">
-                                    / {Math.round(category.budget * 0.90).toLocaleString()} - {Math.round(category.budget * 1.10).toLocaleString()} $
+                                    / {formatCurrency(Math.round(category.budget * 0.90))} - {formatCurrency(Math.round(category.budget * 1.10))}
                                   </div>
                                 </div>
                                 <div className="shrink-0 p-1">
@@ -1118,7 +1134,7 @@ const Budget = () => {
                                       {supplier.amount && (
                                         <div className="flex items-center gap-2 font-medium">
                                           <DollarSign className="h-4 w-4 text-muted-foreground" />
-                                          <span>{parseFloat(supplier.amount).toLocaleString("fr-CA")} $</span>
+                                          <span>{formatCurrency(parseFloat(supplier.amount))}</span>
                                         </div>
                                       )}
                                     </div>
@@ -1148,7 +1164,7 @@ const Budget = () => {
                           </div>
                           <div className="text-right shrink-0 min-w-[140px]">
                             <div className="text-base font-bold">
-                              {Math.round(contingence * 0.90).toLocaleString()} $ - {Math.round(contingence * 1.10).toLocaleString()} $
+                              {formatCurrency(Math.round(contingence * 0.90))} - {formatCurrency(Math.round(contingence * 1.10))}
                             </div>
                           </div>
                         </div>
@@ -1163,7 +1179,7 @@ const Budget = () => {
                           </div>
                           <div className="text-right shrink-0 min-w-[140px]">
                             <div className="text-base font-bold">
-                              {Math.round(taxes * 0.90).toLocaleString()} $ - {Math.round(taxes * 1.10).toLocaleString()} $
+                              {formatCurrency(Math.round(taxes * 0.90))} - {formatCurrency(Math.round(taxes * 1.10))}
                             </div>
                           </div>
                         </div>
@@ -1200,7 +1216,7 @@ const Budget = () => {
                         ))}
                       </Pie>
                       <Tooltip
-                        formatter={(value: number, name: string) => [`${value.toLocaleString()} $`, name]}
+                        formatter={(value: number, name: string) => [formatCurrency(value), name]}
                         labelFormatter={() => ''}
                         contentStyle={{
                           backgroundColor: 'hsl(var(--card))',
@@ -1232,7 +1248,7 @@ const Budget = () => {
                         </div>
                         <div className="flex items-center gap-2 shrink-0 text-sm">
                           <span className="text-muted-foreground">{percentage}%</span>
-                          <span className="font-medium">{entry.value.toLocaleString()} $</span>
+                          <span className="font-medium">{formatCurrency(entry.value)}</span>
                         </div>
                       </div>
                     );

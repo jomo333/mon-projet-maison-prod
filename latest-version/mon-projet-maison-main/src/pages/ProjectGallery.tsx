@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { formatCurrency } from "@/lib/i18n";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Header } from "@/components/layout/Header";
@@ -1169,7 +1170,7 @@ const ProjectGallery = () => {
                                 </div>
                                 {trade.amount && (
                                   <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                    {parseFloat(trade.amount).toLocaleString('fr-CA', { style: 'currency', currency: 'CAD' })}
+                                    {formatCurrency(parseFloat(trade.amount))}
                                   </Badge>
                                 )}
                               </div>
