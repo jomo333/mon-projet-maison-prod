@@ -121,6 +121,8 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
   const [isUploadingManualImage, setIsUploadingManualImage] = useState(false);
   const manualImageInputRef = useRef<HTMLInputElement>(null);
   
+  // Analyse détaillée (modèle IA plus précis)
+  const [detailedAnalysis, setDetailedAnalysis] = useState(false);
   // Plan mode state - now supports multiple plans
   const [selectedPlanUrls, setSelectedPlanUrls] = useState<string[]>([]);
   // Used to avoid re-importing the same existing file (especially PDFs that we convert)
@@ -651,6 +653,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
         const body = {
           mode: "manual",
           lang: currentLang,
+          detailed: detailedAnalysis,
           ...manualData,
           stylePhotoUrls: stylePhotoUrls.length > 0 ? stylePhotoUrls : undefined,
           referenceImageUrls: manualReferenceImages.length > 0 ? manualReferenceImages : undefined,
@@ -783,6 +786,7 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
           const body = {
             mode: "plan",
             lang: currentLang,
+            detailed: detailedAnalysis,
             imageUrls: batchUrls,
             finishQuality,
             manualContext: manualData,
@@ -1682,6 +1686,21 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
         </Tabs>
 
         <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="detailed-analysis"
+                checked={detailedAnalysis}
+                onCheckedChange={(checked) => setDetailedAnalysis(checked === true)}
+              />
+              <label
+                htmlFor="detailed-analysis"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              >
+                {t("planAnalyzer.detailedAnalysis", "Analyse détaillée (plus précise)")}
+              </label>
+            </div>
+          </div>
           <Button 
             onClick={handleAnalyze} 
             disabled={isAnalyzing || (analysisMode === "plan" && selectedPlanUrls.length === 0)}

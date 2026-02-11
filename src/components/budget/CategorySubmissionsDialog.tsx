@@ -66,6 +66,7 @@ import { SubCategoryManager, type SubCategory } from "./SubCategoryManager";
 import { TaskSubmissionsTabs, getTasksForCategory } from "./TaskSubmissionsTabs";
 import { DIYItemsTable, type DIYItem, type DIYSupplierQuote, type DIYSelectedSupplier } from "./DIYItemsTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CategorySubmissionsDialogProps {
   open: boolean;
@@ -152,6 +153,7 @@ export function CategorySubmissionsDialog({
   const [spent, setSpent] = useState(Math.round(currentSpent * 100) / 100 + "");
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [detailedSoumissionsAnalysis, setDetailedSoumissionsAnalysis] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
   const [extractedSuppliers, setExtractedSuppliers] = useState<ExtractedContact[]>([]);
   const [selectedSupplierIndex, setSelectedSupplierIndex] = useState<number | null>(null);
@@ -1117,6 +1119,7 @@ export function CategorySubmissionsDialog({
             tradeName: categoryName,
             tradeDescription: item.name,
             documents,
+            detailed: detailedSoumissionsAnalysis,
           }),
         }
       );
@@ -1399,6 +1402,7 @@ export function CategorySubmissionsDialog({
               file_name: d.file_name,
               file_url: d.file_url,
             })),
+            detailed: detailedSoumissionsAnalysis,
           }),
         }
       );
@@ -2714,19 +2718,31 @@ export function CategorySubmissionsDialog({
                   />
                   {documents.length > 0 && (
                     hasFullManagement ? (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        disabled={analyzing}
-                        onClick={analyzeDocuments}
-                      >
-                        {analyzing ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Sparkles className="h-4 w-4" />
-                        )}
-                        <span className="ml-2">{t("budget.analyzeAI", "Analyser IA")}</span>
-                      </Button>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="detailed-soumissions"
+                            checked={detailedSoumissionsAnalysis}
+                            onCheckedChange={(checked) => setDetailedSoumissionsAnalysis(checked === true)}
+                          />
+                          <label htmlFor="detailed-soumissions" className="text-xs cursor-pointer whitespace-nowrap">
+                            {t("budget.detailedAnalysis", "Analyse détaillée")}
+                          </label>
+                        </div>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          disabled={analyzing}
+                          onClick={analyzeDocuments}
+                        >
+                          {analyzing ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Sparkles className="h-4 w-4" />
+                          )}
+                          <span className="ml-2">{t("budget.analyzeAI", "Analyser IA")}</span>
+                        </Button>
+                      </div>
                     ) : (
                       <TooltipProvider>
                         <Tooltip>

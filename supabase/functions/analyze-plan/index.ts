@@ -1626,6 +1626,7 @@ async function analyzeOnePageWithClaude({
   projectType,
   manualContext,
   lang,
+  detailed = false,
 }: {
   apiKey: string;
   imageBase64: string;
@@ -1644,7 +1645,11 @@ async function analyzeOnePageWithClaude({
     additionalNotes?: string;
   };
   lang?: string;
+  detailed?: boolean;
 }): Promise<string | null> {
+  // Toujours Claude Sonnet 4 20250514 ; mode détaillé = plus de tokens pour une réponse plus complète
+  const visionModel = 'claude-sonnet-4-20250514';
+  const visionMaxTokens = detailed ? 4096 : 2800;
   const isEnglish = String(lang || "fr").startsWith("en");
   const languageInstruction = isEnglish
     ? "IMPORTANT: Respond ONLY in ENGLISH. All strings in the JSON (resume_projet, recommandations, elements_manquants, ambiguites, incoherences, categories.nom, items.description) must be in English."
@@ -1805,8 +1810,8 @@ ${hasManualContext ? '- PERSONNALISE les estimations selon les spécifications c
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2800,
+        model: visionModel,
+        max_tokens: visionMaxTokens,
         temperature: 0,
         system: `${SYSTEM_PROMPT_EXTRACTION}\n\n${languageInstruction}`,
         messages: [
@@ -2371,7 +2376,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { mode, finishQuality = "standard", stylePhotoUrls = [], imageUrls: bodyImageUrls, imageUrl: singleImageUrl, lang = "fr" } = body;
+    const { mode, finishQuality = "standard", stylePhotoUrls = [], imageUrls: bodyImageUrls, imageUrl: singleImageUrl, lang = "fr", detailed: bodyDetailed = false } = body;
     
     // Handle MERGE mode first (no API key needed - just data processing)
     if (mode === "merge") {
@@ -2850,6 +2855,7 @@ Retourne le JSON structuré COMPLET.`;
           projectType: manualContext.projectType || body.projectType,
           manualContext: manualContext,
           lang,
+          detailed: bodyDetailed,
         });
 
         const parsed = pageText ? safeParseJsonFromModel(pageText) : null;

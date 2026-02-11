@@ -508,11 +508,12 @@ serve(async (req) => {
   }
 
   try {
-    const { tradeName, tradeDescription, documents, budgetPrevu } = await req.json() as {
+    const { tradeName, tradeDescription, documents, budgetPrevu, detailed = false } = await req.json() as {
       tradeName: string;
       tradeDescription: string;
       documents: SoumissionDoc[];
       budgetPrevu?: number;
+      detailed?: boolean;
     };
 
     if (!documents || documents.length === 0) {
@@ -605,7 +606,7 @@ Calcule l'écart en % et signale si le budget est dépassé.
 ` : ''}`
     });
 
-    console.log("Sending request to Gemini 2.5 Flash with", messageParts.length, "parts");
+    console.log("Sending request to", soumissionsModel, "with", messageParts.length, "parts");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -614,7 +615,7 @@ Calcule l'écart en % et signale si le budget est dépassé.
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: soumissionsModel,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: messageParts }
