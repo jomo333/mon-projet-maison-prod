@@ -6,9 +6,36 @@ import logoSlim from "@/assets/logo-slim.png";
 import blueprintBgFr from "@/assets/blueprint-background-fr.jpg";
 import blueprintBgEn from "@/assets/blueprint-background-en.jpg";
 
+const HERO_DEFAULTS = {
+  fr: {
+    title: "Votre copilote pour",
+    titleHighlight: "construire en toute confiance",
+    badge: "Pour les autoconstructeurs au Québec",
+    subtitle: "Planifiez, budgétisez et gérez votre projet de construction résidentielle. Évitez les dépassements de coûts et les erreurs de coordination.",
+    cta: "Démarrer mon projet",
+    ctaSecondary: "Voir les forfaits",
+    feature1: "Conforme au Code du bâtiment",
+    feature2: "Économisez du temps",
+    feature3: "Réduisez les coûts",
+  },
+  en: {
+    title: "Your co-pilot for",
+    titleHighlight: "building with confidence",
+    badge: "For owner-builders in Quebec",
+    subtitle: "Plan, budget, and manage your residential construction project. Avoid cost overruns and coordination errors.",
+    cta: "Start my project",
+    ctaSecondary: "View plans",
+    feature1: "Building Code compliant",
+    feature2: "Save time",
+    feature3: "Reduce costs",
+  },
+} as const;
+
 export function BlueprintHero() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const lang = i18n.language?.startsWith("en") ? "en" : "fr";
+  const defaults = HERO_DEFAULTS[lang];
   const blueprintBg = i18n.language?.startsWith("en") ? blueprintBgEn : blueprintBgFr;
 
   const features = [
@@ -18,7 +45,7 @@ export function BlueprintHero() {
   ];
 
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-navy">
+    <section className="relative min-h-[90vh] flex flex-col justify-center overflow-hidden bg-navy py-16 sm:py-20">
       {/* Blueprint background image */}
       <div 
         className="absolute inset-0 pointer-events-none"
@@ -31,7 +58,7 @@ export function BlueprintHero() {
         }}
       />
 
-      <div className="container relative z-10">
+      <div className="container relative z-10 px-4 sm:px-6">
         <div className="mx-auto max-w-4xl text-center">
           {/* Logo slim */}
           <div className="mb-8 flex justify-center animate-fade-up">
@@ -45,18 +72,18 @@ export function BlueprintHero() {
           {/* Badge */}
           <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-2.5 text-sm text-slate-200 backdrop-blur-sm border border-white/10 animate-fade-up-delay-1">
             <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-            {t("hero.badge")}
+            {t("hero.badge", defaults.badge)}
           </div>
 
-          {/* Main heading */}
+          {/* Main heading - fallbacks to avoid missing words on deploy */}
           <h1 className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl xl:text-5xl animate-fade-up-delay-1">
-            {t("hero.title")}
-            <span className="block mt-2 text-slate-300">{t("hero.titleHighlight")}</span>
+            {t("hero.title", defaults.title)}
+            <span className="block mt-2 text-slate-300">{t("hero.titleHighlight", defaults.titleHighlight)}</span>
           </h1>
 
           {/* Subtitle */}
           <p className="mt-8 text-lg text-slate-400 sm:text-xl max-w-2xl mx-auto leading-relaxed animate-fade-up-delay-2">
-            {t("hero.subtitle")}
+            {t("hero.subtitle", defaults.subtitle)}
           </p>
 
           {/* CTAs */}
@@ -67,7 +94,7 @@ export function BlueprintHero() {
               onClick={() => navigate("/start")}
               className="w-full sm:w-auto text-base"
             >
-              {t("hero.cta")}
+              {t("hero.cta", defaults.cta)}
               <ArrowRight className="h-5 w-5" />
             </Button>
             <Button 
@@ -76,7 +103,7 @@ export function BlueprintHero() {
               className="w-full sm:w-auto border-slate-600 bg-transparent text-slate-200 hover:bg-white/10 hover:text-white"
               onClick={() => navigate("/forfaits")}
             >
-              {t("hero.ctaSecondary")}
+              {t("hero.ctaSecondary", defaults.ctaSecondary)}
             </Button>
           </div>
 
@@ -84,6 +111,7 @@ export function BlueprintHero() {
           <div className="mt-16 flex flex-wrap items-center justify-center gap-6 md:gap-10">
             {features.map((feature, index) => {
               const Icon = feature.icon;
+              const defaultLabel = feature.textKey === "hero.feature1" ? defaults.feature1 : feature.textKey === "hero.feature2" ? defaults.feature2 : defaults.feature3;
               return (
                 <div 
                   key={feature.textKey} 
@@ -93,7 +121,7 @@ export function BlueprintHero() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10">
                     <Icon className="h-4 w-4 text-amber-500" />
                   </div>
-                  <span className="text-sm font-medium">{t(feature.textKey)}</span>
+                  <span className="text-sm font-medium">{t(feature.textKey, defaultLabel)}</span>
                 </div>
               );
             })}

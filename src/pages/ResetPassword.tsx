@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/landing/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +14,6 @@ import { supabase } from "@/integrations/supabase/client";
 const ResetPassword = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { updatePassword } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -78,16 +76,24 @@ const ResetPassword = () => {
       return;
     }
 
-    if (password.length < 6) {
-      toast.error(t("auth.minChars"));
+    if (password.length < 8) {
+      toast.error(t("auth.minChars8") || "Minimum 8 caractères (recommandé)");
       return;
     }
 
     setIsLoading(true);
 
-    const { error } = await updatePassword(password);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error(t("auth.invalidLinkDesc") + " " + t("auth.requestNewLink"));
+      setIsLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
+      console.error("Erreur updatePassword:", error);
       toast.error(t("common.error") + ": " + error.message);
     } else {
       setIsSuccess(true);
@@ -218,7 +224,7 @@ const ResetPassword = () => {
                   </button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {t("auth.minChars")}
+                  {t("auth.minChars8") || "Minimum 8 caractères (recommandé)"}
                 </p>
               </div>
               <div className="space-y-2">
@@ -232,7 +238,7 @@ const ResetPassword = () => {
                     placeholder="••••••••"
                     className="pl-10 pr-10"
                     required
-                    minLength={6}
+                    minLength={8}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
