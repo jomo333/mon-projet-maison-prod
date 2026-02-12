@@ -190,24 +190,23 @@ export function GenerateScheduleDialog({
         toast.success(t("generateSchedule.success") || "Échéancier créé avec succès", { duration: 5000 });
       }
 
-      // Appeler onSuccess avant de fermer pour invalider les queries
-      console.log("[GenerateScheduleDialog] Calling onSuccess callback");
+      // Appeler onSuccess (sans attendre pour éviter les timeouts)
       if (onSuccess) {
         try {
-          await onSuccess();
-          console.log("[GenerateScheduleDialog] onSuccess callback completed");
-        } catch (error) {
-          console.error("[GenerateScheduleDialog] Error in onSuccess callback:", error);
+          onSuccess(); // ne pas await pour ne pas bloquer
+        } catch (e) {
+          console.error("[GenerateScheduleDialog] onSuccess error:", e);
         }
-      } else {
-        console.warn("[GenerateScheduleDialog] onSuccess callback not provided");
       }
-      
-      // Attendre un peu avant de fermer pour que les queries soient invalidées et les toasts s'affichent
+
+      onOpenChange(false);
+
+      // Redirection directe vers la page échéancier pour voir les données
+      const scheduleUrl = `/#/echeancier?project=${projectId}`;
+      console.log("[GenerateScheduleDialog] Redirecting to", scheduleUrl);
       setTimeout(() => {
-        console.log("[GenerateScheduleDialog] Closing dialog");
-        onOpenChange(false);
-      }, 1500);
+        window.location.href = scheduleUrl;
+      }, 800);
     } catch (error) {
       console.error("[GenerateScheduleDialog] Error generating schedule:", error);
       const errorMessage = error instanceof Error ? error.message : t("errors.generic");

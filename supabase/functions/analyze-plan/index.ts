@@ -1615,6 +1615,41 @@ async function fetchImageAsBase64(url: string, maxBytes: number): Promise<{ base
   }
 }
 
+// Fonction pour déterminer la complexité du projet
+function determineProjectComplexity(
+  squareFootage: number,
+  detailed: boolean,
+  projectType?: string
+): 'haute' | 'moyenne' | 'faible' {
+  // Projets complexes : grande superficie, mode détaillé, ou projets commerciaux
+  if (squareFootage > 3000 || detailed || projectType?.toLowerCase().includes('commercial')) {
+    return 'haute';
+  }
+  // Projets moyens : superficie entre 1500 et 3000 pi²
+  if (squareFootage > 1500) {
+    return 'moyenne';
+  }
+  // Petits projets : moins de 1500 pi²
+  return 'faible';
+}
+
+// Fonction pour sélectionner le modèle Claude selon la complexité
+function selectClaudeModel(complexity: 'haute' | 'moyenne' | 'faible'): string {
+  switch (complexity) {
+    case 'haute':
+      // Projets complexes/chers → Précision maximale avec Opus 4.5
+      return 'claude-opus-4-5-20251101';
+    case 'moyenne':
+      // Projets moyens → Bon équilibre avec Sonnet 4.5
+      return 'claude-sonnet-4-5';
+    case 'faible':
+      // Petits projets → Économique avec Haiku 4.5
+      return 'claude-haiku-4-5';
+    default:
+      return 'claude-sonnet-4-5'; // Par défaut
+  }
+}
+
 async function analyzeOnePageWithClaude({
   apiKey,
   imageBase64,
@@ -1647,9 +1682,13 @@ async function analyzeOnePageWithClaude({
   lang?: string;
   detailed?: boolean;
 }): Promise<string | null> {
-  // Toujours Claude Sonnet 4 20250514 ; mode détaillé = plus de tokens pour une réponse plus complète
-  const visionModel = 'claude-sonnet-4-20250514';
+  // Routage intelligent du modèle selon la complexité du projet
+  const squareFootage = manualContext?.squareFootage || 0;
+  const projectComplexity = determineProjectComplexity(squareFootage, detailed, projectType);
+  const visionModel = selectClaudeModel(projectComplexity);
   const visionMaxTokens = detailed ? 4096 : 2800;
+  
+  console.log(`📊 Modèle choisi: ${visionModel} (complexité: ${projectComplexity}, superficie: ${squareFootage} pi²)`);
   const isEnglish = String(lang || "fr").startsWith("en");
   const languageInstruction = isEnglish
     ? "IMPORTANT: Respond ONLY in ENGLISH. All strings in the JSON (resume_projet, recommandations, elements_manquants, ambiguites, incoherences, categories.nom, items.description) must be in English."
@@ -2949,6 +2988,13 @@ Retourne le JSON structuré COMPLET.`;
       // Manual mode or no images: text-only call
       console.log('Analyzing with Claude (text mode)...');
       
+      // Déterminer le modèle pour le mode texte selon la complexité
+      const manualContext = body.manualContext || {};
+      const squareFootage = manualContext.squareFootage || 0;
+      const projectComplexity = determineProjectComplexity(squareFootage, bodyDetailed, body.projectType);
+      const textModel = selectClaudeModel(projectComplexity);
+      console.log(`📊 Modèle texte choisi: ${textModel} (complexité: ${projectComplexity}, superficie: ${squareFootage} pi²)`);
+      
       const textResp = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -2957,7 +3003,7 @@ Retourne le JSON structuré COMPLET.`;
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: textModel,
           max_tokens: 8192,
           temperature: 0,
           system: `${SYSTEM_PROMPT_EXTRACTION}\n\n${lang?.startsWith("en")
