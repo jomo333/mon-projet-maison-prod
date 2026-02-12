@@ -190,7 +190,7 @@ const Budget = () => {
   });
 
   // Fetch budget categories for selected project
-  const { data: savedBudget = [] } = useQuery({
+  const { data: savedBudget = [], isLoading: savedBudgetLoading } = useQuery({
     queryKey: ["project-budget", selectedProjectId],
     queryFn: async () => {
       if (!selectedProjectId) return [];
@@ -278,8 +278,9 @@ const Budget = () => {
     return categoryName.toLowerCase().replace(/\s+/g, "-");
   };
 
-  // Load saved budget when project changes
+  // Load saved budget when project changes (ne pas écraser pendant le chargement)
   useEffect(() => {
+    if (savedBudgetLoading) return; // Ne pas toucher aux catégories pendant le chargement
     if (savedBudget && savedBudget.length > 0) {
       // IMPORTANT: Always display categories in the construction-step order.
       // For legacy projects, this also allows new steps (e.g. "Excavation")
@@ -315,10 +316,10 @@ const Budget = () => {
       // These will be ignored (not displayed) - only current step categories are shown
       setBudgetCategories(rerouteFoundationItems(ordered));
     } else if (selectedProjectId) {
-      // Reset to default if no budget saved
+      // Reset to default only when loaded and no budget saved for this project
       setBudgetCategories(defaultCategories);
     }
-  }, [savedBudget, selectedProjectId]);
+  }, [savedBudget, selectedProjectId, savedBudgetLoading]);
 
   // Auto-select first project if available (and sync URL)
   useEffect(() => {
@@ -758,7 +759,21 @@ const Budget = () => {
               projectId={selectedProjectId}
               autoSelectPlanTab={autoAnalyze && !autoManual}
               autoSelectManualTab={autoManual}
-              onGenerateSchedule={() => setShowScheduleDialog(true)}
+              onGenerateSchedule={async () => {
+                if (!selectedProjectId) {
+                  toast.error(t("toasts.noProjectSelected"));
+                  return;
+                }
+                // Enregistrer le budget avant d'ouvrir le dialogue pour qu'il persiste au changement de page
+                try {
+                  await saveBudgetMutation.mutateAsync(budgetCategories);
+                } catch (e) {
+                  console.error("Save budget before schedule:", e);
+                  toast.error(t("toasts.budgetSaveError"));
+                  return;
+                }
+                setShowScheduleDialog(true);
+              }}
               besoinsNote={besoinsNoteFromUrl}
               prefillProjectType={prefillProjectType}
               prefillFloors={prefillFloors}

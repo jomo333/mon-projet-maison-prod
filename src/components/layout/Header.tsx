@@ -50,9 +50,9 @@ export function Header() {
   // Get project ID from URL if available
   const projectId = searchParams.get("project") || location.pathname.match(/\/projet\/([^/]+)/)?.[1];
   
-  // Helper to get href with project param
+  // Helper to get href with project param (conserver le projet actif entre les pages)
   const getHref = (href: string) => {
-    if (projectId && (href === "/galerie" || href === "/dashboard" || href === "/budget")) {
+    if (projectId && (href === "/galerie" || href === "/dashboard" || href === "/budget" || href === "/echeancier")) {
       return `${href}?project=${projectId}`;
     }
     return href;
