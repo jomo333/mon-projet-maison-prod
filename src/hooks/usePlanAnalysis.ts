@@ -286,7 +286,13 @@ export function usePlanAnalysis(options: UsePlanAnalysisOptions = {}) {
       
       if (error) throw error;
       
+      if (!data) {
+        throw new Error("Réponse vide du serveur (status 2xx mais pas de données)");
+      }
+      
       if (data.success && data.data) {
+        // Refresh limits after successful analysis
+        await refetchLimits();
         return {
           success: true,
           analysis: data.data as BudgetAnalysis,
@@ -294,10 +300,7 @@ export function usePlanAnalysis(options: UsePlanAnalysisOptions = {}) {
         };
       }
       
-      // Refresh limits after successful analysis
-      await refetchLimits();
-      
-      throw new Error(data.error || "Échec de l'analyse");
+      throw new Error(data?.error || "Échec de l'analyse - " + JSON.stringify(data).slice(0, 200));
     } catch (error) {
       console.error("Manual analysis error:", error);
       throw error;
@@ -383,11 +386,21 @@ export function usePlanAnalysis(options: UsePlanAnalysisOptions = {}) {
           continue;
         }
 
+        if (!data) {
+          console.error(`Batch ${batchIndex + 1}: réponse vide`);
+          toast.error(`Lot ${batchIndex + 1}: réponse vide du serveur`);
+          failedBatches++;
+          continue;
+        }
+
         if (data.success && data.rawAnalysis) {
           batchResults.push(data.rawAnalysis as BatchResult);
         } else if (data.success && data.data) {
           batchResults.push({ categories: data.data.categories, extraction: data.data } as BatchResult);
         } else {
+          const errMsg = data?.error || "Format de réponse invalide";
+          console.error(`Batch ${batchIndex + 1}:`, errMsg, data);
+          toast.error(`Lot ${batchIndex + 1}: ${errMsg}`);
           failedBatches++;
         }
       }
@@ -413,7 +426,7 @@ export function usePlanAnalysis(options: UsePlanAnalysisOptions = {}) {
 
       if (batchResults.length === 1 && totalBatches === 1) {
         // Single batch - try server merge for proper formatting
-        const { data: finalData } = await supabase.functions.invoke("analyze-plan", {
+        const { data: finalData, error: finalError } = await supabase.functions.invoke("analyze-plan", {
           body: {
             mode: "merge",
             batchResults,
@@ -424,9 +437,12 @@ export function usePlanAnalysis(options: UsePlanAnalysisOptions = {}) {
           },
         });
 
-        if (finalData?.success && finalData?.data) {
+        if (finalError) {
+          console.error("Merge error:", finalError);
+        } else if (finalData?.success && finalData?.data) {
           finalAnalysis = finalData.data as BudgetAnalysis;
         } else {
+          console.warn("Merge failed or empty response, using local transform");
           finalAnalysis = transformRawToAnalysis(batchResults[0], totalImages);
         }
       } else {
@@ -446,10 +462,14 @@ export function usePlanAnalysis(options: UsePlanAnalysisOptions = {}) {
 
         if (mergeError) throw mergeError;
 
+        if (!mergedData) {
+          throw new Error("Réponse vide du serveur lors de la fusion (status 2xx mais pas de données)");
+        }
+
         if (mergedData?.success && mergedData?.data) {
           finalAnalysis = mergedData.data as BudgetAnalysis;
         } else {
-          throw new Error(mergedData?.error || "Échec de la fusion des résultats");
+          throw new Error(mergedData?.error || "Échec de la fusion des résultats - " + JSON.stringify(mergedData).slice(0, 200));
         }
       }
 

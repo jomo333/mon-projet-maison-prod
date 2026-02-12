@@ -661,11 +661,14 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
 
         const { data, error } = await supabase.functions.invoke('analyze-plan', { body });
         if (error) throw error;
+        if (!data) {
+          throw new Error("Réponse vide du serveur (status 2xx mais pas de données)");
+        }
         if (data.success && data.data) {
           setAnalysis(data.data);
           toast.success(t("toasts.analysisDone"));
         } else {
-          throw new Error(data.error || "Échec de l'analyse");
+          throw new Error(data?.error || "Échec de l'analyse - " + JSON.stringify(data).slice(0, 200));
         }
       } else {
         // IMPORTANT: older plans already stored can be huge PNGs and will trigger backend WORKER_LIMIT.
@@ -807,16 +810,24 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
             console.error(`Batch ${batchIndex + 1} error:`, error);
             toast.error(t("toasts.batchError", { batch: batchIndex + 1, message: error.message }));
             failedBatches++;
-            // Continue avec les autres lots
+            continue;
+          }
+          
+          if (!data) {
+            console.error(`Batch ${batchIndex + 1}: réponse vide`);
+            toast.error(`Lot ${batchIndex + 1}: réponse vide du serveur`);
+            failedBatches++;
             continue;
           }
           
           if (data.success && data.rawAnalysis) {
             batchResults.push(data.rawAnalysis as BatchResultRaw);
           } else if (data.success && data.data) {
-            // Fallback si rawAnalysis n'est pas disponible
             batchResults.push({ categories: data.data.categories, extraction: data.data } as BatchResultRaw);
           } else {
+            const errMsg = data?.error || "Format de réponse invalide";
+            console.error(`Batch ${batchIndex + 1}:`, errMsg, data);
+            toast.error(`Lot ${batchIndex + 1}: ${errMsg}`);
             failedBatches++;
           }
         }
@@ -913,10 +924,14 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
           
           if (mergeError) throw mergeError;
           
+          if (!mergedData) {
+            throw new Error("Réponse vide du serveur lors de la fusion (status 2xx mais pas de données)");
+          }
+          
           if (mergedData?.success && mergedData?.data) {
             setAnalysis(mergedData.data);
           } else {
-            throw new Error(mergedData?.error || "Échec de la fusion des résultats");
+            throw new Error(mergedData?.error || "Échec de la fusion des résultats - " + JSON.stringify(mergedData).slice(0, 200));
           }
         }
         

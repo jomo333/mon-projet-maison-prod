@@ -3058,13 +3058,16 @@ Retourne le JSON structuré COMPLET.`;
     const transformedData = transformToLegacyFormat(budgetData, finishQuality, lang);
 
     console.log('Analysis complete - categories:', transformedData.categories?.length || 0);
+    const responsePayload = { success: true, data: transformedData, rawAnalysis: budgetData };
+    const responseJson = JSON.stringify(responsePayload);
+    console.log('Response size:', Math.round(responseJson.length / 1024), 'KB');
 
     // Increment AI usage for the user
     await incrementAiUsage(authHeader);
     await trackAiAnalysisUsage(authHeader, 'analyze-plan', null);
 
     return new Response(
-      JSON.stringify({ success: true, data: transformedData, rawAnalysis: budgetData }),
+      responseJson,
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
