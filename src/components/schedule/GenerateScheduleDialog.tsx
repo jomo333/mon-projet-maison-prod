@@ -34,7 +34,7 @@ interface GenerateScheduleDialogProps {
   createSchedule: (data: any) => Promise<any>;
   calculateEndDate: (startDate: string, days: number) => string;
   generateAlerts: (schedule: any) => Promise<void>;
-  onSuccess?: () => void;
+  onSuccess?: () => Promise<void> | void;
 }
 
 // Durées par défaut
@@ -187,18 +187,27 @@ export function GenerateScheduleDialog({
       if (result.warning) {
         toast.warning(result.warning, { duration: 8000 });
       } else {
-        toast.success(t("generateSchedule.success") || "Échéancier créé avec succès");
+        toast.success(t("generateSchedule.success") || "Échéancier créé avec succès", { duration: 5000 });
       }
 
       // Appeler onSuccess avant de fermer pour invalider les queries
       console.log("[GenerateScheduleDialog] Calling onSuccess callback");
-      onSuccess?.();
+      if (onSuccess) {
+        try {
+          await onSuccess();
+          console.log("[GenerateScheduleDialog] onSuccess callback completed");
+        } catch (error) {
+          console.error("[GenerateScheduleDialog] Error in onSuccess callback:", error);
+        }
+      } else {
+        console.warn("[GenerateScheduleDialog] onSuccess callback not provided");
+      }
       
-      // Attendre un peu avant de fermer pour que les queries soient invalidées
+      // Attendre un peu avant de fermer pour que les queries soient invalidées et les toasts s'affichent
       setTimeout(() => {
         console.log("[GenerateScheduleDialog] Closing dialog");
         onOpenChange(false);
-      }, 500);
+      }, 1500);
     } catch (error) {
       console.error("[GenerateScheduleDialog] Error generating schedule:", error);
       const errorMessage = error instanceof Error ? error.message : t("errors.generic");

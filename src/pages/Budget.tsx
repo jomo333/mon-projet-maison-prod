@@ -775,11 +775,66 @@ const Budget = () => {
               createSchedule={(data) => createScheduleAsync(data as any)}
               calculateEndDate={calculateEndDate}
               generateAlerts={generateAlerts}
-              onSuccess={() => {
-                // Invalider seulement les queries spécifiques après création de l'échéancier
-                queryClient.invalidateQueries({ queryKey: ["project-schedules", selectedProjectId] });
-                // Ne pas invalider user-projects ici pour éviter que les projets disparaissent
-                // Le budget est déjà sauvegardé, pas besoin de recharger les projets
+              onSuccess={async () => {
+                // Invalider les queries après création de l'échéancier
+                console.log("[Budget] Schedule created successfully, invalidating queries");
+                
+                // Invalider avec refetch pour forcer le rechargement
+                await queryClient.invalidateQueries({ 
+                  queryKey: ["project-schedules", selectedProjectId],
+                  refetchType: 'active'
+                });
+                await queryClient.invalidateQueries({ 
+                  queryKey: ["project-alerts", selectedProjectId],
+                  refetchType: 'active'
+                });
+                
+                console.log("[Budget] Queries invalidated, schedules should be visible now");
+                
+                // Vérifier que les schedules sont bien dans la base de données
+                const { data: verifySchedules, error: verifyError } = await supabase
+                  .from("project_schedules")
+                  .select("id, step_id, step_name, start_date, end_date")
+                  .eq("project_id", selectedProjectId)
+                  .order("start_date", { ascending: true })
+                  .limit(10);
+                
+                if (verifyError) {
+                  console.error("[Budget] Error verifying schedules:", verifyError);
+                } else {
+                  console.log(`[Budget] Verification: Found ${verifySchedules?.length || 0} schedules in database`);
+                  if (verifySchedules && verifySchedules.length > 0) {
+                    console.log("[Budget] First few schedules:", verifySchedules.slice(0, 3));
+                  } else {
+                    console.warn("[Budget] No schedules found in database after creation!");
+                  }
+                }
+                
+                // Afficher un toast avec navigation automatique après 2 secondes si pas d'action de l'utilisateur
+                const scheduleCount = verifySchedules?.length || 0;
+                
+                if (scheduleCount > 0) {
+                  toast.success(
+                    `Échéancier créé avec succès ! ${scheduleCount} étape(s) planifiée(s).`,
+                    {
+                      action: {
+                        label: "Voir l'échéancier",
+                        onClick: () => {
+                          window.location.href = `/#/echeancier?project=${selectedProjectId}`;
+                        }
+                      },
+                      duration: 8000
+                    }
+                  );
+                  
+                  // Navigation automatique après 3 secondes si l'utilisateur ne clique pas
+                  setTimeout(() => {
+                    console.log("[Budget] Auto-navigating to schedule page");
+                    window.location.href = `/#/echeancier?project=${selectedProjectId}`;
+                  }, 3000);
+                } else {
+                  toast.error("Erreur : L'échéancier n'a pas pu être créé. Vérifiez les logs de la console.");
+                }
               }}
             />
           )}

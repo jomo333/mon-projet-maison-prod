@@ -261,12 +261,17 @@ export async function generateProjectSchedule(
   targetStartDate: string,
   startingStepId?: string
 ): Promise<{ success: boolean; error?: string; warning?: string }> {
+  console.log(`[generateProjectSchedule] Starting schedule generation for project ${projectId}, target date: ${targetStartDate}, starting step: ${startingStepId || 'planification'}`);
+  
   try {
     // Récupérer les durées de référence et la superficie du projet
+    console.log("[generateProjectSchedule] Fetching reference durations and project square footage...");
     const [referenceDurations, projectSquareFootage] = await Promise.all([
       getReferenceDurations(),
       getProjectSquareFootage(projectId),
     ]);
+    
+    console.log(`[generateProjectSchedule] Reference durations: ${referenceDurations.size} entries, Project square footage: ${projectSquareFootage || 'N/A'} pi²`);
 
     // Trouver l'index de départ dans constructionSteps
     // Si startingStepId est fourni, l'utiliser directement
@@ -431,8 +436,15 @@ export async function generateProjectSchedule(
       previousStepEndDates[exteriorStep.id] = exteriorEndDate;
     }
 
+    // Vérifier qu'il y a des étapes à insérer
+    if (schedulesToInsert.length === 0) {
+      console.warn("[generateProjectSchedule] No schedule entries to insert!");
+      return { success: false, error: "Aucune étape à planifier. Vérifiez que le projet a des étapes valides." };
+    }
+
     // Utiliser upsert pour éviter les doublons
     console.log(`[generateProjectSchedule] Inserting ${schedulesToInsert.length} schedule entries for project ${projectId}`);
+    console.log("[generateProjectSchedule] First few entries:", schedulesToInsert.slice(0, 3));
     
     const { data, error } = await supabase
       .from("project_schedules")
@@ -443,10 +455,28 @@ export async function generateProjectSchedule(
 
     if (error) {
       console.error("[generateProjectSchedule] Error inserting schedules:", error);
-      return { success: false, error: error.message };
+      console.error("[generateProjectSchedule] Error details:", JSON.stringify(error, null, 2));
+      return { success: false, error: error.message || "Erreur lors de l'insertion dans la base de données" };
     }
 
-    console.log(`[generateProjectSchedule] Successfully inserted schedules. Data:`, data);
+    console.log(`[generateProjectSchedule] Successfully inserted ${schedulesToInsert.length} schedules`);
+    console.log(`[generateProjectSchedule] Upsert result data:`, data);
+
+    // Vérifier que les schedules ont bien été créés en interrogeant la base de données
+    const { data: verifyData, error: verifyError } = await supabase
+      .from("project_schedules")
+      .select("id, step_id, step_name, start_date, end_date")
+      .eq("project_id", projectId)
+      .order("start_date", { ascending: true });
+
+    if (verifyError) {
+      console.warn("[generateProjectSchedule] Error verifying schedules (non-critical):", verifyError);
+    } else {
+      console.log(`[generateProjectSchedule] Verification: Found ${verifyData?.length || 0} schedules in database for project ${projectId}`);
+      if (verifyData && verifyData.length > 0) {
+        console.log("[generateProjectSchedule] First few schedules:", verifyData.slice(0, 3));
+      }
+    }
 
     // Générer les alertes pour chaque étape
     try {
