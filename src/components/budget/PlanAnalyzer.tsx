@@ -1019,10 +1019,17 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
       toast.success(t("toasts.budgetApplied"));
       
       // Propose de générer l'échéancier si callback disponible
+      console.log('[PlanAnalyzer] handleApplyBudget - onGenerateSchedule:', !!onGenerateSchedule, 'projectId:', projectId);
       if (onGenerateSchedule && projectId) {
+        console.log('[PlanAnalyzer] Opening schedule dialog...');
         setTimeout(() => {
           onGenerateSchedule();
         }, 500);
+      } else {
+        console.warn('[PlanAnalyzer] Cannot open schedule dialog - missing:', {
+          onGenerateSchedule: !onGenerateSchedule,
+          projectId: !projectId
+        });
       }
     }
   };

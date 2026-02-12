@@ -500,7 +500,8 @@ const Budget = () => {
   };
 
   // Check if budget has been analyzed (not just default categories)
-  const hasAnalyzedBudget = savedBudget && savedBudget.length > 0;
+  // Check both savedBudget and budgetCategories to handle immediate updates
+  const hasAnalyzedBudget = (savedBudget && savedBudget.length > 0) || budgetCategories.some(cat => cat.budget > 0);
   
   const totalBudget = budgetCategories.reduce((acc, cat) => acc + cat.budget, 0);
   const totalSpent = budgetCategories.reduce((acc, cat) => acc + cat.spent, 0);
@@ -527,7 +528,12 @@ const Budget = () => {
 
     // Auto-save if a project is selected
     if (selectedProjectId) {
-      saveBudgetMutation.mutate(mapped);
+      saveBudgetMutation.mutate(mapped, {
+        onSuccess: () => {
+          // Invalidate queries to refresh savedBudget
+          queryClient.invalidateQueries({ queryKey: ["project-budget", selectedProjectId] });
+        }
+      });
     }
   };
 
