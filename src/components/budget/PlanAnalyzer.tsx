@@ -36,12 +36,14 @@ async function invokeAnalyzePlan(body: any): Promise<{ data: any; error: any }> 
     const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
     const { data: { session } } = await supabase.auth.getSession();
     
+    // Use session token if available, otherwise use anon key
+    const authToken = session?.access_token || supabaseKey;
+    
     const response = await fetch(`${supabaseUrl}/functions/v1/analyze-plan`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseKey}`,
-        ...(session?.access_token && { 'x-supabase-auth': session.access_token }),
+        'Authorization': `Bearer ${authToken}`,
       },
       body: JSON.stringify(body),
     });
