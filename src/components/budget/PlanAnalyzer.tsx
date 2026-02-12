@@ -1013,18 +1013,20 @@ export const PlanAnalyzer = forwardRef<PlanAnalyzerHandle, PlanAnalyzerProps>(fu
     }
   };
 
-  const handleApplyBudget = () => {
+  const handleApplyBudget = async () => {
     if (analysis?.categories) {
+      // Sauvegarder le budget d'abord
       onBudgetGenerated(analysis.categories);
       toast.success(t("toasts.budgetApplied"));
+      
+      // Attendre un peu pour que la sauvegarde soit complétée
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Propose de générer l'échéancier si callback disponible
       console.log('[PlanAnalyzer] handleApplyBudget - onGenerateSchedule:', !!onGenerateSchedule, 'projectId:', projectId);
       if (onGenerateSchedule && projectId) {
         console.log('[PlanAnalyzer] Opening schedule dialog...');
-        setTimeout(() => {
-          onGenerateSchedule();
-        }, 500);
+        onGenerateSchedule();
       } else {
         console.warn('[PlanAnalyzer] Cannot open schedule dialog - missing:', {
           onGenerateSchedule: !onGenerateSchedule,

@@ -388,8 +388,13 @@ const Budget = () => {
       if (updateError) throw updateError;
     },
     onSuccess: () => {
+      // Invalider seulement les queries spécifiques au projet, pas toutes les queries
       queryClient.invalidateQueries({ queryKey: ["project-budget", selectedProjectId] });
-      queryClient.invalidateQueries({ queryKey: ["user-projects"] });
+      // Invalider user-projects seulement pour mettre à jour total_budget, pas pour supprimer
+      queryClient.invalidateQueries({ 
+        queryKey: ["user-projects", user?.id],
+        exact: true // Exact match pour éviter d'invalider d'autres queries
+      });
       toast.success(t("toasts.budgetSaved"));
     },
     onError: (error) => {
@@ -526,14 +531,26 @@ const Budget = () => {
     }));
     setBudgetCategories(mapped);
 
-    // Auto-save if a project is selected
+    // Auto-save if a project is selected - attendre la sauvegarde avant de continuer
     if (selectedProjectId) {
-      saveBudgetMutation.mutate(mapped, {
-        onSuccess: () => {
-          // Invalidate queries to refresh savedBudget
-          queryClient.invalidateQueries({ queryKey: ["project-budget", selectedProjectId] });
-        }
-      });
+      try {
+        await new Promise<void>((resolve, reject) => {
+          saveBudgetMutation.mutate(mapped, {
+            onSuccess: () => {
+              // Invalidate queries to refresh savedBudget
+              queryClient.invalidateQueries({ queryKey: ["project-budget", selectedProjectId] });
+              resolve();
+            },
+            onError: (error) => {
+              console.error("Error saving budget:", error);
+              reject(error);
+            }
+          });
+        });
+      } catch (error) {
+        console.error("Failed to save budget:", error);
+        // Ne pas bloquer le processus même si la sauvegarde échoue
+      }
     }
   };
 
@@ -758,6 +775,12 @@ const Budget = () => {
               createSchedule={(data) => createScheduleAsync(data as any)}
               calculateEndDate={calculateEndDate}
               generateAlerts={generateAlerts}
+              onSuccess={() => {
+                // Invalider seulement les queries spécifiques après création de l'échéancier
+                queryClient.invalidateQueries({ queryKey: ["project-schedules", selectedProjectId] });
+                // Ne pas invalider user-projects ici pour éviter que les projets disparaissent
+                // Le budget est déjà sauvegardé, pas besoin de recharger les projets
+              }}
             />
           )}
 

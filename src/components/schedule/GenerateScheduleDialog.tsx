@@ -170,11 +170,16 @@ export function GenerateScheduleDialog({
       if (result.warning) {
         toast.warning(result.warning, { duration: 8000 });
       } else {
-        toast.success(t("toasts.saved"));
+        toast.success(t("generateSchedule.success") || "Échéancier créé avec succès");
       }
 
+      // Appeler onSuccess avant de fermer pour invalider les queries
       onSuccess?.();
-      onOpenChange(false);
+      
+      // Attendre un peu avant de fermer pour que les queries soient invalidées
+      setTimeout(() => {
+        onOpenChange(false);
+      }, 300);
     } catch (error) {
       console.error("Error generating schedule:", error);
       toast.error(t("errors.generic"));
