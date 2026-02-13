@@ -36,6 +36,7 @@ export default function Plans() {
   const { user } = useAuth();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
 
   const benefits = [
     {
@@ -88,11 +89,33 @@ export default function Plans() {
     fetchPlans();
   }, []);
 
-  const handleChoosePlan = (planId: string) => {
-    if (user) {
-      navigate("/mes-projets");
-    } else {
+  const handleChoosePlan = async (planId: string, billingCycle: "monthly" | "yearly" = "monthly") => {
+    if (!user) {
       navigate("/auth");
+      return;
+    }
+    const plan = plans.find((p) => p.id === planId);
+    const amount = billingCycle === "yearly" && plan?.price_yearly != null ? plan.price_yearly : plan?.price_monthly ?? 0;
+    if (amount === 0) {
+      navigate("/mes-projets");
+      return;
+    }
+    setCheckoutLoading(planId);
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout-session", {
+        body: { plan_id: planId, billing_cycle: billingCycle },
+      });
+      if (error) throw new Error(error.message || "Erreur lors de la création de la session");
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+      throw new Error(data?.error || "Aucune URL de paiement reçue");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erreur inattendue";
+      alert(message);
+    } finally {
+      setCheckoutLoading(null);
     }
   };
 
@@ -255,9 +278,19 @@ export default function Plans() {
                         variant={plan.is_featured ? "accent" : "outline"}
                         className="w-full"
                         size="lg"
+                        disabled={checkoutLoading !== null}
                       >
-                        {plan.price_monthly === 0 ? t("pricing.discovery.cta") : t("plans.choosePlan")}
-                        <ArrowRight className="h-4 w-4 ml-2" />
+                        {checkoutLoading === plan.id ? (
+                          <>
+                            <span className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent inline-block mr-2" />
+                            {t("plans.redirectingToCheckout")}
+                          </>
+                        ) : (
+                          <>
+                            {plan.price_monthly === 0 ? t("pricing.discovery.cta") : t("plans.choosePlan")}
+                            <ArrowRight className="h-4 w-4 ml-2" />
+                          </>
+                        )}
                       </Button>
                     </CardFooter>
                   </Card>

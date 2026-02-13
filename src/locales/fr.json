@@ -1569,6 +1569,7 @@
     "benefit5Title": "Décider au bon moment",
     "benefit5Desc": "Prenez des décisions plus réfléchies, sans pression.",
     "choosePlan": "Choisir ce forfait",
+    "redirectingToCheckout": "Redirection vers le paiement…",
     "startFree": "Commencer gratuitement",
     "tiers": {
       "decouverte": {
@@ -2979,12 +2980,33 @@
     "lastUpdated": "Dernière mise à jour : Janvier 2026",
     "title": "Politique de",
     "titleHighlight": "Cookies",
-    "subtitle": "Cette politique explique comment Monprojetmaison.ca utilise les cookies et technologies similaires.",
+    "description": "Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et offrir du contenu pertinent. Vous pouvez accepter, refuser ou personnaliser vos préférences à tout moment.",
+    "learnMore": "En savoir plus",
+    "accept": "Accepter",
+    "refuse": "Refuser",
+    "customize": "Paramétrer",
+    "settingsTitle": "Paramètres des cookies",
+    "settingsDescription": "Personnalisez vos préférences en matière de cookies. Vous pouvez modifier ces paramètres à tout moment.",
+    "viewPolicy": "Consulter notre politique de cookies",
+    "required": "Requis",
+    "refuseAll": "Tout refuser",
+    "acceptAll": "Tout accepter",
+    "savePreferences": "Enregistrer mes choix",
     "managePreferences": "Gérer mes préférences de cookies",
     "contactTitle": "Questions sur les cookies",
     "contactDescription": "Si vous avez des questions concernant notre utilisation des cookies, veuillez nous contacter :",
     "email": "Courriel",
     "copyright": "© {{year}} Monprojetmaison.ca. Tous droits réservés.",
+    "categories": {
+      "essential": "Cookies essentiels",
+      "essentialDesc": "Ces cookies sont nécessaires au fonctionnement du site et ne peuvent pas être désactivés. Ils permettent notamment la navigation, la sécurité et l'authentification.",
+      "analytics": "Cookies analytiques",
+      "analyticsDesc": "Ces cookies nous aident à comprendre comment les visiteurs utilisent le site en collectant des informations de manière anonyme. Ils permettent d'améliorer nos services.",
+      "marketing": "Cookies marketing",
+      "marketingDesc": "Ces cookies sont utilisés pour vous présenter des publicités pertinentes et mesurer l'efficacité de nos campagnes marketing.",
+      "functional": "Cookies fonctionnels",
+      "functionalDesc": "Ces cookies permettent d'améliorer les fonctionnalités du site, comme la mémorisation de vos préférences (langue, région, etc.)."
+    },
     "sections": {
       "1": {
         "title": "Qu'est-ce qu'un cookie ?",
