@@ -387,44 +387,52 @@
   },
   "pricing": {
     "title": "A plan tailored to your needs",
-    "subtitle": "Start free, upgrade when you're ready",
+    "subtitle": "Start free, upgrade to a paid plan when you're ready",
     "mostPopular": "Most popular",
     "discovery": {
       "name": "Discovery",
-      "description": "Explore basic features for free.",
+      "description": "To understand and structure the basics of your project",
       "cta": "Start for free",
       "features": [
-        "1 active project",
-        "Read-only guide and structure",
-        "10 GB storage",
-        "1 AI analysis per month"
+        "1 project",
+        "Construction guide (read-only)",
+        "Schedule (read-only)",
+        "Budget (read-only)",
+        "Upload of 2 documents",
+        "Access to building code (1 search)",
+        "1 AI analysis per month",
+        "Storage: 1 GB"
       ]
     },
     "essential": {
       "name": "Essential",
-      "description": "The complete tool to manage your owner-build.",
+      "description": "To actively manage your owner-building project",
       "cta": "Choose Essential",
       "features": [
-        "1 active project",
-        "Editable schedule and budget",
-        "Complete guide with tracking",
-        "10 GB storage",
-        "10 AI analyses per month"
+        "1 project",
+        "10 AI analyses per month",
+        "Editable schedule",
+        "Editable budget",
+        "Document upload and management",
+        "Full access to construction guide",
+        "Access to building code (reasonable searches)",
+        "Storage: 5 GB"
       ]
     },
     "complete": {
       "name": "Complete Management",
-      "description": "Advanced management with specialized analyses.",
+      "description": "For complete control of your build from A to Z",
       "cta": "Choose Complete Management",
       "features": [
         "1 active project",
-        "Everything in Essential",
-        "Step-by-step quote analysis",
+        "25 AI analyses per month",
+        "Quote analysis by construction step",
         "RBQ license and tax number verification",
-        "Conflict alerts and subcontractor reminders",
-        "Critical omission and inconsistency detection",
-        "10 GB storage",
-        "25 AI analyses per month"
+        "Conflict alerts and subcontractor contact reminders",
+        "Detection of inconsistencies and critical omissions",
+        "Complete document centralization",
+        "Extended access to building code",
+        "Storage: 10 GB"
       ]
     }
   },
@@ -1570,6 +1578,10 @@
     "benefit5Desc": "Make more thoughtful decisions, without pressure.",
     "choosePlan": "Choose this plan",
     "redirectingToCheckout": "Redirecting to checkout…",
+    "billingMonthly": "Monthly",
+    "billingYearly": "Yearly",
+    "billingYearlyOnePayment": "One-time payment for the year",
+    "billingMonthsFree": "months free",
     "startFree": "Start for free",
     "tiers": {
       "decouverte": {

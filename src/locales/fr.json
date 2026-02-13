@@ -387,44 +387,52 @@
   },
   "pricing": {
     "title": "Un forfait adapté à vos besoins",
-    "subtitle": "Commencez gratuitement, passez à Pro quand vous êtes prêt",
+    "subtitle": "Commencez gratuitement, passez à un forfait payant quand vous êtes prêt",
     "mostPopular": "Le plus populaire",
     "discovery": {
       "name": "Découverte",
-      "description": "Pour explorer les fonctionnalités de base gratuitement.",
+      "description": "Pour comprendre et structurer les bases du projet",
       "cta": "Commencer gratuitement",
       "features": [
-        "1 projet actif",
-        "Guide et structure en lecture seule",
-        "Stockage 10 Go",
-        "1 analyse IA par mois"
+        "1 projet",
+        "Guide de construction (consultation seulement)",
+        "Échéancier (lecture seule)",
+        "Budget (lecture seule)",
+        "Téléversement de 2 documents",
+        "Accès au code du bâtiment (1 recherche)",
+        "1 analyse IA par mois",
+        "Stockage : 1 Go"
       ]
     },
     "essential": {
       "name": "Essentiel",
-      "description": "L'outil complet pour gérer votre autoconstruction.",
+      "description": "Pour gérer activement son autoconstruction",
       "cta": "Choisir Essentiel",
       "features": [
-        "1 projet actif",
-        "Échéancier et budget modifiables",
-        "Guide complet avec suivi",
-        "Stockage 10 Go",
-        "10 analyses IA par mois"
+        "1 projet",
+        "10 analyses IA par mois",
+        "Échéancier modifiable",
+        "Budget modifiable",
+        "Téléversement et gestion des documents",
+        "Accès complet au guide de construction",
+        "Accès au code du bâtiment (recherches raisonnables)",
+        "Stockage : 5 Go"
       ]
     },
     "complete": {
       "name": "Gestion complète",
-      "description": "Pour une gestion avancée avec analyses spécialisées.",
+      "description": "Pour une autoconstruction maîtrisée de A à Z",
       "cta": "Choisir Gestion complète",
       "features": [
         "1 projet actif",
-        "Tout du forfait Essentiel",
+        "25 analyses IA par mois",
         "Analyse des soumissions par étape",
         "Vérification des licences RBQ et numéros de taxes",
-        "Alertes de conflits et rappels sous-traitants",
-        "Détection d'incohérences et oublis critiques",
-        "Stockage 10 Go",
-        "25 analyses IA par mois"
+        "Alertes de conflits et rappels de contact sous-traitants",
+        "Détection des incohérences et oublis critiques",
+        "Centralisation complète des documents",
+        "Accès étendu au code du bâtiment",
+        "Stockage : 10 Go"
       ]
     }
   },
@@ -1570,6 +1578,10 @@
     "benefit5Desc": "Prenez des décisions plus réfléchies, sans pression.",
     "choosePlan": "Choisir ce forfait",
     "redirectingToCheckout": "Redirection vers le paiement…",
+    "billingMonthly": "Mensuel",
+    "billingYearly": "Annuel",
+    "billingYearlyOnePayment": "Paiement unique pour l'année",
+    "billingMonthsFree": "mois gratuits",
     "startFree": "Commencer gratuitement",
     "tiers": {
       "decouverte": {

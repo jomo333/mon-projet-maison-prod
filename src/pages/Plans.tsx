@@ -37,6 +37,7 @@ export default function Plans() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
 
   const benefits = [
     {
@@ -102,15 +103,24 @@ export default function Plans() {
     }
     setCheckoutLoading(planId);
     try {
+      const { data: sessionData, error: sessionError } = await supabase.auth.refreshSession();
+      if (sessionError || !sessionData?.session) {
+        alert("Session expirée. Veuillez vous reconnecter.");
+        navigate("/auth");
+        return;
+      }
       const { data, error } = await supabase.functions.invoke("create-checkout-session", {
         body: { plan_id: planId, billing_cycle: billingCycle },
       });
-      if (error) throw new Error(error.message || "Erreur lors de la création de la session");
+      if (error) {
+        const msg = (data as { error?: string })?.error || error.message || "Erreur lors de la création de la session";
+        throw new Error(msg);
+      }
       if (data?.url) {
         window.location.href = data.url;
         return;
       }
-      throw new Error(data?.error || "Aucune URL de paiement reçue");
+      throw new Error((data as { error?: string })?.error || "Aucune URL de paiement reçue");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erreur inattendue";
       alert(message);
@@ -211,7 +221,39 @@ export default function Plans() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+              <>
+                {/* Billing cycle selector */}
+                <div className="flex justify-center mb-10">
+                  <div className="inline-flex rounded-lg border border-border bg-muted/50 p-1">
+                    <button
+                      type="button"
+                      onClick={() => setBillingCycle("monthly")}
+                      className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                        billingCycle === "monthly"
+                          ? "bg-background text-foreground shadow"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {t("plans.billingMonthly")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBillingCycle("yearly")}
+                      className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                        billingCycle === "yearly"
+                          ? "bg-background text-foreground shadow"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {t("plans.billingYearly")}
+                      <span className="ml-1.5 text-primary text-xs font-normal">
+                        (−2 {t("plans.billingMonthsFree")})
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
                 {plans.map((plan) => (
                   <Card
                     key={plan.id}
@@ -239,21 +281,35 @@ export default function Plans() {
                     <CardContent className="flex-1 space-y-6">
                       {/* Pricing */}
                       <div className="text-center">
-                        <div className="flex items-baseline justify-center gap-1">
-                          <span className="text-4xl font-bold text-foreground">
-                            {formatPrice(plan.price_monthly)}
-                          </span>
-                          <span className="text-muted-foreground">{t("common.perMonth")}</span>
-                        </div>
-                        {plan.price_yearly && plan.price_yearly > 0 && (
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {t("common.or")} {formatPrice(plan.price_yearly)}{t("common.perYear")}
-                            {plan.price_monthly > 0 && (
-                              <span className="text-primary ml-1">
-                                {t("common.freeMonths")}
+                        {billingCycle === "monthly" ? (
+                          <>
+                            <div className="flex items-baseline justify-center gap-1">
+                              <span className="text-4xl font-bold text-foreground">
+                                {formatPrice(plan.price_monthly)}
                               </span>
+                              <span className="text-muted-foreground">{t("common.perMonth")}</span>
+                            </div>
+                            {plan.price_yearly != null && plan.price_yearly > 0 && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {t("common.or")} {formatPrice(plan.price_yearly)}{t("common.perYear")}
+                                <span className="text-primary ml-1">{t("common.freeMonths")}</span>
+                              </p>
                             )}
-                          </p>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex items-baseline justify-center gap-1">
+                              <span className="text-4xl font-bold text-foreground">
+                                {formatPrice(plan.price_yearly ?? plan.price_monthly * 12)}
+                              </span>
+                              <span className="text-muted-foreground">{t("common.perYear")}</span>
+                            </div>
+                            {plan.price_yearly != null && plan.price_yearly > 0 && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {t("plans.billingYearlyOnePayment")}
+                              </p>
+                            )}
+                          </>
                         )}
                       </div>
 
@@ -295,7 +351,8 @@ export default function Plans() {
                     </CardFooter>
                   </Card>
                 ))}
-              </div>
+                </div>
+              </>
             )}
 
             {/* Reassuring text */}

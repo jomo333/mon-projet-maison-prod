@@ -26,6 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Search, Download, CreditCard, ExternalLink } from "lucide-react";
+import { formatCurrency } from "@/lib/i18n";
 
 interface Payment {
   id: string;
@@ -282,7 +283,7 @@ export default function AdminPayments() {
                               {payment.profiles?.display_name || "Utilisateur"}
                             </TableCell>
                             <TableCell className="font-medium">
-                              {formatCurrency(payment.amount, payment.currency)}
+                              {formatCurrency(payment.amount)}
                             </TableCell>
                             <TableCell>
                               <Badge

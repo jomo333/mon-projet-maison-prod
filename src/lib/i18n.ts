@@ -33,23 +33,16 @@ export const getDateLocale = () => {
   return i18n.language === 'en' ? enCA : fr;
 };
 
-// Helper to format currency with consistent formatting:
-// - Always 2 decimal places (e.g., 30 833,00 $)
-// - Space as thousands separator for French, comma for English
-// - Rounded to 2 decimals
+// Helper to format currency: always "30 267,00 $" (space = thousands, comma = decimals)
+// Used everywhere: tableaux, analyses, budget, etc.
 export const formatCurrency = (amount: number) => {
-  // Round to 2 decimal places
   const rounded = Math.round(amount * 100) / 100;
-  const locale = i18n.language === 'en' ? 'en-CA' : 'fr-CA';
-  
-  // Format with 2 decimal places
-  const formatted = new Intl.NumberFormat(locale, {
+  const formatted = new Intl.NumberFormat("fr-CA", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
+    useGrouping: true,
   }).format(rounded);
-  
-  // Add currency symbol in the correct position
-  return i18n.language === 'en' ? `$${formatted}` : `${formatted} $`;
+  return `${formatted} $`;
 };
 
 // Helper to format numbers
