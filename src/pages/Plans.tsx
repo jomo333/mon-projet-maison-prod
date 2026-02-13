@@ -109,8 +109,10 @@ export default function Plans() {
         navigate("/auth");
         return;
       }
+      const accessToken = sessionData.session.access_token;
       const { data, error } = await supabase.functions.invoke("create-checkout-session", {
         body: { plan_id: planId, billing_cycle: billingCycle },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (error) {
         const msg = (data as { error?: string })?.error || error.message || "Erreur lors de la création de la session";
